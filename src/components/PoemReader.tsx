@@ -15,6 +15,7 @@ import {
   type ReadingDirection,
   persistReadingDirection,
   readStoredReadingDirection,
+  verticalReadingScrollLeft,
 } from "@/lib/reading-direction";
 import { cn } from "@/lib/utils";
 
@@ -55,17 +56,38 @@ export function PoemReader({
       return;
     }
 
+    let cancelled = false;
+
     function alignVerticalReadingStart() {
       if (!viewport) {
         return;
       }
-      const overflow = viewport.scrollWidth - viewport.clientWidth;
-      viewport.scrollLeft = overflow > 0 ? overflow : 0;
+      const scrollLeft = verticalReadingScrollLeft(
+        viewport.scrollWidth,
+        viewport.clientWidth,
+      );
+      viewport.scrollTo({ left: scrollLeft, behavior: "instant" });
     }
 
     alignVerticalReadingStart();
     const frame = requestAnimationFrame(alignVerticalReadingStart);
-    return () => cancelAnimationFrame(frame);
+
+    const observer = new ResizeObserver(() => {
+      alignVerticalReadingStart();
+    });
+    observer.observe(viewport);
+
+    void document.fonts.ready.then(() => {
+      if (!cancelled) {
+        alignVerticalReadingStart();
+      }
+    });
+
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+    };
   }, [direction, lines.length]);
 
   function handleDirectionChange(value: string) {
@@ -98,6 +120,31 @@ export function PoemReader({
       </div>
     </>
   );
+
+  const collationFooter =
+    poem.base || poem.variants.length > 0 ? (
+      <footer className="poem-reader__collation">
+        {poem.base && <p className="poem-reader__base">底本：{poem.base}</p>}
+        {poem.variants.length > 0 && (
+          <ol className="poem-reader__variants">
+            {poem.variants.map((variant) => (
+              <li
+                key={`${variant.line}-${variant.at ?? ""}-${variant.note}`}
+                className="poem-reader__variant"
+              >
+                <span className="poem-reader__variant-mark" aria-hidden="true">
+                  {variant.line}
+                </span>
+                {variant.at && (
+                  <span className="poem-reader__variant-at">「{variant.at}」</span>
+                )}
+                <span>{variant.note}</span>
+              </li>
+            ))}
+          </ol>
+        )}
+      </footer>
+    ) : null;
 
   return (
     <main
@@ -138,40 +185,16 @@ export function PoemReader({
             <Breadcrumbs items={breadcrumbs} />
             {direction === "vertical" ? (
               <div ref={viewportRef} className="poem-reader__columns-viewport">
-                <div className="poem-reader__columns">{poemContent}</div>
+                <div className="poem-reader__columns">
+                  {poemContent}
+                  {collationFooter}
+                </div>
               </div>
             ) : (
-              poemContent
-            )}
-            {(poem.base || poem.variants.length > 0) && (
-              <footer className="poem-reader__collation">
-                {poem.base && (
-                  <p className="poem-reader__base">底本：{poem.base}</p>
-                )}
-                {poem.variants.length > 0 && (
-                  <ol className="poem-reader__variants">
-                    {poem.variants.map((variant) => (
-                      <li
-                        key={`${variant.line}-${variant.at ?? ""}-${variant.note}`}
-                        className="poem-reader__variant"
-                      >
-                        <span
-                          className="poem-reader__variant-mark"
-                          aria-hidden="true"
-                        >
-                          {variant.line}
-                        </span>
-                        {variant.at && (
-                          <span className="poem-reader__variant-at">
-                            「{variant.at}」
-                          </span>
-                        )}
-                        <span>{variant.note}</span>
-                      </li>
-                    ))}
-                  </ol>
-                )}
-              </footer>
+              <>
+                {poemContent}
+                {collationFooter}
+              </>
             )}
             <PoemNav prev={prev} next={next} />
           </div>

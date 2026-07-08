@@ -6,6 +6,7 @@ import {
   parseReadingDirection,
   persistReadingDirection,
   readStoredReadingDirection,
+  verticalReadingScrollLeft,
 } from "./reading-direction";
 
 describe("parseReadingDirection", () => {
@@ -68,5 +69,16 @@ describe("overlaySideForReadingDirection", () => {
   it("opens overlays to the left in vertical mode", () => {
     expect(overlaySideForReadingDirection("vertical", "popover")).toBe("left");
     expect(overlaySideForReadingDirection("vertical", "tooltip")).toBe("left");
+  });
+});
+
+describe("verticalReadingScrollLeft", () => {
+  it("returns zero when content fits the viewport", () => {
+    expect(verticalReadingScrollLeft(320, 320)).toBe(0);
+    expect(verticalReadingScrollLeft(280, 320)).toBe(0);
+  });
+
+  it("returns overflow when content is wider than the viewport", () => {
+    expect(verticalReadingScrollLeft(800, 320)).toBe(480);
   });
 });

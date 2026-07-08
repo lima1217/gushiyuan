@@ -40,3 +40,12 @@ export function overlaySideForReadingDirection(
 
   return kind === "popover" ? "bottom" : "top";
 }
+
+/** 竖排阅读起点：列自右向左，滚动到最右端。 */
+export function verticalReadingScrollLeft(
+  scrollWidth: number,
+  clientWidth: number,
+): number {
+  const overflow = scrollWidth - clientWidth;
+  return overflow > 0 ? overflow : 0;
+}

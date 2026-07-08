@@ -107,7 +107,11 @@ body {
   padding-top: calc(var(--poem-control-clearance) + env(safe-area-inset-top, 0px));
   padding-bottom: clamp(2rem, 6vh, 4rem);
   padding-inline: calc(
-    var(--poem-control-clearance) + env(safe-area-inset-inline, 0px)
+    var(--poem-control-clearance) +
+      max(
+        env(safe-area-inset-left, 0px),
+        env(safe-area-inset-right, 0px)
+      )
   );
 }
 
@@ -533,7 +537,6 @@ body {
   overflow-y: hidden;
   overscroll-behavior-x: contain;
   -webkit-overflow-scrolling: touch;
-  scroll-behavior: smooth;
 }
 
 .poem-reader--vertical .poem-reader__columns {
@@ -599,9 +602,11 @@ body {
 
 .poem-reader--vertical .poem-reader__lineage-mark {
   display: inline-block;
-  margin-inline-start: 0;
-  margin-block-start: 0.4em;
+  margin-inline-start: 0.35em;
+  margin-block-start: 0;
   vertical-align: baseline;
+  writing-mode: inherit;
+  text-orientation: upright;
 }
 
 .poem-reader--vertical .poem-reader__char--key {
@@ -616,10 +621,39 @@ body {
 }
 
 .poem-reader--vertical .poem-reader__collation {
-  margin-top: 2rem;
-  writing-mode: horizontal-tb;
-  text-align: left;
-  max-width: min(100%, 36rem);
+  display: inline-block;
+  margin-top: 0;
+  margin-inline-start: clamp(1.5em, 4.5vw, 2em);
+  padding-top: 0;
+  padding-inline-start: clamp(1em, 3vw, 1.5em);
+  border-top: none;
+  border-inline-start: 1px solid color-mix(in srgb, var(--color-ink) 8%, transparent);
+  text-align: start;
+  font-size: clamp(0.75rem, 2.2vw, 0.8125rem);
+  line-height: 1.85;
+  letter-spacing: 0.05em;
+  text-orientation: upright;
+  vertical-align: top;
+  max-width: none;
+}
+
+.poem-reader--vertical .poem-reader__variants {
+  margin-top: 1em;
+}
+
+.poem-reader--vertical .poem-reader__variant {
+  display: inline-block;
+  vertical-align: top;
+}
+
+.poem-reader--vertical .poem-reader__variant + .poem-reader__variant {
+  margin-top: 0;
+  margin-block-start: 1.25em;
+}
+
+.poem-reader--vertical .poem-reader__variant-mark,
+.poem-reader--vertical .poem-reader__variant-at {
+  display: inline;
 }
 
 .poem-reader--vertical .poem-nav {
