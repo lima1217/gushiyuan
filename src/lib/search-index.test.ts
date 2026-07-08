@@ -16,24 +16,13 @@ describe("buildSearchIndex", () => {
     ).toBe(true);
   });
 
-  it("lists distinct authors with a representative poem slug", () => {
+  it("lists distinct authors with volume metadata", () => {
     const index = buildSearchIndex();
     const caoCao = index.authors.find((a) => a.authorSlug === "cao-cao");
 
     expect(caoCao?.name).toBe("曹操");
     expect(caoCao?.volume).toBe("wei");
-    expect(caoCao?.poemSlug).toBeTruthy();
-    expect(index.poems.some((p) => p.slug === caoCao?.poemSlug)).toBe(true);
-  });
-
-  it("picks the first poem by title as the author landing page", () => {
-    const index = buildSearchIndex();
-    const caoCao = index.authors.find((a) => a.authorSlug === "cao-cao");
-    const caoCaoPoems = index.poems
-      .filter((poem) => poem.authorSlug === "cao-cao")
-      .sort((a, b) => a.title.localeCompare(b.title, "zh-CN"));
-
-    expect(caoCao?.poemSlug).toBe(caoCaoPoems[0]?.slug);
+    expect(index.poems.some((p) => p.authorSlug === "cao-cao")).toBe(true);
   });
 });
 
@@ -73,7 +62,6 @@ describe("filterSearchIndex", () => {
         name: `作者${index}`,
         authorSlug: `author-${index}`,
         volume: "han",
-        poemSlug: `poem-${index}`,
       })),
     };
 

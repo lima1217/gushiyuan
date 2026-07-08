@@ -115,7 +115,9 @@ export function SiteSearch({ index }: SiteSearchProps) {
                   <CommandItem
                     key={`author-${author.authorSlug}`}
                     value={author.name}
-                    onSelect={() => navigate(`/p/${author.poemSlug}`)}
+                    onSelect={() =>
+                      navigate(`/v/${author.volume}/${author.authorSlug}`)
+                    }
                   >
                     <span>{author.name}</span>
                   </CommandItem>

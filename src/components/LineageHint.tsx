@@ -24,12 +24,12 @@ export function LineageHint({ clue, lineIndex, children }: LineageHintProps) {
       triggerId={`line-${lineIndex}`}
       ariaLabel="查看此句的源流线索"
       triggerLabel={
-        <>
+        <span className="poem-reader__line-inner">
           {children}
           <span className="poem-reader__lineage-mark" aria-hidden="true">
             源
           </span>
-        </>
+        </span>
       }
       triggerClassName="poem-reader__line poem-reader__line--lineage"
       contentClassName="lineage-hint__content w-72 max-w-[min(18rem,calc(100vw-2rem))] flex-col items-stretch gap-2 rounded-lg border border-[color-mix(in_srgb,var(--color-ink)_10%,transparent)] bg-[var(--color-paper)] px-3 py-2.5 text-[var(--color-ink)] shadow-md ring-0"

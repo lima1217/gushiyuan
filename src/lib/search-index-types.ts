@@ -11,7 +11,6 @@ export type SearchIndexAuthor = {
   name: string;
   authorSlug: string;
   volume: string;
-  poemSlug: string;
 };
 
 export type SearchIndex = {

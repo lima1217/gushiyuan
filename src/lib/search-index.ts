@@ -34,9 +34,7 @@ export function buildSearchIndex(): SearchIndex {
     .sort((a, b) => a.title.localeCompare(b.title, "zh-CN"));
 
   const authorMap = new Map<string, SearchIndexAuthor>();
-  for (const poem of [...allPoems].sort((a, b) =>
-    a.title.localeCompare(b.title, "zh-CN"),
-  )) {
+  for (const poem of allPoems) {
     if (authorMap.has(poem.authorSlug)) {
       continue;
     }
@@ -45,7 +43,6 @@ export function buildSearchIndex(): SearchIndex {
       name: poem.author,
       authorSlug: poem.authorSlug,
       volume: poem.volume,
-      poemSlug: poem.slug,
     });
   }
 
