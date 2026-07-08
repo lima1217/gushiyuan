@@ -4,6 +4,11 @@ author: 汉乐府
 authorSlug: han-yue-fu
 dynasty: 汉
 volume: han
+base: 《古诗源·卷三》沈德潜（摘录）
+variants:
+  - line: 3
+    at: 自名为
+    note: 一作「自言名」；逯钦立《先秦汉魏晋南北朝诗》同底本作「自名为」。
 ---
 
 日出东南隅，照我秦氏楼。

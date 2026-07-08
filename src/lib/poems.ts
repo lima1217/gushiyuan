@@ -21,9 +21,17 @@ export type AuthorMeta = {
   name: string;
 };
 
+export type PoemVariant = {
+  line: number;
+  at?: string;
+  note: string;
+};
+
 export type Poem = PoemMeta & {
   body: string;
   keyChars: string[];
+  base?: string;
+  variants: PoemVariant[];
 };
 
 const CONTENT_DIR = path.join(process.cwd(), "content");
@@ -56,6 +64,48 @@ function parseKeyChars(data: Record<string, unknown>): string[] {
     .filter(Boolean);
 }
 
+function parseBase(data: Record<string, unknown>): string | undefined {
+  const value = data.base;
+  if (value === undefined || value === null) {
+    return undefined;
+  }
+
+  const base = String(value).trim();
+  return base || undefined;
+}
+
+function parseVariants(data: Record<string, unknown>): PoemVariant[] {
+  const value = data.variants;
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.flatMap((item) => {
+    if (!item || typeof item !== "object") {
+      return [];
+    }
+
+    const record = item as Record<string, unknown>;
+    const line = record.line;
+    const note = record.note;
+
+    if (typeof line !== "number" || line < 1 || !Number.isInteger(line)) {
+      return [];
+    }
+
+    if (typeof note !== "string" || note.trim() === "") {
+      return [];
+    }
+
+    const at =
+      typeof record.at === "string" && record.at.trim()
+        ? record.at.trim()
+        : undefined;
+
+    return [{ line, ...(at ? { at } : {}), note: note.trim() }];
+  });
+}
+
 function parsePoemFile(slug: string): Poem {
   const filePath = path.join(POEMS_DIR, `${slug}.md`);
   const raw = fs.readFileSync(filePath, "utf-8");
@@ -70,6 +120,8 @@ function parsePoemFile(slug: string): Poem {
     volume: requireField(data, "volume", slug),
     body: content.trim(),
     keyChars: parseKeyChars(data),
+    base: parseBase(data),
+    variants: parseVariants(data),
   };
 }
 
@@ -130,4 +182,39 @@ export function getPoemsByKeyChar(char: string): PoemMeta[] {
   return getAllPoems()
     .filter((poem) => getPoemBySlug(poem.slug)?.keyChars.includes(char))
     .sort((a, b) => a.title.localeCompare(b.title, "zh-CN"));
+}
+
+export function getPoemsByVolume(volumeSlug: string): PoemMeta[] {
+  const poems: PoemMeta[] = [];
+
+  for (const author of getAuthorsByVolume(volumeSlug)) {
+    poems.push(...getPoemsByAuthor(volumeSlug, author.slug));
+  }
+
+  return poems;
+}
+
+export function getAdjacentPoemsInVolume(slug: string): {
+  prev?: PoemMeta;
+  next?: PoemMeta;
+} {
+  const poem = getPoemBySlug(slug);
+  if (!poem) {
+    return {};
+  }
+
+  const volumePoems = getPoemsByVolume(poem.volume);
+  const index = volumePoems.findIndex((item) => item.slug === slug);
+  if (index === -1) {
+    return {};
+  }
+
+  return {
+    prev: index > 0 ? volumePoems[index - 1] : undefined,
+    next: index < volumePoems.length - 1 ? volumePoems[index + 1] : undefined,
+  };
+}
+
+export function isVolumeEmpty(volumeSlug: string): boolean {
+  return getAuthorsByVolume(volumeSlug).length === 0;
 }

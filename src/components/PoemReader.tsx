@@ -87,6 +87,31 @@ export function PoemReader({ poem, keyCharacters, lineageByLine }: PoemReaderPro
             />
           ))}
         </div>
+        {(poem.base || poem.variants.length > 0) && (
+          <footer className="poem-reader__collation">
+            {poem.base && (
+              <p className="poem-reader__base">底本：{poem.base}</p>
+            )}
+            {poem.variants.length > 0 && (
+              <ol className="poem-reader__variants">
+                {poem.variants.map((variant) => (
+                  <li
+                    key={`${variant.line}-${variant.at ?? ""}-${variant.note}`}
+                    className="poem-reader__variant"
+                  >
+                    <span className="poem-reader__variant-mark" aria-hidden="true">
+                      {variant.line}
+                    </span>
+                    {variant.at && (
+                      <span className="poem-reader__variant-at">「{variant.at}」</span>
+                    )}
+                    <span>{variant.note}</span>
+                  </li>
+                ))}
+              </ol>
+            )}
+          </footer>
+        )}
       </div>
     </article>
   );

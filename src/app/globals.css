@@ -162,6 +162,55 @@ body {
   text-align: center;
 }
 
+.poem-reader__collation {
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid color-mix(in srgb, var(--color-ink) 8%, transparent);
+  text-align: left;
+  font-size: 0.8125rem;
+  line-height: 1.7;
+  color: color-mix(in srgb, var(--color-ink) 56%, transparent);
+  letter-spacing: 0.04em;
+}
+
+.poem-reader__base {
+  margin: 0;
+}
+
+.poem-reader__variants {
+  margin: 0.75rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.poem-reader__variant {
+  display: flex;
+  gap: 0.45rem;
+  align-items: baseline;
+}
+
+.poem-reader__variant + .poem-reader__variant {
+  margin-top: 0.45rem;
+}
+
+.poem-reader__variant-mark {
+  flex: none;
+  font-size: 0.6875rem;
+  color: color-mix(in srgb, var(--color-ink) 40%, transparent);
+}
+
+.poem-reader__variant-at {
+  flex: none;
+  color: color-mix(in srgb, var(--color-ink) 68%, transparent);
+}
+
+.poem-reader--vertical .poem-reader__collation {
+  margin-top: 2rem;
+  writing-mode: horizontal-tb;
+  text-align: left;
+  max-width: 100%;
+}
+
 .poem-reader__line {
   font-size: 1.25rem;
   line-height: 2.2;

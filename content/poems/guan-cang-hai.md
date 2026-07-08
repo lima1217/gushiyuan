@@ -4,6 +4,7 @@ author: 曹操
 authorSlug: cao-cao
 dynasty: 魏
 volume: wei
+base: 《古诗源·卷五》沈德潜
 keyChars:
   - 海
   - 山

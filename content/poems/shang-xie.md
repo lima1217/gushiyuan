@@ -4,6 +4,7 @@ author: 汉乐府
 authorSlug: han-yue-fu
 dynasty: 汉
 volume: han
+base: 《古诗源·卷三》沈德潜
 ---
 
 上邪！

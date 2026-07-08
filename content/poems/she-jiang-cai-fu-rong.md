@@ -4,6 +4,7 @@ author: 古诗十九首
 authorSlug: gu-shi-shi-jiu-shou
 dynasty: 汉
 volume: han
+base: 《古诗源·卷四》沈德潜
 keyChars:
   - 心
   - 忧
