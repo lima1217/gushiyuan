@@ -1,3 +1,4 @@
+import { LanguageToggle } from "@/components/LanguageToggle";
 import { SiteLogo } from "@/components/SiteLogo";
 import { SiteSearch } from "@/components/SiteSearch";
 import { SkipLink } from "@/components/SkipLink";
@@ -13,7 +14,10 @@ export function SiteChrome({ searchIndex }: SiteChromeProps) {
       <SkipLink />
       <div className="site-chrome">
         <SiteLogo />
-        <SiteSearch index={searchIndex} />
+        <div className="site-chrome__actions">
+          <SiteSearch index={searchIndex} />
+          <LanguageToggle />
+        </div>
       </div>
     </>
   );
