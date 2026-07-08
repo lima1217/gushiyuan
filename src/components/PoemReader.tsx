@@ -6,7 +6,8 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { PoemNav } from "@/components/PoemNav";
 import { PoemLine } from "@/components/PoemLine";
 import { ReadingDirectionProvider } from "@/components/ReadingDirectionProvider";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { ReadingDirectionToggle } from "@/components/ReadingDirectionToggle";
+import { SiteChromeActions } from "@/components/SiteChromeActions";
 import type { LineageByLine } from "@/lib/lineage";
 import type { Poem, PoemMeta } from "@/lib/poems";
 import {
@@ -96,11 +97,7 @@ export function PoemReader({
     };
   }, [direction, lines.length]);
 
-  function handleDirectionChange(value: string) {
-    if (value !== "horizontal" && value !== "vertical") {
-      return;
-    }
-
+  function handleDirectionChange(value: ReadingDirection) {
     setDirection(value);
     persistReadingDirection(localStorage, value);
   }
@@ -161,28 +158,12 @@ export function PoemReader({
           : "poem-reader--horizontal items-center justify-center",
       )}
     >
-      <div className="poem-reader__toolbar">
-        <ToggleGroup
-          value={[direction]}
-          onValueChange={(value) => {
-            const nextDirection = value.at(-1);
-            if (nextDirection) {
-              handleDirectionChange(nextDirection);
-            }
-          }}
-          variant="outline"
-          size="sm"
-          spacing={0}
-          aria-label="阅读方向"
-        >
-          <ToggleGroupItem value="horizontal" aria-label="横排">
-            横
-          </ToggleGroupItem>
-          <ToggleGroupItem value="vertical" aria-label="竖排">
-            竖
-          </ToggleGroupItem>
-        </ToggleGroup>
-      </div>
+      <SiteChromeActions>
+        <ReadingDirectionToggle
+          direction={direction}
+          onDirectionChange={handleDirectionChange}
+        />
+      </SiteChromeActions>
 
       <div className="poem-reader__viewport">
         <ReadingDirectionProvider direction={direction}>

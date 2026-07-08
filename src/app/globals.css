@@ -136,39 +136,6 @@ body {
   justify-content: center;
 }
 
-/* 切换控件：角落安放，低对比，不抢正文 */
-.poem-reader__toolbar {
-  position: fixed;
-  top: max(1.25rem, env(safe-area-inset-top, 0px));
-  right: max(1.25rem, env(safe-area-inset-right, 0px));
-  z-index: 10;
-  opacity: 0.72;
-  transition: opacity 160ms ease;
-}
-
-.poem-reader__toolbar:hover,
-.poem-reader__toolbar:focus-within {
-  opacity: 1;
-}
-
-.poem-reader__toolbar [data-slot="toggle-group"] {
-  background: color-mix(in srgb, var(--color-paper) 88%, var(--color-ink));
-  border-color: color-mix(in srgb, var(--color-ink) 12%, transparent);
-}
-
-.poem-reader__toolbar [data-slot="toggle-group-item"] {
-  min-width: 2rem;
-  font-size: 0.8125rem;
-  letter-spacing: 0.08em;
-  color: var(--color-ink-muted);
-}
-
-.poem-reader__toolbar [data-slot="toggle-group-item"][data-pressed],
-.poem-reader__toolbar [data-slot="toggle-group-item"][data-state="on"] {
-  color: var(--color-ink);
-  background: color-mix(in srgb, var(--color-ink) 6%, transparent);
-}
-
 .poem-reader__sheet {
   max-width: 28rem;
 }
@@ -745,7 +712,7 @@ body {
   text-decoration: none;
 }
 
-.skip-link:focus {
+.skip-link:focus-visible {
   top: 1.25rem;
 }
 
@@ -759,6 +726,7 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+  pointer-events: none;
   opacity: 0.72;
   transition: opacity 160ms ease;
 }
@@ -768,24 +736,68 @@ body {
   opacity: 1;
 }
 
+.site-chrome__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  min-width: 0;
+  pointer-events: auto;
+}
+
+.site-chrome__divider {
+  width: 1px;
+  height: 0.75rem;
+  flex-shrink: 0;
+  background: color-mix(in srgb, var(--color-ink) 10%, transparent);
+}
+
 .site-chrome__actions {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  flex-shrink: 0;
+  pointer-events: auto;
+}
+
+.site-chrome__actions [data-slot="toggle-group"] {
+  background: color-mix(in srgb, var(--color-paper) 88%, var(--color-ink));
+  border-color: color-mix(in srgb, var(--color-ink) 12%, transparent);
+}
+
+.site-chrome__actions [data-slot="toggle-group-item"] {
+  min-width: 2rem;
+  font-size: 0.8125rem;
+  letter-spacing: 0.08em;
+  color: var(--color-ink-muted);
+}
+
+.site-chrome__actions [data-slot="toggle-group-item"][data-pressed],
+.site-chrome__actions [data-slot="toggle-group-item"][data-state="on"] {
+  color: var(--color-ink);
+  background: color-mix(in srgb, var(--color-ink) 6%, transparent);
 }
 
 .site-logo {
-  font-family: var(--font-heading);
-  font-size: clamp(1.375rem, 1.2rem + 0.8vw, 1.5rem);
-  font-weight: 600;
-  color: var(--color-ink-muted);
-  letter-spacing: 0.18em;
+  font-family: var(--font-wenkai), serif;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: color-mix(in srgb, var(--color-ink) 52%, transparent);
+  letter-spacing: 0.1em;
   text-decoration: none;
   white-space: nowrap;
+  text-wrap: balance;
+  touch-action: manipulation;
 }
 
 .site-logo:hover {
-  color: var(--color-ink);
+  color: var(--color-ink-muted);
+}
+
+.site-logo:focus-visible {
+  color: var(--color-ink-muted);
+  outline: 2px solid color-mix(in srgb, var(--color-ink) 24%, transparent);
+  outline-offset: 3px;
+  border-radius: 0.125rem;
 }
 
 /* 面包屑：阅读页与目录页共用 */
@@ -883,41 +895,39 @@ body {
 .site-search__trigger {
   display: inline-flex;
   align-items: center;
-  gap: 0.375rem;
-  padding: 0.375rem 0.625rem;
-  border: 1px solid color-mix(in srgb, var(--color-ink) 10%, transparent);
-  border-radius: 0.5rem;
-  background: color-mix(in srgb, var(--color-paper) 88%, var(--color-ink));
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--color-ink) 8%, transparent);
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--color-paper) 92%, var(--color-ink));
   color: var(--color-ink-muted);
-  font-size: 0.8125rem;
-  letter-spacing: 0.08em;
   cursor: pointer;
-  transition: color 160ms ease, border-color 160ms ease;
+  touch-action: manipulation;
+  transition:
+    color 160ms ease,
+    border-color 160ms ease,
+    background-color 160ms ease;
 }
 
-.site-search__trigger:hover,
+.site-search__trigger:hover {
+  color: var(--color-ink);
+  border-color: color-mix(in srgb, var(--color-ink) 16%, transparent);
+  background: color-mix(in srgb, var(--color-paper) 84%, var(--color-ink));
+}
+
 .site-search__trigger:focus-visible {
   color: var(--color-ink);
-  border-color: color-mix(in srgb, var(--color-ink) 18%, transparent);
-  outline: none;
+  border-color: color-mix(in srgb, var(--color-ink) 20%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--color-ink) 24%, transparent);
+  outline-offset: 2px;
 }
 
-.site-search__trigger-label {
-  display: none;
-}
-
-.site-search__shortcut {
-  display: none;
-  font-family: inherit;
-  font-size: 0.6875rem;
-  letter-spacing: 0.04em;
-  color: var(--color-ink-muted);
-}
-
-@media (min-width: 768px) {
-  .site-search__trigger-label,
-  .site-search__shortcut {
-    display: inline;
+@media (prefers-reduced-motion: reduce) {
+  .site-chrome,
+  .site-search__trigger {
+    transition: none;
   }
 }
 

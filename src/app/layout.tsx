@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { SiteChrome } from "@/components/SiteChrome";
+import { SiteChromeProvider } from "@/components/SiteChrome";
 import { buildSearchIndex } from "@/lib/search-index";
 import {
   createPageMetadata,
@@ -27,8 +27,9 @@ export default function RootLayout({
   return (
     <html lang="zh-CN">
       <body>
-        <SiteChrome searchIndex={searchIndex} />
-        {children}
+        <SiteChromeProvider searchIndex={searchIndex}>
+          {children}
+        </SiteChromeProvider>
       </body>
     </html>
   );

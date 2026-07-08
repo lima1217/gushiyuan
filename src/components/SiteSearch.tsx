@@ -19,22 +19,10 @@ type SiteSearchProps = {
   index: SearchIndex;
 };
 
-function isMacPlatform(): boolean {
-  if (typeof navigator === "undefined") {
-    return false;
-  }
-
-  return /Mac|iPhone|iPad|iPod/.test(navigator.platform);
-}
-
 export function SiteSearch({ index }: SiteSearchProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const shortcutLabel = useMemo(
-    () => (isMacPlatform() ? "⌘K" : "Ctrl+K"),
-    [],
-  );
 
   const results = useMemo(
     () => filterSearchIndex(index, query),
@@ -80,8 +68,6 @@ export function SiteSearch({ index }: SiteSearchProps) {
         aria-label="打开检索"
       >
         <SearchIcon aria-hidden="true" className="size-3.5" />
-        <span className="site-search__trigger-label">检索</span>
-        <kbd className="site-search__shortcut">{shortcutLabel}</kbd>
       </button>
 
       <CommandDialog
