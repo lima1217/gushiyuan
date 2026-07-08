@@ -4,6 +4,7 @@ import { PoemReader } from "@/components/PoemReader";
 import { getKeyCharacterMap } from "@/lib/characters";
 import { getLineageForPoem } from "@/lib/lineage";
 import { getAllPoems, getPoemBySlug } from "@/lib/poems";
+import { createPageMetadata } from "@/lib/site-metadata";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -19,10 +20,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!poem) {
     return { title: "古诗源" };
   }
-  return {
+  return createPageMetadata({
     title: `${poem.title} · ${poem.author} · 古诗源`,
     description: poem.body.slice(0, 80),
-  };
+  });
 }
 
 export default async function PoemPage({ params }: PageProps) {
