@@ -29,7 +29,6 @@ export type PoemVariant = {
 
 export type Poem = PoemMeta & {
   body: string;
-  keyChars: string[];
   base?: string;
   variants: PoemVariant[];
 };
@@ -50,18 +49,6 @@ function requireField(
     );
   }
   return String(value);
-}
-
-function parseKeyChars(data: Record<string, unknown>): string[] {
-  const value = data.keyChars;
-  if (!Array.isArray(value)) {
-    return [];
-  }
-
-  return value
-    .filter((item): item is string => typeof item === "string")
-    .map((item) => item.trim())
-    .filter(Boolean);
 }
 
 function parseBase(data: Record<string, unknown>): string | undefined {
@@ -119,7 +106,6 @@ function parsePoemFile(slug: string): Poem {
     dynasty: requireField(data, "dynasty", slug),
     volume: requireField(data, "volume", slug),
     body: content.trim(),
-    keyChars: parseKeyChars(data),
     base: parseBase(data),
     variants: parseVariants(data),
   };
@@ -175,12 +161,6 @@ export function getPoemsByAuthor(
 ): PoemMeta[] {
   return getAllPoems()
     .filter((p) => p.volume === volumeSlug && p.authorSlug === authorSlug)
-    .sort((a, b) => a.title.localeCompare(b.title, "zh-CN"));
-}
-
-export function getPoemsByKeyChar(char: string): PoemMeta[] {
-  return getAllPoems()
-    .filter((poem) => getPoemBySlug(poem.slug)?.keyChars.includes(char))
     .sort((a, b) => a.title.localeCompare(b.title, "zh-CN"));
 }
 

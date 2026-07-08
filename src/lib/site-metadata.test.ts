@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 import { buildSitemapEntries, SITE_URL } from "./site-metadata";
-import { getAllCharacters } from "./characters";
 import { getAllPoems, getAllVolumes } from "./poems";
 
 describe("buildSitemapEntries", () => {
@@ -10,7 +9,7 @@ describe("buildSitemapEntries", () => {
     expect(urls).toContain(`${SITE_URL}/`);
   });
 
-  it("includes every poem, volume, and character page", () => {
+  it("includes every poem and volume page", () => {
     const urls = new Set(buildSitemapEntries().map((entry) => entry.url));
 
     for (const poem of getAllPoems()) {
@@ -19,10 +18,6 @@ describe("buildSitemapEntries", () => {
 
     for (const volume of getAllVolumes()) {
       expect(urls.has(`${SITE_URL}/v/${volume.slug}`)).toBe(true);
-    }
-
-    for (const character of getAllCharacters()) {
-      expect(urls.has(`${SITE_URL}/c/${character.char}`)).toBe(true);
     }
   });
 

@@ -5,9 +5,6 @@ authorSlug: gu-shi-shi-jiu-shou
 dynasty: 漢
 volume: han
 base: 《古詩源·卷四》沈德潛 中華書局點校本
-keyChars:
-  - 楼
-  - 思
 variants:
   - line: 9
     at: 雙鳴鶴

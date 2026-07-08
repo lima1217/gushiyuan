@@ -42,9 +42,7 @@ export function SiteSearch({ index }: SiteSearchProps) {
   );
 
   const hasResults =
-    results.poems.length > 0 ||
-    results.authors.length > 0 ||
-    results.characters.length > 0;
+    results.poems.length > 0 || results.authors.length > 0;
 
   const navigate = useCallback(
     (href: string) => {
@@ -90,13 +88,13 @@ export function SiteSearch({ index }: SiteSearchProps) {
         open={open}
         onOpenChange={setOpen}
         title="站内检索"
-        description="按诗题、作者或字检索"
+        description="按诗题或作者检索"
         className="border-[color-mix(in_srgb,var(--color-ink)_10%,transparent)] bg-[var(--color-paper)] text-[var(--color-ink)] sm:max-w-lg"
         showCloseButton
       >
         <Command shouldFilter={false}>
           <CommandInput
-            placeholder="诗题、作者、字…"
+            placeholder="诗题、作者…"
             value={query}
             onValueChange={setQuery}
             className="text-[var(--color-ink)] placeholder:text-[var(--color-ink-muted)]"
@@ -104,7 +102,7 @@ export function SiteSearch({ index }: SiteSearchProps) {
           <CommandList className="max-h-80">
             {!hasResults ? (
               <CommandEmpty className="text-[var(--color-ink-muted)]">
-                {query.trim() ? "未找到匹配" : "输入诗题、作者或字"}
+                {query.trim() ? "未找到匹配" : "输入诗题或作者"}
               </CommandEmpty>
             ) : null}
 
@@ -134,23 +132,6 @@ export function SiteSearch({ index }: SiteSearchProps) {
                     onSelect={() => navigate(`/p/${author.poemSlug}`)}
                   >
                     <span>{author.name}</span>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            ) : null}
-
-            {results.characters.length > 0 ? (
-              <CommandGroup heading="字">
-                {results.characters.map((character) => (
-                  <CommandItem
-                    key={`char-${character.char}`}
-                    value={`${character.char} ${character.meaning}`}
-                    onSelect={() => navigate(`/c/${character.char}`)}
-                  >
-                    <span className="tracking-[0.12em]">{character.char}</span>
-                    <span className="ml-2 truncate text-xs text-[var(--color-ink-muted)]">
-                      {character.meaning}
-                    </span>
                   </CommandItem>
                 ))}
               </CommandGroup>

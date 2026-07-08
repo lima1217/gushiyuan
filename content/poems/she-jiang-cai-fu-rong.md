@@ -5,10 +5,6 @@ authorSlug: gu-shi-shi-jiu-shou
 dynasty: 漢
 volume: han
 base: 《古詩源·卷四》沈德潛 中華書局點校本
-keyChars:
-  - 心
-  - 忧
-  - 思
 ---
 
 涉江采芙蓉，蘭澤多芳草。

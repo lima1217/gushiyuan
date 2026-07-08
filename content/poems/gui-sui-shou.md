@@ -5,10 +5,6 @@ authorSlug: cao-cao
 dynasty: 魏
 volume: wei
 base: 《古詩源·卷五》沈德潛 中華書局點校本
-keyChars:
-  - 神
-  - 寿
-  - 生
 variants:
   - line: 2
     at: 成霧

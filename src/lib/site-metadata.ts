@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import type { MetadataRoute } from "next";
-import { getAllCharacters } from "@/lib/characters";
 import { getAllPoems, getAllVolumes } from "@/lib/poems";
 
 export const SITE_URL = "https://gsy.aiwayfarer.net";
@@ -61,10 +60,6 @@ export function buildSitemapEntries(): MetadataRoute.Sitemap {
     if (authorKeys.has(key)) continue;
     authorKeys.add(key);
     entries.push({ url: `${SITE_URL}/v/${poem.volume}/${poem.authorSlug}` });
-  }
-
-  for (const character of getAllCharacters()) {
-    entries.push({ url: `${SITE_URL}/c/${character.char}` });
   }
 
   return entries;

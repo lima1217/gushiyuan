@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { SiteChrome } from "@/components/SiteChrome";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { buildSearchIndex } from "@/lib/search-index";
 import {
   createPageMetadata,
@@ -29,7 +28,7 @@ export default function RootLayout({
     <html lang="zh-CN">
       <body>
         <SiteChrome searchIndex={searchIndex} />
-        <TooltipProvider delay={200}>{children}</TooltipProvider>
+        {children}
       </body>
     </html>
   );

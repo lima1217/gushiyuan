@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-import { getCharacterByChar } from "./characters";
 import {
   getAdjacentPoemsInVolume,
   getAllPoems,
@@ -26,18 +25,6 @@ describe("getPoemBySlug", () => {
     expect(poem?.body).toContain("周公吐哺，天下歸心。");
   });
 
-  it("returns keyChars from frontmatter", () => {
-    const poem = getPoemBySlug("duan-ge-xing");
-
-    expect(poem?.keyChars).toEqual(["月", "心", "忧", "歌", "酒"]);
-  });
-
-  it("returns an empty keyChars list when frontmatter omits it", () => {
-    const poem = getPoemBySlug("hao-li-xing");
-
-    expect(poem?.keyChars).toEqual([]);
-  });
-
   it("returns optional base and variants from frontmatter", () => {
     const poem = getPoemBySlug("duan-ge-xing");
 
@@ -60,18 +47,6 @@ describe("getPoemBySlug", () => {
 
   it("returns undefined for an unknown slug", () => {
     expect(getPoemBySlug("not-a-poem")).toBeUndefined();
-  });
-});
-
-describe("poem keyChars reuse character library entries", () => {
-  it("shares the same character data when multiple poems reference a character", () => {
-    const duanGeXing = getPoemBySlug("duan-ge-xing");
-    const guanCangHai = getPoemBySlug("guan-cang-hai");
-    const yue = getCharacterByChar("月");
-
-    expect(duanGeXing?.keyChars).toContain("月");
-    expect(guanCangHai?.keyChars).toContain("月");
-    expect(yue?.char).toBe("月");
   });
 });
 

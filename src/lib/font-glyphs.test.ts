@@ -52,14 +52,13 @@ describe("collectSiteFontGlyphs", () => {
   it("collects characters from content and ui literals", () => {
     const contentRoot = makeTempContent({
       "poems/test.md": "关关雎鸠",
-      "characters/x.json": '{"char":"雎","meaning":"鸟名"}',
     });
 
     const glyphs = collectSiteFontGlyphs({
       contentRoot,
       uiLiterals: "检索面板",
     });
-    for (const char of "关关雎鸠雎鸟名检索面板") {
+    for (const char of "关关雎鸠检索面板") {
       expect(glyphs).toContain(char.codePointAt(0));
     }
   });

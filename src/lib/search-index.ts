@@ -1,4 +1,3 @@
-import { getAllCharacters } from "@/lib/characters";
 import type {
   SearchIndex,
   SearchIndexAuthor,
@@ -8,7 +7,6 @@ import { getAllPoems, getPoemBySlug, type Poem } from "@/lib/poems";
 export type {
   SearchIndex,
   SearchIndexAuthor,
-  SearchIndexCharacter,
   SearchIndexPoem,
   SearchResults,
 } from "@/lib/search-index-types";
@@ -51,18 +49,10 @@ export function buildSearchIndex(): SearchIndex {
     });
   }
 
-  const characters = getAllCharacters()
-    .map((character) => ({
-      char: character.char,
-      meaning: character.meaning,
-    }))
-    .sort((a, b) => a.char.localeCompare(b.char, "zh-CN"));
-
   return {
     poems,
     authors: [...authorMap.values()].sort((a, b) =>
       a.name.localeCompare(b.name, "zh-CN"),
     ),
-    characters,
   };
 }

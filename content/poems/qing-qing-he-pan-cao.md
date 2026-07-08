@@ -5,10 +5,6 @@ authorSlug: gu-shi-shi-jiu-shou
 dynasty: 漢
 volume: han
 base: 《古詩源·卷四》沈德潛 中華書局點校本
-keyChars:
-  - 草
-  - 心
-  - 思
 ---
 
 青青河畔草，鬱鬱園中柳。

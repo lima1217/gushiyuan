@@ -7,7 +7,6 @@ import { PoemNav } from "@/components/PoemNav";
 import { PoemLine } from "@/components/PoemLine";
 import { ReadingDirectionProvider } from "@/components/ReadingDirectionProvider";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import type { Character } from "@/lib/character-types";
 import type { LineageByLine } from "@/lib/lineage";
 import type { Poem, PoemMeta } from "@/lib/poems";
 import {
@@ -25,7 +24,6 @@ type PoemReaderProps = {
   breadcrumbs: BreadcrumbItem[];
   prev?: PoemMeta;
   next?: PoemMeta;
-  keyCharacters: Record<string, Character>;
   lineageByLine: LineageByLine;
 };
 
@@ -34,7 +32,6 @@ export function PoemReader({
   breadcrumbs,
   prev,
   next,
-  keyCharacters,
   lineageByLine,
 }: PoemReaderProps) {
   const lines = poem.body.split("\n").filter(Boolean);
@@ -42,6 +39,13 @@ export function PoemReader({
   const [direction, setDirection] = useState<ReadingDirection>(
     DEFAULT_READING_DIRECTION,
   );
+
+  // 竖排正文：四句一列（古籍版式，每列四句）
+  const LINES_PER_COLUMN = 4;
+  const lineColumns: string[][] = [];
+  for (let i = 0; i < lines.length; i += LINES_PER_COLUMN) {
+    lineColumns.push(lines.slice(i, i + LINES_PER_COLUMN));
+  }
 
   useEffect(() => {
     setDirection(readStoredReadingDirection(localStorage));
@@ -115,7 +119,6 @@ export function PoemReader({
             key={`${index}-${line}`}
             line={line}
             lineIndex={index}
-            keyCharacters={keyCharacters}
             lineageClue={lineageByLine.get(index)}
           />
         ))}

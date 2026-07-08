@@ -14,19 +14,12 @@ export type SearchIndexAuthor = {
   poemSlug: string;
 };
 
-export type SearchIndexCharacter = {
-  char: string;
-  meaning: string;
-};
-
 export type SearchIndex = {
   poems: SearchIndexPoem[];
   authors: SearchIndexAuthor[];
-  characters: SearchIndexCharacter[];
 };
 
 export type SearchResults = {
   poems: SearchIndexPoem[];
   authors: SearchIndexAuthor[];
-  characters: SearchIndexCharacter[];
 };

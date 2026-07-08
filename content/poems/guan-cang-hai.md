@@ -5,11 +5,6 @@ authorSlug: cao-cao
 dynasty: 魏
 volume: wei
 base: 《古詩源·卷五》沈德潛 中華書局點校本
-keyChars:
-  - 海
-  - 山
-  - 水
-  - 月
 ---
 
 東臨碣石，以觀滄海。

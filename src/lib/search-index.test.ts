@@ -26,13 +26,6 @@ describe("buildSearchIndex", () => {
     expect(index.poems.some((p) => p.slug === caoCao?.poemSlug)).toBe(true);
   });
 
-  it("includes characters from the character library", () => {
-    const index = buildSearchIndex();
-    const yue = index.characters.find((c) => c.char === "月");
-
-    expect(yue?.meaning).toBeTruthy();
-  });
-
   it("picks the first poem by title as the author landing page", () => {
     const index = buildSearchIndex();
     const caoCao = index.authors.find((a) => a.authorSlug === "cao-cao");
@@ -51,7 +44,6 @@ describe("filterSearchIndex", () => {
     expect(filterSearchIndex(index, "")).toEqual({
       poems: [],
       authors: [],
-      characters: [],
     });
   });
 
@@ -65,12 +57,6 @@ describe("filterSearchIndex", () => {
     const results = filterSearchIndex(index, "曹操");
 
     expect(results.authors.some((a) => a.authorSlug === "cao-cao")).toBe(true);
-  });
-
-  it("matches characters in the character library", () => {
-    const results = filterSearchIndex(index, "月");
-
-    expect(results.characters.some((c) => c.char === "月")).toBe(true);
   });
 
   it("limits results to keep the palette concise", () => {
@@ -89,16 +75,11 @@ describe("filterSearchIndex", () => {
         volume: "han",
         poemSlug: `poem-${index}`,
       })),
-      characters: Array.from({ length: 20 }, (_, index) => ({
-        char: `字${index}`,
-        meaning: `含义${index}`,
-      })),
     };
 
     const results = filterSearchIndex(bigIndex, "测试");
 
     expect(results.poems.length).toBeLessThanOrEqual(8);
     expect(results.authors.length).toBeLessThanOrEqual(5);
-    expect(results.characters.length).toBeLessThanOrEqual(8);
   });
 });

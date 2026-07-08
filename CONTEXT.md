@@ -22,10 +22,12 @@
 
 源流讲《古诗源》**选诗**如何被后世化用。每条线索（clue）指向一首选诗的某句，并列出后世承袭的「流」（streams）。三种关系：`化用` / `脱胎` / `意象承接`。诗经楚辞不在选目内，故不作为源流源头。
 
+源流是站点**唯一的行内注解形态**：带源流线索的诗句渲染为可点击/可聚焦的按钮（标记「源」，约 0.85em），点击打开 Popover 浮层（点击外部或 Esc 关闭），键盘与触屏均可用。浮层模式由通用组件 `AnnotationPopover` 提供（见 ADR 0002）。
+
 ## 阅读方向（reading direction）
 
-横排（默认）/ 竖排（列自右向左）。偏好存 localStorage，key `gushiyuan-reading-direction`。
+横排（默认）/ 竖排（列自右向左）。偏好存 localStorage，key `gushiyuan-reading-direction`。注解浮层方向随阅读方向：横排在下、竖排在左。
 
-## 字形演变（已弃用）
+## 字形演变（已移除）
 
-字形演变功能（`/c/[char]`、`content/characters/*`）将整体移除（见 #18），其点击 Popover 模式迁用于「源」注解。移除后「源」为唯一行内注解形态。
+字形演变功能（`/c/[char]`、`content/characters/*`、`public/characters/*`）已整体移除（见 #18、ADR 0002）：字形数据不可靠且非核心价值。其点击 Popover 交互模式抽为通用组件 `AnnotationPopover`，迁用于「源」注解。移除后诗句按纯文本渲染，不再有关键字高亮与字形浮层。

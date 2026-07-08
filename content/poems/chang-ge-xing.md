@@ -5,9 +5,6 @@ authorSlug: han-yue-fu
 dynasty: 漢
 volume: han
 base: 《古詩源·卷三》沈德潛 中華書局點校本
-keyChars:
-  - 光
-  - 生
 variants:
   - line: 4
     at: 華

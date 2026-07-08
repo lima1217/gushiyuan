@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { PoemReader } from "@/components/PoemReader";
-import { getKeyCharacterMap } from "@/lib/characters";
 import { getLineageForPoem } from "@/lib/lineage";
 import {
   getAdjacentPoemsInVolume,
@@ -44,7 +43,6 @@ export default async function PoemPage({ params }: PageProps) {
   }
 
   const { prev, next } = getAdjacentPoemsInVolume(slug);
-  const keyCharacters = getKeyCharacterMap(poem.keyChars);
   const lineageByLine = getLineageForPoem(slug);
 
   return (
@@ -60,7 +58,6 @@ export default async function PoemPage({ params }: PageProps) {
       ]}
       prev={prev}
       next={next}
-      keyCharacters={keyCharacters}
       lineageByLine={lineageByLine}
     />
   );
