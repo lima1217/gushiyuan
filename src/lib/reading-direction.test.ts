@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
   DEFAULT_READING_DIRECTION,
   READING_DIRECTION_STORAGE_KEY,
+  overlaySideForReadingDirection,
   parseReadingDirection,
   persistReadingDirection,
   readStoredReadingDirection,
@@ -50,5 +51,22 @@ describe("persistReadingDirection", () => {
       READING_DIRECTION_STORAGE_KEY,
       "vertical",
     );
+  });
+});
+
+describe("overlaySideForReadingDirection", () => {
+  it("opens popovers below in horizontal mode", () => {
+    expect(overlaySideForReadingDirection("horizontal", "popover")).toBe(
+      "bottom",
+    );
+  });
+
+  it("opens tooltips above in horizontal mode", () => {
+    expect(overlaySideForReadingDirection("horizontal", "tooltip")).toBe("top");
+  });
+
+  it("opens overlays to the left in vertical mode", () => {
+    expect(overlaySideForReadingDirection("vertical", "popover")).toBe("left");
+    expect(overlaySideForReadingDirection("vertical", "tooltip")).toBe("left");
   });
 });

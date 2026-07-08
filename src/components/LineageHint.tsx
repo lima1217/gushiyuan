@@ -1,12 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import type { LineageClue } from "@/lib/lineage-types";
+import { useReadingDirection } from "@/components/ReadingDirectionProvider";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { overlaySideForReadingDirection } from "@/lib/reading-direction";
+import type { LineageClue } from "@/lib/lineage-types";
 
 type LineageHintProps = {
   clue: LineageClue;
@@ -23,6 +25,9 @@ function streamHref(stream: LineageClue["streams"][number]): string {
 }
 
 export function LineageHint({ clue, lineIndex, children }: LineageHintProps) {
+  const direction = useReadingDirection();
+  const side = overlaySideForReadingDirection(direction, "tooltip");
+
   return (
     <Tooltip>
       <TooltipTrigger
@@ -40,7 +45,7 @@ export function LineageHint({ clue, lineIndex, children }: LineageHintProps) {
         </span>
       </TooltipTrigger>
       <TooltipContent
-        side="top"
+        side={side}
         sideOffset={10}
         className="lineage-hint__content w-72 max-w-[min(18rem,calc(100vw-2rem))] flex-col items-stretch gap-2 rounded-lg border border-[color-mix(in_srgb,var(--color-ink)_10%,transparent)] bg-[var(--color-paper)] px-3 py-2.5 text-[var(--color-ink)] shadow-md ring-0"
       >

@@ -1,8 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import type { Character } from "@/lib/character-types";
-import { GLYPH_STAGE_ORDER } from "@/lib/character-types";
+import { useReadingDirection } from "@/components/ReadingDirectionProvider";
 import {
   Popover,
   PopoverContent,
@@ -11,6 +10,9 @@ import {
   PopoverTitle,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import type { Character } from "@/lib/character-types";
+import { GLYPH_STAGE_ORDER } from "@/lib/character-types";
+import { overlaySideForReadingDirection } from "@/lib/reading-direction";
 
 const STAGE_ORDER = GLYPH_STAGE_ORDER;
 
@@ -21,6 +23,9 @@ type CharacterEvolutionPopoverProps = {
 export function CharacterEvolutionPopover({
   character,
 }: CharacterEvolutionPopoverProps) {
+  const direction = useReadingDirection();
+  const side = overlaySideForReadingDirection(direction, "popover");
+
   const stages = STAGE_ORDER.flatMap((stage) => {
     const data = character.stages[stage];
     return data ? [{ stage, ...data }] : [];
@@ -35,7 +40,11 @@ export function CharacterEvolutionPopover({
       >
         {character.char}
       </PopoverTrigger>
-      <PopoverContent className="char-evolution w-[min(20rem,calc(100vw-2rem))] border-[color-mix(in_srgb,var(--color-ink)_10%,transparent)] bg-[var(--color-paper)] p-4 text-[var(--color-ink)] shadow-lg ring-0">
+      <PopoverContent
+        side={side}
+        sideOffset={8}
+        className="char-evolution w-[min(20rem,calc(100vw-2rem))] border-[color-mix(in_srgb,var(--color-ink)_10%,transparent)] bg-[var(--color-paper)] p-4 text-[var(--color-ink)] shadow-lg ring-0"
+      >
         <PopoverHeader className="gap-1">
           <PopoverTitle className="text-base font-normal tracking-[0.12em]">
             {character.char}
