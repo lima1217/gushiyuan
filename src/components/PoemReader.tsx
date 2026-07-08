@@ -14,6 +14,7 @@ import {
   DEFAULT_READING_DIRECTION,
   type ReadingDirection,
   alignVerticalScrollToFirstColumn,
+  groupVerticalLineColumns,
   persistReadingDirection,
   readStoredReadingDirection,
   verticalReadingScrollLeft,
@@ -41,11 +42,13 @@ export function PoemReader({
     DEFAULT_READING_DIRECTION,
   );
 
-  // 竖排正文：四句一列（古籍版式，每列四句）
-  const LINES_PER_COLUMN = 4;
-  const lineColumns: string[][] = [];
-  for (let i = 0; i < lines.length; i += LINES_PER_COLUMN) {
-    lineColumns.push(lines.slice(i, i + LINES_PER_COLUMN));
+  // 竖排正文：四句一列（古籍版式）；余一句落单时均衡分列，避免末句孤列。
+  const lineColumns = groupVerticalLineColumns(lines);
+  const columnStartIndexes: number[] = [];
+  let lineOffset = 0;
+  for (const column of lineColumns) {
+    columnStartIndexes.push(lineOffset);
+    lineOffset += column.length;
   }
 
   useEffect(() => {
@@ -161,7 +164,7 @@ export function PoemReader({
                     </p>
                   </header>
                   {lineColumns.map((columnLines, colIndex) => {
-                    const startLineIndex = colIndex * LINES_PER_COLUMN;
+                    const startLineIndex = columnStartIndexes[colIndex] ?? 0;
                     return (
                       <div
                         key={`col-${colIndex}`}

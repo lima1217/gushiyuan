@@ -1,3 +1,51 @@
+export const VERTICAL_LINES_PER_COLUMN = 4;
+
+/**
+ * 竖排正文分列：默认每列四句。余一句落单时（如五句古诗）改为 3+2、3+3+3
+ * 等均衡分法，避免末句独占一列、列间距过大而显得突兀。
+ */
+export function groupVerticalLineColumns(
+  lines: string[],
+  columnSize = VERTICAL_LINES_PER_COLUMN,
+): string[][] {
+  const count = lines.length;
+  if (count <= columnSize) {
+    return [lines];
+  }
+
+  if (count % columnSize === 1) {
+    // 五句短章不必硬拆两列，单列间距更匀
+    if (count === 5) {
+      return [lines];
+    }
+
+    const columns: string[][] = [];
+    let index = 0;
+    while (index < count) {
+      const remaining = count - index;
+      if (remaining === columnSize) {
+        columns.push(lines.slice(index, index + columnSize));
+        break;
+      }
+      if (remaining === 5) {
+        columns.push(lines.slice(index, index + 3));
+        columns.push(lines.slice(index + 3, count));
+        break;
+      }
+      const take = Math.min(columnSize - 1, remaining);
+      columns.push(lines.slice(index, index + take));
+      index += take;
+    }
+    return columns;
+  }
+
+  const columns: string[][] = [];
+  for (let i = 0; i < count; i += columnSize) {
+    columns.push(lines.slice(i, i + columnSize));
+  }
+  return columns;
+}
+
 export type ReadingDirection = "horizontal" | "vertical";
 
 export type OverlayKind = "popover" | "tooltip";

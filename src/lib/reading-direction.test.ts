@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
   alignVerticalScrollToFirstColumn,
   DEFAULT_READING_DIRECTION,
+  groupVerticalLineColumns,
   READING_DIRECTION_STORAGE_KEY,
   overlaySideForReadingDirection,
   parseReadingDirection,
@@ -81,6 +82,44 @@ describe("verticalReadingScrollLeft", () => {
 
   it("returns overflow when content is wider than the viewport", () => {
     expect(verticalReadingScrollLeft(800, 320)).toBe(480);
+  });
+});
+
+describe("groupVerticalLineColumns", () => {
+  const lines = (count: number) =>
+    Array.from({ length: count }, (_, i) => `line-${i + 1}`);
+
+  it("keeps short poems in a single column", () => {
+    expect(groupVerticalLineColumns(lines(3))).toEqual([lines(3)]);
+    expect(groupVerticalLineColumns(lines(4))).toEqual([lines(4)]);
+  });
+
+  it("chunks by four when the count is a multiple of four", () => {
+    expect(groupVerticalLineColumns(lines(8))).toEqual([
+      ["line-1", "line-2", "line-3", "line-4"],
+      ["line-5", "line-6", "line-7", "line-8"],
+    ]);
+  });
+
+  it("keeps five-line poems in one column for even spacing", () => {
+    expect(groupVerticalLineColumns(lines(5))).toEqual([lines(5)]);
+  });
+
+  it("balances nine lines into three columns of three", () => {
+    expect(groupVerticalLineColumns(lines(9))).toEqual([
+      lines(3),
+      ["line-4", "line-5", "line-6"],
+      ["line-7", "line-8", "line-9"],
+    ]);
+  });
+
+  it("keeps a trailing quartet when thirteen lines would otherwise orphan one", () => {
+    expect(groupVerticalLineColumns(lines(13))).toEqual([
+      lines(3),
+      ["line-4", "line-5", "line-6"],
+      ["line-7", "line-8", "line-9"],
+      ["line-10", "line-11", "line-12", "line-13"],
+    ]);
   });
 });
 
