@@ -125,3 +125,9 @@ export function getPoemsByAuthor(
     .filter((p) => p.volume === volumeSlug && p.authorSlug === authorSlug)
     .sort((a, b) => a.title.localeCompare(b.title, "zh-CN"));
 }
+
+export function getPoemsByKeyChar(char: string): PoemMeta[] {
+  return getAllPoems()
+    .filter((poem) => getPoemBySlug(poem.slug)?.keyChars.includes(char))
+    .sort((a, b) => a.title.localeCompare(b.title, "zh-CN"));
+}

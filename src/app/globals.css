@@ -607,20 +607,8 @@ body {
 }
 
 /* 字页：字形演变 + 相关诗作 */
-.char-evolution__header {
-  margin-bottom: 1.25rem;
-  text-align: center;
-}
-
-.char-evolution__title {
-  font-size: 2rem;
-  font-weight: 400;
-  letter-spacing: 0.16em;
-  line-height: 1.5;
-}
-
 .char-evolution__meaning {
-  margin-top: 0.75rem;
+  text-align: center;
   font-size: 0.95rem;
   color: var(--color-ink-muted);
   line-height: 1.75;
