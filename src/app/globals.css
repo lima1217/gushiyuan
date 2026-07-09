@@ -547,6 +547,8 @@ body {
   writing-mode: vertical-rl;
   text-orientation: upright;
   flex: 0 0 auto;
+  /* inline 轴 = 纵轴，start 让题首字与朝代首字齐顶 */
+  align-self: start;
 }
 
 .poem-reader--vertical .poem-reader__masthead .poem-reader__title {
@@ -560,10 +562,10 @@ body {
 .poem-reader--vertical .poem-reader__masthead .poem-reader__meta {
   margin: 0;
   display: flex;
-  /* vertical-rl 下 inline 轴为纵轴，row 让朝代/点/作者自上而下叠放 */
+  /* vertical-rl 下 inline 轴为纵轴，row 让朝代/作者自上而下叠放 */
   flex-direction: row;
   align-items: center;
-  gap: 0.1em;
+  gap: 0.9em;
   font-size: clamp(0.75rem, 2.2vw, 0.8125rem);
   color: var(--color-ink-muted);
   letter-spacing: 0;
@@ -574,27 +576,6 @@ body {
 .poem-reader--vertical .poem-reader__meta-author {
   display: block;
   text-align: center;
-}
-
-.poem-reader--vertical .poem-reader__meta-sep {
-  margin: 0;
-  display: block;
-  inline-size: 1em;
-  block-size: 1em;
-  color: transparent;
-  line-height: 1;
-  position: relative;
-}
-
-.poem-reader--vertical .poem-reader__meta-sep::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  margin: auto;
-  width: 0.22em;
-  height: 0.22em;
-  border-radius: 50%;
-  background: var(--color-ink-muted);
 }
 
 /* 正文列：同一竖行内叠放若干句（奇三偶二），多列自右向左 */

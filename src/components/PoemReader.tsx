@@ -33,16 +33,20 @@ import { cn } from "@/lib/utils";
 function PoemAttribution({
   dynasty,
   author,
+  layout = "horizontal",
 }: {
   dynasty: string;
   author: string;
+  layout?: "horizontal" | "vertical";
 }) {
   return (
     <p className="poem-reader__meta" aria-label={`${dynasty} · ${author}`}>
       <span className="poem-reader__meta-dynasty">{dynasty}</span>
-      <span className="poem-reader__meta-sep" aria-hidden="true">
-        ·
-      </span>
+      {layout === "horizontal" ? (
+        <span className="poem-reader__meta-sep" aria-hidden="true">
+          ·
+        </span>
+      ) : null}
       <span className="poem-reader__meta-author">{author}</span>
     </p>
   );
@@ -215,7 +219,11 @@ export function PoemReader({
                 <div className="poem-reader__columns">
                   <header className="poem-reader__masthead">
                     <h1 className="poem-reader__title">{title}</h1>
-                    <PoemAttribution dynasty={dynasty} author={author} />
+                    <PoemAttribution
+                      dynasty={dynasty}
+                      author={author}
+                      layout="vertical"
+                    />
                   </header>
                   {verticalChapters.map((columns, chapterIndex) => {
                     const startLineIndex = chapterOffsets[chapterIndex] ?? 0;
