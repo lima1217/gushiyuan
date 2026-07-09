@@ -23,6 +23,24 @@ import {
 } from "@/lib/reading-direction";
 import { cn } from "@/lib/utils";
 
+function PoemAttribution({
+  dynasty,
+  author,
+}: {
+  dynasty: string;
+  author: string;
+}) {
+  return (
+    <p className="poem-reader__meta" aria-label={`${dynasty} · ${author}`}>
+      <span className="poem-reader__meta-dynasty">{dynasty}</span>
+      <span className="poem-reader__meta-sep" aria-hidden="true">
+        ·
+      </span>
+      <span className="poem-reader__meta-author">{author}</span>
+    </p>
+  );
+}
+
 type PoemReaderProps = {
   poem: Poem;
   breadcrumbs: BreadcrumbItem[];
@@ -108,9 +126,7 @@ export function PoemReader({
     <>
       <header className="poem-reader__header">
         <h1 className="poem-reader__title">{poem.title}</h1>
-        <p className="poem-reader__meta">
-          {poem.dynasty} · {poem.author}
-        </p>
+        <PoemAttribution dynasty={poem.dynasty} author={poem.author} />
       </header>
       <div className="poem-reader__body">
         {chapters.map((sentences, chapterIndex) => {
@@ -169,9 +185,7 @@ export function PoemReader({
                 <div className="poem-reader__columns">
                   <header className="poem-reader__masthead">
                     <h1 className="poem-reader__title">{poem.title}</h1>
-                    <p className="poem-reader__meta">
-                      {poem.dynasty} · {poem.author}
-                    </p>
+                    <PoemAttribution dynasty={poem.dynasty} author={poem.author} />
                   </header>
                   {verticalChapters.map((columns, chapterIndex) => {
                     const startLineIndex = chapterOffsets[chapterIndex] ?? 0;

@@ -159,6 +159,11 @@ body {
   letter-spacing: 0.08em;
 }
 
+.poem-reader__meta-sep {
+  margin-inline: 0.35em;
+  letter-spacing: 0;
+}
+
 .poem-reader__body {
   text-align: center;
 }
@@ -500,7 +505,7 @@ body {
   display: flex;
   flex-direction: row-reverse;
   align-items: flex-start;
-  gap: clamp(2em, 5vw, 2.75em);
+  gap: clamp(1.05em, 2.6vw, 1.55em);
   padding-block: clamp(0.75rem, 3vh, 1.5rem);
   padding-inline: clamp(1rem, 4vw, 2rem);
   min-height: min(52dvh, 100%);
@@ -543,8 +548,17 @@ body {
   margin: 0;
   font-size: clamp(0.75rem, 2.2vw, 0.8125rem);
   color: var(--color-ink-muted);
-  letter-spacing: 0.08em;
-  line-height: 1.75;
+  letter-spacing: 0.02em;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.poem-reader--vertical .poem-reader__meta-sep {
+  margin-inline: 0.08em;
+  display: inline-block;
+  width: 1em;
+  line-height: 1;
+  text-align: center;
 }
 
 /* 正文列：同一竖行内叠放若干句（奇三偶二），多列自右向左 */
@@ -553,7 +567,7 @@ body {
   /* vertical-rl 下 inline 轴为纵轴，row 让多句在同一条竖行内自上而下排列 */
   flex-direction: row;
   align-items: flex-start;
-  gap: 0.65em;
+  gap: 0.24em;
   flex-shrink: 0;
 }
 
@@ -564,9 +578,9 @@ body {
 .poem-reader--vertical .poem-reader__line {
   margin: 0;
   font-size: clamp(1.0625rem, 3vw, 1.25rem);
-  line-height: 2;
-  letter-spacing: 0.08em;
-  padding-block-start: 0.1em;
+  line-height: 1.5;
+  letter-spacing: 0.015em;
+  padding-block-start: 0.04em;
 }
 
 .poem-reader--vertical .poem-reader__line--lineage {
