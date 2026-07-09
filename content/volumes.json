@@ -1,12 +1,12 @@
 [
   { "slug": "gu-yi", "name": "古逸" },
-  { "slug": "han", "name": "漢" },
+  { "slug": "han", "name": "汉" },
   { "slug": "wei", "name": "魏" },
-  { "slug": "jin", "name": "晉" },
+  { "slug": "jin", "name": "晋" },
   { "slug": "song", "name": "宋" },
-  { "slug": "qi", "name": "齊" },
+  { "slug": "qi", "name": "齐" },
   { "slug": "liang", "name": "梁" },
-  { "slug": "chen", "name": "陳" },
+  { "slug": "chen", "name": "陈" },
   { "slug": "bei-chao", "name": "北朝" },
   { "slug": "sui", "name": "隋" }
 ]

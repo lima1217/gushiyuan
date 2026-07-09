@@ -7,7 +7,7 @@ export default function HomePage() {
 
   return (
     <CatalogLayout title="目录">
-      <nav aria-label="古詩源分卷">
+      <nav aria-label="古诗源分卷">
         <ol className="catalog__list">
           {volumes.map((volume) => {
             const empty = isVolumeEmpty(volume.slug);

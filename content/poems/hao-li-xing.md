@@ -4,7 +4,6 @@ author: 曹操
 authorSlug: cao-cao
 dynasty: 魏
 volume: wei
-base: 《古詩源·卷五》沈德潛 中華書局點校本
 ---
 
 關東有義士，興兵討群凶。

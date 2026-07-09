@@ -4,7 +4,6 @@ author: 古詩十九首
 authorSlug: gu-shi-shi-jiu-shou
 dynasty: 漢
 volume: han
-base: 《古詩源·卷四》沈德潛 中華書局點校本
 ---
 
 青青河畔草，鬱鬱園中柳。

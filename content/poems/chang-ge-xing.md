@@ -4,7 +4,6 @@ author: 漢樂府
 authorSlug: han-yue-fu
 dynasty: 漢
 volume: han
-base: 《古詩源·卷三》沈德潛 中華書局點校本
 ---
 
 青青園中葵，朝露待日晞。

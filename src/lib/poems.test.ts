@@ -25,18 +25,6 @@ describe("getPoemBySlug", () => {
     expect(poem?.body).toContain("周公吐哺，天下歸心。");
   });
 
-  it("returns optional base from frontmatter", () => {
-    const poem = getPoemBySlug("duan-ge-xing");
-
-    expect(poem?.base).toMatch(/古詩源/);
-  });
-
-  it("leaves base undefined when frontmatter omits it", () => {
-    const poem = getPoemBySlug("guan-cang-hai");
-
-    expect(poem?.base).toMatch(/古詩源/);
-  });
-
   it("returns undefined for an unknown slug", () => {
     expect(getPoemBySlug("not-a-poem")).toBeUndefined();
   });
@@ -74,11 +62,22 @@ describe("getAllVolumes", () => {
     ]);
     expect(volumes[0]?.name).toBe("古逸");
   });
+
+  it("uses simplified Chinese for all volume names", () => {
+    const traditionalVolumeChars = /[漢晉齊陳]/;
+
+    for (const volume of getAllVolumes()) {
+      expect(volume.name).not.toMatch(traditionalVolumeChars);
+    }
+  });
 });
 
 describe("getVolumeBySlug", () => {
   it("returns a volume by slug", () => {
-    expect(getVolumeBySlug("han")?.name).toBe("漢");
+    expect(getVolumeBySlug("han")?.name).toBe("汉");
+    expect(getVolumeBySlug("jin")?.name).toBe("晋");
+    expect(getVolumeBySlug("qi")?.name).toBe("齐");
+    expect(getVolumeBySlug("chen")?.name).toBe("陈");
   });
 
   it("returns undefined for unknown slug", () => {

@@ -10,7 +10,11 @@ type PageProps = {
 };
 
 export function generateStaticParams() {
-  return getAllStreamIds().map((streamId) => ({ streamId }));
+  const streamIds = getAllStreamIds();
+  if (streamIds.length === 0) {
+    return [{ streamId: "__none__" }];
+  }
+  return streamIds.map((streamId) => ({ streamId }));
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -29,6 +33,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function StreamPage({ params }: PageProps) {
   const { streamId } = await params;
+  if (streamId === "__none__") {
+    notFound();
+  }
   const context = getStreamContext(streamId);
   if (!context) {
     notFound();

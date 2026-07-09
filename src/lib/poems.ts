@@ -23,7 +23,6 @@ export type AuthorMeta = {
 
 export type Poem = PoemMeta & {
   body: string;
-  base?: string;
 };
 
 const CONTENT_DIR = path.join(process.cwd(), "content");
@@ -69,16 +68,6 @@ function requireField(
   return String(value);
 }
 
-function parseBase(data: Record<string, unknown>): string | undefined {
-  const value = data.base;
-  if (value === undefined || value === null) {
-    return undefined;
-  }
-
-  const base = String(value).trim();
-  return base || undefined;
-}
-
 function parsePoemFile(slug: string): Poem {
   const filePath = path.join(POEMS_DIR, `${slug}.md`);
   const raw = fs.readFileSync(filePath, "utf-8");
@@ -92,7 +81,6 @@ function parsePoemFile(slug: string): Poem {
     dynasty: requireField(data, "dynasty", slug),
     volume: requireField(data, "volume", slug),
     body: content.trim(),
-    base: parseBase(data),
   };
 }
 

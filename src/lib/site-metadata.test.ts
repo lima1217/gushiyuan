@@ -1,6 +1,18 @@
 import { describe, expect, it } from "vitest";
-import { buildSitemapEntries, SITE_URL } from "./site-metadata";
+import {
+  buildSitemapEntries,
+  SITE_DESCRIPTION,
+  SITE_URL,
+} from "./site-metadata";
 import { getAllPoems, getAllVolumes } from "./poems";
+
+describe("SITE_DESCRIPTION", () => {
+  it("uses simplified Chinese for site metadata", () => {
+    expect(SITE_DESCRIPTION).not.toMatch(/[潛詩頭]/);
+    expect(SITE_DESCRIPTION).toContain("沈德潜");
+    expect(SITE_DESCRIPTION).toContain("古诗源");
+  });
+});
 
 describe("buildSitemapEntries", () => {
   it("includes the home page", () => {

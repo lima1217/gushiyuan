@@ -1,10 +1,10 @@
 ---
-title: 楚人謠
-author: 民謠
+title: 楚人谣
+author: 民谣
 authorSlug: min-yao-chu
 dynasty: 古逸
 volume: gu-yi
-base: 《古詩源·卷一》沈德潛 中華書局點校本
 ---
 
-楚雖三戶，亡秦必楚。
+楚虽三户。
+亡秦必楚。

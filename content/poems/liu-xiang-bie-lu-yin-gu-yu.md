@@ -1,10 +1,10 @@
 ---
-title: 劉向別錄引古語
-author: 劉向別錄
+title: 刘向别录引古语
+author: 刘向别录
 authorSlug: liu-xiang-bie-lu
 dynasty: 古逸
 volume: gu-yi
-base: 《古詩源·卷一》沈德潛 中華書局點校本
 ---
 
-唇亡而齒寒，河水崩其壞在山。
+唇亡而齿寒。
+河水崩其坏在山。
