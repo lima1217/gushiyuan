@@ -3,6 +3,7 @@ import path from "path";
 import matter from "gray-matter";
 import { describe, expect, it } from "vitest";
 import { getAllVolumes, getPoemBySlug, getPoemsByVolume } from "./poems";
+import { parseVerticalLayoutOverride } from "./vertical-layout";
 
 const POEMS_DIR = path.join(process.cwd(), "content", "poems");
 const MANIFEST_DIR = path.join(process.cwd(), "content", "volumes");
@@ -61,6 +62,15 @@ describe("imported volume content invariants", () => {
       it("omits base from frontmatter", () => {
         for (const { slug, data } of poems) {
           expect(data.base, `${slug} should not have base field`).toBeUndefined();
+        }
+      });
+
+      it("uses valid verticalLayout frontmatter overrides", () => {
+        for (const { slug, data } of poems) {
+          expect(
+            () => parseVerticalLayoutOverride(data.verticalLayout),
+            `${slug} has invalid verticalLayout`,
+          ).not.toThrow();
         }
       });
 

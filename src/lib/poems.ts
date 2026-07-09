@@ -2,6 +2,10 @@ import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
 import { parsePoemBody, type PoemBodyStructure } from "./poem-body";
+import {
+  parseVerticalLayoutOverride,
+  type VerticalLayoutOverride,
+} from "./vertical-layout";
 
 export type { PoemBodyStructure };
 export { parsePoemBody };
@@ -46,6 +50,7 @@ export function isLegacyAnonymousAuthorSlug(authorSlug: string): boolean {
 
 export type Poem = PoemMeta & {
   body: string;
+  verticalLayout?: VerticalLayoutOverride;
 };
 
 const CONTENT_DIR = path.join(process.cwd(), "content");
@@ -103,6 +108,7 @@ function parsePoemFile(slug: string): Poem {
     authorSlug: requireField(data, "authorSlug", slug),
     dynasty: requireField(data, "dynasty", slug),
     volume: requireField(data, "volume", slug),
+    verticalLayout: parseVerticalLayoutOverride(data.verticalLayout),
     body: content.trim(),
   };
 }

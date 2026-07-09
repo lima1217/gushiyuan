@@ -17,7 +17,7 @@
 
 1. **源流改点击 Popover。** 触发器改为可聚焦 `<button>`，标记放大到与正文接近（约 0.85em）、加可点区域内边距、`cursor: pointer`；浮层点击打开、点击外部或 Esc 关闭，键盘与触屏均可用。源流数据（关系 `化用`/`脱胎`/`意象承接`、后世化用列表、源流跳转链接）不动。
 
-2. **抽通用组件 `AnnotationPopover`。** 把字形演变那套成熟的点击 Popover 模式抽为通用组件（`src/components/AnnotationPopover.tsx`），浮层方向随阅读方向（横排在下、竖排在左，复用 `overlaySideForReadingDirection`）。现供「源」注解使用，后续行内注解亦可复用。
+2. **抽通用组件 `AnnotationPopover`。** 把字形演变那套成熟的点击 Popover 模式抽为通用组件（`src/components/AnnotationPopover.tsx`）。#35 取消横排后，浮层固定从左侧弹出。现供「源」注解使用，后续行内注解亦可复用。
 
 3. **整体移除字形演变。** 诗句按纯文本渲染（不再有关键字高亮与字形浮层触发）；移除字形详情路由 `/c/[char]`、`CharacterEvolutionPopover`/`CharacterEvolutionPanel` 组件、`src/lib/characters.ts`/`character-types.ts`、字形数据 `content/characters/*.json`、字形 SVG `public/characters/*`；从检索索引、检索面板、sitemap、字体 UI 文案中清除字形相关入口与码点。
 

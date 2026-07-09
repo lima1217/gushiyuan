@@ -1,12 +1,10 @@
 "use client";
 
-import { useReadingDirection } from "@/components/ReadingDirectionProvider";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { overlaySideForReadingDirection } from "@/lib/reading-direction";
 
 type AnnotationPopoverProps = {
   /** Visible content of the trigger button. */
@@ -27,7 +25,7 @@ type AnnotationPopoverProps = {
 
 /**
  * 行内注解的点击型浮层。点击触发器打开、点击外部或 Esc 关闭，
- * 键盘可聚焦、触屏可用。浮层方向随阅读方向（横排在下、竖排在左）。
+ * 键盘可聚焦、触屏可用。竖排阅读中浮层固定从左侧弹出。
  *
  * 抽自字形演变的点击 Popover 模式，现为「源」等行内注解共用。
  */
@@ -40,9 +38,6 @@ export function AnnotationPopover({
   sideOffset = 8,
   children,
 }: AnnotationPopoverProps) {
-  const direction = useReadingDirection();
-  const side = overlaySideForReadingDirection(direction, "popover");
-
   return (
     <Popover>
       <PopoverTrigger
@@ -54,7 +49,7 @@ export function AnnotationPopover({
         {triggerLabel}
       </PopoverTrigger>
       <PopoverContent
-        side={side}
+        side="left"
         sideOffset={sideOffset}
         className={contentClassName}
       >

@@ -56,6 +56,7 @@ export default async function PoemPage({ params }: PageProps) {
     <PoemReader
       poem={withTraditionalPoem(poem)}
       breadcrumbs={[
+        { label: makeTextVariant("古诗源"), href: "/" },
         { label: makeTextVariant(volume.name), href: `/v/${volume.slug}` },
         {
           label: makeTextVariant(poem.author),

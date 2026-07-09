@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useReadingDirection } from "@/components/ReadingDirectionProvider";
 import {
   useUiText,
   useVariantText,
@@ -15,8 +14,6 @@ export type BreadcrumbItem = {
 
 type BreadcrumbsProps = {
   items: BreadcrumbItem[];
-  /** 竖排阅读时顶栏面包屑仍横排展示 */
-  layout?: "auto" | "horizontal";
 };
 
 function BreadcrumbListItem({
@@ -50,17 +47,12 @@ function BreadcrumbListItem({
   );
 }
 
-export function Breadcrumbs({ items, layout = "auto" }: BreadcrumbsProps) {
-  const direction = useReadingDirection();
+export function Breadcrumbs({ items }: BreadcrumbsProps) {
   const ariaLabel = useUiText("breadcrumbsAria");
 
   if (items.length === 0) {
     return null;
   }
-
-  const useVerticalSeparator =
-    layout === "auto" && direction === "vertical";
-  const separator = useVerticalSeparator ? "\u3000" : "›";
 
   return (
     <nav aria-label={ariaLabel} className="breadcrumbs">
@@ -70,7 +62,7 @@ export function Breadcrumbs({ items, layout = "auto" }: BreadcrumbsProps) {
             key={`${index}-${item.href ?? ""}`}
             item={item}
             index={index}
-            separator={separator}
+            separator="›"
           />
         ))}
       </ol>

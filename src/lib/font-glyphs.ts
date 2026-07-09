@@ -5,7 +5,7 @@ import { toTraditional } from "@/lib/script-conversion";
 
 const CONTENT_ROOT = path.join(process.cwd(), "content");
 
-/** UI 与排版常用标点，竖排悬挂与检索面板也需要。 */
+/** UI、内容标点与检索面板所需的兜底字形。 */
 export const FONT_GLYPH_FALLBACK =
   " \t\n\r" +
   "0123456789" +
