@@ -16,12 +16,14 @@ type BreadcrumbsProps = {
   items: BreadcrumbItem[];
 };
 
+type BreadcrumbLinkItem = BreadcrumbItem & { href: string };
+
 function BreadcrumbListItem({
   item,
   index,
   separator,
 }: {
-  item: BreadcrumbItem;
+  item: BreadcrumbLinkItem;
   index: number;
   separator: string;
 }) {
@@ -34,32 +36,29 @@ function BreadcrumbListItem({
           {separator}
         </span>
       ) : null}
-      {item.href ? (
-        <Link href={item.href} className="breadcrumbs__link">
-          {label}
-        </Link>
-      ) : (
-        <span className="breadcrumbs__current" aria-current="page">
-          {label}
-        </span>
-      )}
+      <Link href={item.href} className="breadcrumbs__link">
+        {label}
+      </Link>
     </li>
   );
 }
 
 export function Breadcrumbs({ items }: BreadcrumbsProps) {
   const ariaLabel = useUiText("breadcrumbsAria");
+  const links = items.filter(
+    (item): item is BreadcrumbLinkItem => Boolean(item.href),
+  );
 
-  if (items.length === 0) {
+  if (links.length === 0) {
     return null;
   }
 
   return (
     <nav aria-label={ariaLabel} className="breadcrumbs">
       <ol className="breadcrumbs__list">
-        {items.map((item, index) => (
+        {links.map((item, index) => (
           <BreadcrumbListItem
-            key={`${index}-${item.href ?? ""}`}
+            key={`${item.href}-${index}`}
             item={item}
             index={index}
             separator="›"

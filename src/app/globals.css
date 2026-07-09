@@ -43,6 +43,9 @@
   --sidebar-ring: oklch(0.708 0 0);
   --site-header-top: 1.25rem;
   --site-header-row-height: 1.75rem;
+  --site-header-clearance: calc(
+    var(--site-header-top) + var(--site-header-row-height)
+  );
 }
 
 @theme inline {
@@ -402,24 +405,24 @@ body {
   }
 }
 
-/* 竖排：顶栏横排面包屑，中段仅诗题与正文成列，底栏横排导航 */
+/* 竖排：顶栏横排导航，中段仅诗题与正文成列，底栏横排导航 */
 .poem-reader--vertical {
   align-items: stretch;
   justify-content: flex-start;
-  --poem-header-clearance: var(--site-header-top);
+  --poem-header-clearance: var(--site-header-clearance);
   padding-top: calc(var(--poem-header-clearance) + env(safe-area-inset-top, 0px));
   /*
    * 竖排节律：
-   * - char-track：字距，沿 inline 轴（竖排纵轴）
+   * - char-track：一句一列用 flex gap；栏内回行用 letter-spacing
    * - col-leading：列宽，沿 block 轴（line-height）
    * - column-gap：列与列之间
-   * - reflow-height：栏内回行栏高，默认 18em
+   * - reflow-height：栏内回行栏高，默认 22em
    */
   --vertical-char-track: 0.2em;
   --vertical-col-leading: 2.05;
   --vertical-column-gap: 2em;
   --vertical-chapter-gap: 3em;
-  --vertical-reflow-height: 18em;
+  --vertical-reflow-height: 22em;
 }
 
 .poem-reader--vertical .poem-reader__viewport {
@@ -435,44 +438,6 @@ body {
   display: flex;
   flex-direction: column;
   gap: clamp(0.5rem, 1.5vh, 0.875rem);
-}
-
-/* 顶栏面包屑：诗页与目录页共用 */
-.site-breadcrumbs-bar {
-  position: sticky;
-  top: max(var(--site-header-top), env(safe-area-inset-top, 0px));
-  z-index: 11;
-  display: flex;
-  align-items: center;
-  min-height: var(--site-header-row-height);
-  flex-shrink: 0;
-  width: 100%;
-  writing-mode: horizontal-tb;
-  padding-inline-end: min(7rem, 34vw);
-  pointer-events: none;
-}
-
-.site-breadcrumbs-bar .breadcrumbs {
-  margin: 0;
-}
-
-.site-breadcrumbs-bar .breadcrumbs__list {
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  gap: 0.25rem 0.375rem;
-  font-size: 0.8125rem;
-  line-height: 1;
-  color: color-mix(in srgb, var(--color-ink) 52%, transparent);
-  letter-spacing: 0.1em;
-  pointer-events: auto;
-  text-align: start;
-}
-
-.site-breadcrumbs-bar .breadcrumbs__item {
-  flex-direction: row;
-  align-items: center;
-  gap: 0.375rem;
 }
 
 /*
@@ -519,7 +484,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 0.9em;
+  gap: 0.7em;
   flex-shrink: 0;
 }
 
@@ -546,11 +511,13 @@ body {
   /* vertical-rl 下 inline 轴为纵轴，row 让朝代/作者自上而下叠放 */
   flex-direction: row;
   align-items: center;
-  gap: 0.8em;
+  gap: 0.7em;
   font-size: clamp(0.75rem, 2.2vw, 0.8125rem);
   color: var(--color-ink-muted);
   letter-spacing: 0.12em;
   line-height: 1;
+  /* vertical-rl 下 inline-start = 天头；小字 em-box 齐顶时字面显得偏高 */
+  padding-inline-start: 0.2em;
 }
 
 .poem-reader--vertical .poem-reader__meta-dynasty,
@@ -612,6 +579,28 @@ body {
   padding-block-start: 0;
 }
 
+/* 一句一列：单字行盒 + flex gap，避免比例字体 letter-spacing 视觉不匀 */
+.poem-reader__columns--line-per-column .poem-reader__line {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--vertical-char-track);
+  letter-spacing: 0;
+}
+
+.poem-reader__columns--line-per-column .poem-reader__line--lineage .poem-reader__line-inner {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--vertical-char-track);
+}
+
+.poem-reader__columns--line-per-column .poem-reader__char {
+  display: block;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
 .poem-reader--vertical .poem-reader__sentence {
   font-size: clamp(1.0625rem, 3vw, 1.25rem);
   line-height: var(--vertical-col-leading);
@@ -656,7 +645,7 @@ body {
 }
 .catalog-layout {
   --poem-page-gutter: 3.25rem;
-  --catalog-header-clearance: var(--site-header-top);
+  --catalog-header-clearance: var(--site-header-clearance);
   padding-top: calc(
     var(--catalog-header-clearance) + env(safe-area-inset-top, 0px)
   );
@@ -796,7 +785,7 @@ body {
   z-index: 10;
   display: flex;
   align-items: center;
-  min-height: var(--site-header-row-height);
+  height: var(--site-header-row-height);
   justify-content: space-between;
   gap: 1rem;
   pointer-events: none;
@@ -827,12 +816,39 @@ body:has(.catalog-layout) .site-chrome {
   transform: none;
 }
 
-.site-chrome__brand {
+.site-chrome__trail {
   display: flex;
   align-items: center;
-  gap: 0.625rem;
+  flex: 1;
   min-width: 0;
   pointer-events: auto;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.site-chrome__trail .breadcrumbs {
+  margin: 0;
+}
+
+.site-chrome__trail .breadcrumbs__list {
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  gap: 0.25rem 0.375rem;
+  font-size: 0.8125rem;
+  line-height: 1;
+  color: color-mix(in srgb, var(--color-ink) 52%, transparent);
+  letter-spacing: 0.1em;
+  text-align: start;
+}
+
+.site-chrome__trail .breadcrumbs__item {
+  flex-direction: row;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 0.375rem;
 }
 
 .site-chrome__divider {

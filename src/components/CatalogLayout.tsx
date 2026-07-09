@@ -1,5 +1,6 @@
 import type { BreadcrumbItem } from "@/components/Breadcrumbs";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { SiteChromeTrail } from "@/components/SiteChromeTrail";
 import { VariantText } from "@/components/VariantText";
 import type { VariantableText } from "@/lib/script-variant";
 
@@ -12,9 +13,9 @@ type CatalogLayoutProps = {
 export function CatalogLayout({ title, breadcrumbs, children }: CatalogLayoutProps) {
   return (
     <div className="catalog-layout flex min-h-dvh flex-col">
-      <div className="site-breadcrumbs-bar">
+      <SiteChromeTrail>
         <Breadcrumbs items={breadcrumbs} />
-      </div>
+      </SiteChromeTrail>
       <div className="catalog-layout__body flex flex-1 flex-col py-16 md:py-24">
         <header className="catalog__header mb-16 text-center md:mb-20">
           <h1 className="catalog__title">

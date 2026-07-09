@@ -18,18 +18,51 @@ type PoemSentenceProps = {
   lineIndex: number;
   lineageClue?: LineageClueWithTraditional;
   inline?: boolean;
+  verticalColumn?: boolean;
 };
+
+function splitIntoCharacters(text: string): string[] {
+  return [...text];
+}
+
+function VerticalColumnCharacters({
+  sentence,
+  lineIndex,
+}: {
+  sentence: string;
+  lineIndex: number;
+}) {
+  return (
+    <>
+      {splitIntoCharacters(sentence).map((character, index) => (
+        <span
+          key={`${lineIndex}-${index}-${character}`}
+          className="poem-reader__char"
+        >
+          {character}
+        </span>
+      ))}
+    </>
+  );
+}
 
 export function PoemSentence({
   sentence,
   lineIndex,
   lineageClue,
   inline = false,
+  verticalColumn = false,
 }: PoemSentenceProps) {
+  const content = verticalColumn ? (
+    <VerticalColumnCharacters sentence={sentence} lineIndex={lineIndex} />
+  ) : (
+    sentence
+  );
+
   if (lineageClue) {
     return (
       <LineageHint clue={lineageClue} lineIndex={lineIndex} inline={inline}>
-        {sentence}
+        {content}
       </LineageHint>
     );
   }
@@ -37,14 +70,14 @@ export function PoemSentence({
   if (inline) {
     return (
       <span id={`line-${lineIndex}`} className="poem-reader__sentence">
-        {sentence}
+        {content}
       </span>
     );
   }
 
   return (
     <p id={`line-${lineIndex}`} className="poem-reader__line">
-      {sentence}
+      {content}
     </p>
   );
 }
@@ -53,14 +86,21 @@ type PoemLineProps = {
   line: string;
   lineIndex: number;
   lineageClue?: LineageClueWithTraditional;
+  verticalColumn?: boolean;
 };
 
-export function PoemLine({ line, lineIndex, lineageClue }: PoemLineProps) {
+export function PoemLine({
+  line,
+  lineIndex,
+  lineageClue,
+  verticalColumn = false,
+}: PoemLineProps) {
   return (
     <PoemSentence
       sentence={line}
       lineIndex={lineIndex}
       lineageClue={lineageClue}
+      verticalColumn={verticalColumn}
     />
   );
 }

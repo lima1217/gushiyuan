@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef } from "react";
 import type { BreadcrumbItem } from "@/components/Breadcrumbs";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { PoemNav } from "@/components/PoemNav";
+import { SiteChromeTrail } from "@/components/SiteChromeTrail";
 import { PoemLine, PoemSentence } from "@/components/PoemLine";
 import {
   useScriptVariant,
@@ -182,11 +183,11 @@ export function PoemReader({
       id="main-content"
       className="poem-reader poem-reader--vertical relative flex min-h-dvh flex-col"
     >
+      <SiteChromeTrail>
+        <Breadcrumbs items={breadcrumbs} />
+      </SiteChromeTrail>
       <div ref={readingAreaRef} className="poem-reader__viewport">
         <div className="poem-reader__vertical-layout">
-          <div className="poem-reader__vertical-head site-breadcrumbs-bar">
-            <Breadcrumbs items={breadcrumbs} />
-          </div>
           <div ref={viewportRef} className="poem-reader__columns-viewport">
             <div
               className={cn(
@@ -219,6 +220,7 @@ export function PoemReader({
                               line={line}
                               lineIndex={lineIndex}
                               lineageClue={lineageByLine.get(lineIndex)}
+                              verticalColumn
                             />
                           </div>
                         );
