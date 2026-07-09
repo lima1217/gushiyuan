@@ -7,10 +7,10 @@ describe("buildSearchIndex", () => {
   it("includes every poem with title and author metadata", () => {
     const index = buildSearchIndex();
 
-    expect(index.poems.length).toBeGreaterThanOrEqual(14);
-    expect(index.poems.some((p) => p.slug === "duan-ge-xing" && p.title === "短歌行")).toBe(
-      true,
-    );
+    expect(index.poems.length).toBeGreaterThanOrEqual(100);
+    expect(
+      index.poems.some((p) => p.slug === "ji-rang-ge" && p.title === "击壤歌"),
+    ).toBe(true);
     expect(
       index.poems.every((p) => p.title && p.author && p.authorSlug && p.volume),
     ).toBe(true);
@@ -18,11 +18,19 @@ describe("buildSearchIndex", () => {
 
   it("lists distinct authors with volume metadata", () => {
     const index = buildSearchIndex();
-    const caoCao = index.authors.find((a) => a.authorSlug === "cao-cao");
+    const jingKe = index.authors.find((a) => a.authorSlug === "jing-ke");
 
-    expect(caoCao?.name).toBe("曹操");
-    expect(caoCao?.volume).toBe("wei");
-    expect(index.poems.some((p) => p.authorSlug === "cao-cao")).toBe(true);
+    expect(jingKe?.name).toBe("荆轲");
+    expect(jingKe?.volume).toBe("gu-yi");
+    expect(index.poems.some((p) => p.authorSlug === "jing-ke")).toBe(true);
+  });
+
+  it("excludes removed han and wei poems", () => {
+    const index = buildSearchIndex();
+
+    expect(index.poems.some((p) => p.volume === "han")).toBe(false);
+    expect(index.poems.some((p) => p.volume === "wei")).toBe(false);
+    expect(index.poems.some((p) => p.slug === "duan-ge-xing")).toBe(false);
   });
 });
 
@@ -37,15 +45,15 @@ describe("filterSearchIndex", () => {
   });
 
   it("matches poem titles", () => {
-    const results = filterSearchIndex(index, "短歌");
+    const results = filterSearchIndex(index, "易水");
 
-    expect(results.poems.some((p) => p.slug === "duan-ge-xing")).toBe(true);
+    expect(results.poems.some((p) => p.slug === "yi-shui-ge")).toBe(true);
   });
 
   it("matches author names", () => {
-    const results = filterSearchIndex(index, "曹操");
+    const results = filterSearchIndex(index, "荆轲");
 
-    expect(results.authors.some((a) => a.authorSlug === "cao-cao")).toBe(true);
+    expect(results.authors.some((a) => a.authorSlug === "jing-ke")).toBe(true);
   });
 
   it("limits results to keep the palette concise", () => {

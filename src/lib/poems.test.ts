@@ -13,16 +13,16 @@ import {
 
 describe("getPoemBySlug", () => {
   it("returns poem metadata and body for a known slug", () => {
-    const poem = getPoemBySlug("duan-ge-xing");
+    const poem = getPoemBySlug("ji-rang-ge");
 
     expect(poem).toBeDefined();
-    expect(poem?.title).toBe("短歌行");
-    expect(poem?.author).toBe("曹操");
-    expect(poem?.authorSlug).toBe("cao-cao");
-    expect(poem?.dynasty).toBe("魏");
-    expect(poem?.volume).toBe("wei");
-    expect(poem?.body).toContain("對酒當歌，人生幾何！");
-    expect(poem?.body).toContain("周公吐哺，天下歸心。");
+    expect(poem?.title).toBe("击壤歌");
+    expect(poem?.author).toBe("尧时民歌");
+    expect(poem?.authorSlug).toBe("yao-shi-min-ge");
+    expect(poem?.dynasty).toBe("古逸");
+    expect(poem?.volume).toBe("gu-yi");
+    expect(poem?.body).toContain("日出而作。");
+    expect(poem?.body).toContain("帝力于我何有哉。");
   });
 
   it("returns undefined for an unknown slug", () => {
@@ -35,7 +35,7 @@ describe("getAllPoems", () => {
     const poems = getAllPoems();
 
     expect(poems.length).toBeGreaterThanOrEqual(1);
-    expect(poems.some((p) => p.slug === "duan-ge-xing")).toBe(true);
+    expect(poems.some((p) => p.slug === "ji-rang-ge")).toBe(true);
     expect(
       poems.every(
         (p) => p.title && p.author && p.authorSlug && p.dynasty && p.volume,
@@ -87,37 +87,30 @@ describe("getVolumeBySlug", () => {
 
 describe("getAuthorsByVolume", () => {
   it("lists distinct authors in a volume", () => {
-    const authors = getAuthorsByVolume("han");
+    const authors = getAuthorsByVolume("gu-yi");
 
-    expect(authors.some((a) => a.slug === "gu-shi-shi-jiu-shou")).toBe(true);
-    expect(authors.some((a) => a.slug === "han-yue-fu")).toBe(true);
+    expect(authors.some((a) => a.slug === "yao-shi-min-ge")).toBe(true);
     expect(authors.every((a) => a.slug && a.name)).toBe(true);
+  });
+
+  it("returns an empty list for a volume with no poems", () => {
+    expect(getAuthorsByVolume("han")).toEqual([]);
+    expect(getAuthorsByVolume("wei")).toEqual([]);
   });
 });
 
 describe("getPoemsByAuthor", () => {
   it("lists poems for an author within a volume", () => {
-    const poems = getPoemsByAuthor("wei", "cao-cao");
+    const poems = getPoemsByAuthor("gu-yi", "jing-ke");
 
-    expect(poems.some((p) => p.slug === "duan-ge-xing")).toBe(true);
-    expect(poems.every((p) => p.volume === "wei" && p.authorSlug === "cao-cao")).toBe(
-      true,
-    );
+    expect(poems.some((p) => p.slug === "yi-shui-ge")).toBe(true);
+    expect(
+      poems.every((p) => p.volume === "gu-yi" && p.authorSlug === "jing-ke"),
+    ).toBe(true);
   });
 });
 
 describe("getPoemsByVolume", () => {
-  it("orders poems by author then title within a volume", () => {
-    const poems = getPoemsByVolume("wei");
-
-    expect(poems.map((p) => p.slug)).toEqual([
-      "duan-ge-xing",
-      "guan-cang-hai",
-      "gui-sui-shou",
-      "hao-li-xing",
-    ]);
-  });
-
   it("orders gu-yi poems by volume manifest", () => {
     const poems = getPoemsByVolume("gu-yi");
 
@@ -127,33 +120,35 @@ describe("getPoemsByVolume", () => {
   });
 
   it("returns an empty list for a volume with no poems", () => {
+    expect(getPoemsByVolume("han")).toEqual([]);
+    expect(getPoemsByVolume("wei")).toEqual([]);
     expect(getPoemsByVolume("jin")).toEqual([]);
   });
 });
 
 describe("getAdjacentPoemsInVolume", () => {
   it("returns prev and next neighbors in volume order", () => {
-    const { prev, next } = getAdjacentPoemsInVolume("guan-cang-hai");
+    const { prev, next } = getAdjacentPoemsInVolume("kang-qu-yao");
 
-    expect(prev?.slug).toBe("duan-ge-xing");
-    expect(next?.slug).toBe("gui-sui-shou");
+    expect(prev?.slug).toBe("ji-rang-ge");
+    expect(next?.slug).toBe("yi-qi-shi-la-ci");
   });
 
   it("omits prev at the first poem in a volume", () => {
-    const { prev, next } = getAdjacentPoemsInVolume("duan-ge-xing");
+    const { prev, next } = getAdjacentPoemsInVolume("ji-rang-ge");
 
     expect(prev).toBeUndefined();
-    expect(next?.slug).toBe("guan-cang-hai");
+    expect(next?.slug).toBe("kang-qu-yao");
   });
 
   it("omits next at the last poem in a volume", () => {
-    const poems = getPoemsByVolume("wei");
+    const poems = getPoemsByVolume("gu-yi");
     const last = poems.at(-1);
     expect(last).toBeDefined();
 
     const { prev, next } = getAdjacentPoemsInVolume(last!.slug);
 
-    expect(prev?.slug).toBe("gui-sui-shou");
+    expect(prev).toBeDefined();
     expect(next).toBeUndefined();
   });
 
@@ -164,6 +159,8 @@ describe("getAdjacentPoemsInVolume", () => {
 
 describe("isVolumeEmpty", () => {
   it("returns true when a volume has no poems", () => {
+    expect(isVolumeEmpty("han")).toBe(true);
+    expect(isVolumeEmpty("wei")).toBe(true);
     expect(isVolumeEmpty("jin")).toBe(true);
     expect(isVolumeEmpty("song")).toBe(true);
     expect(isVolumeEmpty("qi")).toBe(true);
@@ -175,7 +172,5 @@ describe("isVolumeEmpty", () => {
 
   it("returns false when a volume has poems", () => {
     expect(isVolumeEmpty("gu-yi")).toBe(false);
-    expect(isVolumeEmpty("wei")).toBe(false);
-    expect(isVolumeEmpty("han")).toBe(false);
   });
 });
