@@ -62,7 +62,6 @@ export default async function PoemPage({ params }: PageProps) {
           label: makeTextVariant(poem.author),
           href: `/v/${volume.slug}/${getCatalogAuthorSlug(poem)}`,
         },
-        { label: makeTextVariant(poem.title) },
       ]}
       prev={prev ? withTraditionalPoemMeta(prev) : undefined}
       next={next ? withTraditionalPoemMeta(next) : undefined}

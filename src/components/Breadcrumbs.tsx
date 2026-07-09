@@ -17,12 +17,10 @@ type BreadcrumbsProps = {
 function BreadcrumbListItem({
   item,
   index,
-  isLast,
   separator,
 }: {
   item: BreadcrumbItem;
   index: number;
-  isLast: boolean;
   separator: string;
 }) {
   return (
@@ -32,7 +30,7 @@ function BreadcrumbListItem({
           {separator}
         </span>
       ) : null}
-      {!isLast && item.href ? (
+      {item.href ? (
         <Link href={item.href} className="breadcrumbs__link">
           <VariantText text={item.label} />
         </Link>
@@ -60,7 +58,6 @@ export function Breadcrumbs({ items }: BreadcrumbsProps) {
             key={`crumb-${index}`}
             item={item}
             index={index}
-            isLast={index === items.length - 1}
             separator="›"
           />
         ))}
