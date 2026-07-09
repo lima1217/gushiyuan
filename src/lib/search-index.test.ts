@@ -19,10 +19,16 @@ describe("buildSearchIndex", () => {
   it("lists distinct authors with volume metadata", () => {
     const index = buildSearchIndex();
     const jingKe = index.authors.find((a) => a.authorSlug === "jing-ke");
+    const anonymous = index.authors.filter(
+      (a) => a.volume === "gu-yi" && a.name === "佚名",
+    );
 
     expect(jingKe?.name).toBe("荆轲");
     expect(jingKe?.volume).toBe("gu-yi");
     expect(index.poems.some((p) => p.authorSlug === "jing-ke")).toBe(true);
+    expect(anonymous).toEqual([
+      { name: "佚名", authorSlug: "yi-ming", volume: "gu-yi" },
+    ]);
   });
 
   it("excludes removed han and wei poems", () => {

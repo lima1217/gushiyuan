@@ -494,7 +494,7 @@ body {
 
 /*
  * 列容器：row-reverse 让 masthead 落最右端=起读列；
- * 正文四句一列，自右向左。
+ * 正文按句数奇偶分列（奇三偶二），列自右向左。
  */
 .poem-reader--vertical .poem-reader__columns {
   display: flex;
@@ -517,17 +517,18 @@ body {
 }
 
 .poem-reader--vertical .poem-reader__masthead {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.65em;
   flex-shrink: 0;
-  padding-block-end: 0.5em;
-  /* vertical-rl 下 block-end = 屏幕左侧，作题头与正文间的纵线 */
-  border-block-end: 1px solid color-mix(in srgb, var(--color-ink) 6%, transparent);
-  border-inline-end: none;
 }
 
 .poem-reader--vertical .poem-reader__masthead .poem-reader__title,
 .poem-reader--vertical .poem-reader__masthead .poem-reader__meta {
   writing-mode: vertical-rl;
   text-orientation: upright;
+  flex: 0 0 auto;
 }
 
 .poem-reader--vertical .poem-reader__masthead .poem-reader__title {
@@ -546,11 +547,11 @@ body {
   line-height: 1.75;
 }
 
-/* 正文列：每句一纵列，五句自右向左 */
+/* 正文列：同一竖行内叠放若干句（奇三偶二），多列自右向左 */
 .poem-reader--vertical .poem-reader__body-column {
   display: flex;
-  /* vertical-rl 下 row 轴为纵轴，column 才是横排并列各句 */
-  flex-direction: column;
+  /* vertical-rl 下 inline 轴为纵轴，row 让多句在同一条竖行内自上而下排列 */
+  flex-direction: row;
   align-items: flex-start;
   gap: 0.65em;
   flex-shrink: 0;
@@ -558,11 +559,6 @@ body {
 
 .poem-reader__chapter-columns {
   display: contents;
-}
-
-.poem-reader__chapter-columns--follows > .poem-reader__body-column:first-child {
-  padding-inline-start: 1.25em;
-  border-inline-start: 1px solid color-mix(in srgb, var(--color-ink) 12%, transparent);
 }
 
 .poem-reader--vertical .poem-reader__line {

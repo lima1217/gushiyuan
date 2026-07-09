@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import type { BreadcrumbItem } from "@/components/Breadcrumbs";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { PoemNav } from "@/components/PoemNav";
-import { PoemLine, PoemRow } from "@/components/PoemLine";
+import { PoemLine } from "@/components/PoemLine";
 import { ReadingDirectionProvider } from "@/components/ReadingDirectionProvider";
 import { ReadingDirectionToggle } from "@/components/ReadingDirectionToggle";
 import { SiteChromeActions } from "@/components/SiteChromeActions";
@@ -16,7 +16,6 @@ import {
   type ReadingDirection,
   alignVerticalScrollToFirstColumn,
   chapterSentenceOffsets,
-  groupHorizontalRowsByChapter,
   groupVerticalColumnsByChapter,
   persistReadingDirection,
   readStoredReadingDirection,
@@ -41,7 +40,6 @@ export function PoemReader({
 }: PoemReaderProps) {
   const { chapters } = parsePoemBody(poem.body);
   const chapterOffsets = chapterSentenceOffsets(chapters);
-  const horizontalChapters = groupHorizontalRowsByChapter(chapters);
   const verticalChapters = groupVerticalColumnsByChapter(chapters);
   const sentenceCount = chapters.reduce(
     (total, chapter) => total + chapter.length,
@@ -115,7 +113,7 @@ export function PoemReader({
         </p>
       </header>
       <div className="poem-reader__body">
-        {horizontalChapters.map((rows, chapterIndex) => {
+        {chapters.map((sentences, chapterIndex) => {
           const startLineIndex = chapterOffsets[chapterIndex] ?? 0;
           return (
             <div
@@ -125,18 +123,14 @@ export function PoemReader({
                 chapterIndex > 0 && "poem-reader__chapter--follows",
               )}
             >
-              {rows.map((rowSentences, rowIndex) => {
-                const rowStartIndex =
-                  startLineIndex +
-                  rows
-                    .slice(0, rowIndex)
-                    .reduce((sum, row) => sum + row.length, 0);
+              {sentences.map((sentence, sentenceIndex) => {
+                const lineIndex = startLineIndex + sentenceIndex;
                 return (
-                  <PoemRow
-                    key={`${chapterIndex}-${rowIndex}`}
-                    sentences={rowSentences}
-                    startLineIndex={rowStartIndex}
-                    lineageByLine={lineageByLine}
+                  <PoemLine
+                    key={`${lineIndex}-${sentence}`}
+                    line={sentence}
+                    lineIndex={lineIndex}
+                    lineageClue={lineageByLine.get(lineIndex)}
                   />
                 );
               })}
@@ -184,10 +178,7 @@ export function PoemReader({
                     return (
                       <div
                         key={`chapter-${chapterIndex}`}
-                        className={cn(
-                          "poem-reader__chapter-columns",
-                          chapterIndex > 0 && "poem-reader__chapter-columns--follows",
-                        )}
+                        className="poem-reader__chapter-columns"
                       >
                         {columns.map((columnLines, colIndex) => {
                           const columnStartIndex =

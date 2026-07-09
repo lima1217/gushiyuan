@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import type { MetadataRoute } from "next";
-import { getAllPoems, getAllVolumes } from "@/lib/poems";
+import { getAllPoems, getAllVolumes, getAuthorsByVolume } from "@/lib/poems";
 
 export const SITE_URL = "https://gsy.aiwayfarer.net";
 export const SITE_NAME = "古诗源";
@@ -54,12 +54,12 @@ export function buildSitemapEntries(): MetadataRoute.Sitemap {
     entries.push({ url: `${SITE_URL}/v/${volume.slug}` });
   }
 
-  const authorKeys = new Set<string>();
-  for (const poem of getAllPoems()) {
-    const key = `${poem.volume}/${poem.authorSlug}`;
-    if (authorKeys.has(key)) continue;
-    authorKeys.add(key);
-    entries.push({ url: `${SITE_URL}/v/${poem.volume}/${poem.authorSlug}` });
+  for (const volume of getAllVolumes()) {
+    for (const author of getAuthorsByVolume(volume.slug)) {
+      entries.push({
+        url: `${SITE_URL}/v/${volume.slug}/${author.slug}`,
+      });
+    }
   }
 
   return entries;

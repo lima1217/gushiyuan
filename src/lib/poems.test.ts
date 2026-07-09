@@ -4,7 +4,11 @@ import {
   getAdjacentPoemsInVolume,
   getAllPoems,
   getAllVolumes,
+  ANONYMOUS_AUTHOR_NAME,
+  ANONYMOUS_AUTHOR_SLUG,
   getAuthorsByVolume,
+  getAuthorInVolume,
+  getAuthorPageParams,
   getPoemBySlug,
   getPoemsByAuthor,
   getPoemsByVolume,
@@ -125,6 +129,15 @@ describe("getAuthorsByVolume", () => {
     expect(getAuthorsByVolume("han")).toEqual([]);
     expect(getAuthorsByVolume("wei")).toEqual([]);
   });
+
+  it("collapses anonymous authors into one catalog entry", () => {
+    const authors = getAuthorsByVolume("gu-yi");
+    const anonymousEntries = authors.filter((a) => a.name === ANONYMOUS_AUTHOR_NAME);
+
+    expect(anonymousEntries).toEqual([
+      { slug: ANONYMOUS_AUTHOR_SLUG, name: ANONYMOUS_AUTHOR_NAME },
+    ]);
+  });
 });
 
 describe("getPoemsByAuthor", () => {
@@ -135,6 +148,46 @@ describe("getPoemsByAuthor", () => {
     expect(
       poems.every((p) => p.volume === "gu-yi" && p.authorSlug === "jing-ke"),
     ).toBe(true);
+  });
+
+  it("lists all anonymous poems under the grouped author slug", () => {
+    const poems = getPoemsByAuthor("gu-yi", ANONYMOUS_AUTHOR_SLUG);
+
+    expect(poems.length).toBeGreaterThan(1);
+    expect(poems.some((p) => p.slug === "zhang-ming")).toBe(true);
+    expect(poems.some((p) => p.slug === "yue-ren-ge")).toBe(true);
+    expect(poems.every((p) => p.author === ANONYMOUS_AUTHOR_NAME)).toBe(true);
+  });
+});
+
+describe("getAuthorInVolume", () => {
+  it("resolves grouped anonymous authors by canonical slug", () => {
+    expect(getAuthorInVolume("gu-yi", ANONYMOUS_AUTHOR_SLUG)).toEqual({
+      slug: ANONYMOUS_AUTHOR_SLUG,
+      name: ANONYMOUS_AUTHOR_NAME,
+    });
+  });
+
+  it("resolves legacy anonymous author slugs to the grouped entry", () => {
+    expect(getAuthorInVolume("gu-yi", "yi-ming-zhang")).toEqual({
+      slug: ANONYMOUS_AUTHOR_SLUG,
+      name: ANONYMOUS_AUTHOR_NAME,
+    });
+  });
+});
+
+describe("getAuthorPageParams", () => {
+  it("includes legacy anonymous author slugs for static export redirects", () => {
+    const params = getAuthorPageParams();
+    const guYiSlugs = new Set(
+      params
+        .filter((entry) => entry.volumeSlug === "gu-yi")
+        .map((entry) => entry.authorSlug),
+    );
+
+    expect(guYiSlugs.has(ANONYMOUS_AUTHOR_SLUG)).toBe(true);
+    expect(guYiSlugs.has("yi-ming-bi")).toBe(true);
+    expect(guYiSlugs.has("yi-ming-zhang")).toBe(true);
   });
 });
 

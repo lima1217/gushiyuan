@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { CatalogLayout } from "@/components/CatalogLayout";
 import {
-  getAllPoems,
-  getAuthorsByVolume,
+  ANONYMOUS_AUTHOR_SLUG,
+  getAuthorPageParams,
+  getAuthorInVolume,
   getPoemsByAuthor,
   getVolumeBySlug,
+  isLegacyAnonymousAuthorSlug,
 } from "@/lib/poems";
 import { createPageMetadata } from "@/lib/site-metadata";
 
@@ -15,22 +17,13 @@ type PageProps = {
 };
 
 export function generateStaticParams() {
-  const params: { volumeSlug: string; authorSlug: string }[] = [];
-
-  for (const poem of getAllPoems()) {
-    const key = `${poem.volume}/${poem.authorSlug}`;
-    if (!params.some((p) => `${p.volumeSlug}/${p.authorSlug}` === key)) {
-      params.push({ volumeSlug: poem.volume, authorSlug: poem.authorSlug });
-    }
-  }
-
-  return params;
+  return getAuthorPageParams();
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { volumeSlug, authorSlug } = await params;
   const volume = getVolumeBySlug(volumeSlug);
-  const author = getAuthorsByVolume(volumeSlug).find((a) => a.slug === authorSlug);
+  const author = getAuthorInVolume(volumeSlug, authorSlug);
   if (!volume || !author) {
     return { title: "古诗源" };
   }
@@ -42,12 +35,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function AuthorPage({ params }: PageProps) {
   const { volumeSlug, authorSlug } = await params;
   const volume = getVolumeBySlug(volumeSlug);
-  const author = getAuthorsByVolume(volumeSlug).find((a) => a.slug === authorSlug);
+  if (isLegacyAnonymousAuthorSlug(authorSlug)) {
+    redirect(`/v/${volumeSlug}/${ANONYMOUS_AUTHOR_SLUG}`);
+  }
+
+  const author = getAuthorInVolume(volumeSlug, authorSlug);
   if (!volume || !author) {
     notFound();
   }
 
-  const poems = getPoemsByAuthor(volumeSlug, authorSlug);
+  const poems = getPoemsByAuthor(volumeSlug, author.slug);
 
   return (
     <CatalogLayout

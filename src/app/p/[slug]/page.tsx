@@ -5,6 +5,7 @@ import { getLineageForPoem } from "@/lib/lineage";
 import {
   getAdjacentPoemsInVolume,
   getAllPoems,
+  getCatalogAuthorSlug,
   getPoemBySlug,
   getVolumeBySlug,
 } from "@/lib/poems";
@@ -52,7 +53,7 @@ export default async function PoemPage({ params }: PageProps) {
         { label: volume.name, href: `/v/${volume.slug}` },
         {
           label: poem.author,
-          href: `/v/${volume.slug}/${poem.authorSlug}`,
+          href: `/v/${volume.slug}/${getCatalogAuthorSlug(poem)}`,
         },
         { label: poem.title },
       ]}

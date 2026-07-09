@@ -18,6 +18,9 @@
 # production
 /build
 
+# python
+.venv-font/
+
 # misc
 .DS_Store
 *.pem

@@ -25,6 +25,25 @@ export type AuthorMeta = {
   name: string;
 };
 
+export const ANONYMOUS_AUTHOR_NAME = "佚名";
+export const ANONYMOUS_AUTHOR_SLUG = "yi-ming";
+
+export function isAnonymousAuthor(author: string): boolean {
+  return author === ANONYMOUS_AUTHOR_NAME;
+}
+
+export function getCatalogAuthorSlug(
+  poem: Pick<PoemMeta, "author" | "authorSlug">,
+): string {
+  return isAnonymousAuthor(poem.author)
+    ? ANONYMOUS_AUTHOR_SLUG
+    : poem.authorSlug;
+}
+
+export function isLegacyAnonymousAuthorSlug(authorSlug: string): boolean {
+  return authorSlug.startsWith(`${ANONYMOUS_AUTHOR_SLUG}-`);
+}
+
 export type Poem = PoemMeta & {
   body: string;
 };
@@ -130,7 +149,20 @@ export function getAuthorsByVolume(volumeSlug: string): AuthorMeta[] {
       });
 
   const seen = new Map<string, AuthorMeta>();
+  let anonymousAdded = false;
+
   for (const poem of orderedPoems) {
+    if (isAnonymousAuthor(poem.author)) {
+      if (!anonymousAdded) {
+        seen.set(ANONYMOUS_AUTHOR_SLUG, {
+          slug: ANONYMOUS_AUTHOR_SLUG,
+          name: ANONYMOUS_AUTHOR_NAME,
+        });
+        anonymousAdded = true;
+      }
+      continue;
+    }
+
     if (!seen.has(poem.authorSlug)) {
       seen.set(poem.authorSlug, { slug: poem.authorSlug, name: poem.author });
     }
@@ -139,14 +171,80 @@ export function getAuthorsByVolume(volumeSlug: string): AuthorMeta[] {
   return [...seen.values()];
 }
 
+export function getAuthorInVolume(
+  volumeSlug: string,
+  authorSlug: string,
+): AuthorMeta | undefined {
+  if (
+    authorSlug === ANONYMOUS_AUTHOR_SLUG ||
+    isLegacyAnonymousAuthorSlug(authorSlug)
+  ) {
+    const hasAnonymous = getAllPoems().some(
+      (p) => p.volume === volumeSlug && isAnonymousAuthor(p.author),
+    );
+    return hasAnonymous
+      ? { slug: ANONYMOUS_AUTHOR_SLUG, name: ANONYMOUS_AUTHOR_NAME }
+      : undefined;
+  }
+
+  return getAuthorsByVolume(volumeSlug).find((a) => a.slug === authorSlug);
+}
+
+export function getAuthorPageParams(): {
+  volumeSlug: string;
+  authorSlug: string;
+}[] {
+  const params: { volumeSlug: string; authorSlug: string }[] = [];
+  const seen = new Set<string>();
+
+  for (const volume of getAllVolumes()) {
+    for (const author of getAuthorsByVolume(volume.slug)) {
+      const key = `${volume.slug}/${author.slug}`;
+      seen.add(key);
+      params.push({ volumeSlug: volume.slug, authorSlug: author.slug });
+    }
+
+    for (const poem of getAllPoems()) {
+      if (
+        poem.volume !== volume.slug ||
+        !isAnonymousAuthor(poem.author) ||
+        !isLegacyAnonymousAuthorSlug(poem.authorSlug)
+      ) {
+        continue;
+      }
+
+      const key = `${volume.slug}/${poem.authorSlug}`;
+      if (seen.has(key)) {
+        continue;
+      }
+
+      seen.add(key);
+      params.push({ volumeSlug: volume.slug, authorSlug: poem.authorSlug });
+    }
+  }
+
+  return params;
+}
+
 export function getPoemsByAuthor(
   volumeSlug: string,
   authorSlug: string,
 ): PoemMeta[] {
   const manifest = getVolumeManifest(volumeSlug);
-  const poems = getAllPoems().filter(
-    (p) => p.volume === volumeSlug && p.authorSlug === authorSlug,
-  );
+  const poems = getAllPoems().filter((p) => {
+    if (p.volume !== volumeSlug) {
+      return false;
+    }
+
+    if (
+      authorSlug === ANONYMOUS_AUTHOR_SLUG ||
+      isLegacyAnonymousAuthorSlug(authorSlug)
+    ) {
+      return isAnonymousAuthor(p.author);
+    }
+
+    return p.authorSlug === authorSlug;
+  });
 
   if (manifest) {
     return sortByManifestOrder(poems, manifest);

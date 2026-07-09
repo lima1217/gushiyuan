@@ -1,48 +1,50 @@
-export const VERTICAL_LINES_PER_COLUMN = 5;
-export const HORIZONTAL_SENTENCES_PER_ROW = 2;
+export const VERTICAL_LINES_PER_COLUMN_ODD = 3;
+export const VERTICAL_LINES_PER_COLUMN_EVEN = 2;
+export const HORIZONTAL_SENTENCES_PER_ROW = 1;
+
+/** 竖排列宽：奇数句三章一列，偶数句两章一列。 */
+export function verticalColumnSizeForCount(count: number): number {
+  return count % 2 === 1
+    ? VERTICAL_LINES_PER_COLUMN_ODD
+    : VERTICAL_LINES_PER_COLUMN_EVEN;
+}
 
 /**
- * 竖排正文分列：默认每列五句。余一句落单时（如六句）改为 3+3、4+4+3
- * 等均衡分法，避免末句独占一列、列间距过大而显得突兀。
+ * 竖排分列：同一竖行内叠放若干句，列自右向左。
+ * 列宽由句数奇偶决定（奇 3 / 偶 2）；奇数句且按三切分余一时改为 …3+2+2。
  */
 export function groupVerticalLineColumns(
   lines: string[],
-  columnSize = VERTICAL_LINES_PER_COLUMN,
+  columnSize?: number,
 ): string[][] {
   const count = lines.length;
-  if (count <= columnSize) {
-    return [lines];
+  if (count === 0) {
+    return [];
   }
 
-  if (count % columnSize === 1) {
+  const size = columnSize ?? verticalColumnSizeForCount(count);
+
+  if (size === 3 && count % 3 === 1 && count > 3) {
     const columns: string[][] = [];
     let index = 0;
-    while (index < count) {
-      const remaining = count - index;
-      if (remaining === columnSize) {
-        columns.push(lines.slice(index, index + columnSize));
-        break;
-      }
-      if (remaining === 6) {
-        columns.push(lines.slice(index, index + 3));
-        columns.push(lines.slice(index + 3, count));
-        break;
-      }
-      const take = Math.min(columnSize - 1, remaining);
-      columns.push(lines.slice(index, index + take));
-      index += take;
+    const leadingThrees = Math.floor((count - 4) / 3);
+    for (let i = 0; i < leadingThrees; i++) {
+      columns.push(lines.slice(index, index + 3));
+      index += 3;
     }
+    columns.push(lines.slice(index, index + 2));
+    columns.push(lines.slice(index + 2, count));
     return columns;
   }
 
   const columns: string[][] = [];
-  for (let i = 0; i < count; i += columnSize) {
-    columns.push(lines.slice(i, i + columnSize));
+  for (let i = 0; i < count; i += size) {
+    columns.push(lines.slice(i, i + size));
   }
   return columns;
 }
 
-/** 横排正文分行：默认每行两句；奇数句时末行单句。 */
+/** 横排正文分行：默认每行一句。 */
 export function groupHorizontalRows(
   sentences: string[],
   rowSize = HORIZONTAL_SENTENCES_PER_ROW,
@@ -63,11 +65,8 @@ export function groupHorizontalRowsByChapter(
 
 export function groupVerticalColumnsByChapter(
   chapters: string[][],
-  columnSize = VERTICAL_LINES_PER_COLUMN,
 ): string[][][] {
-  return chapters.map((chapter) =>
-    groupVerticalLineColumns(chapter, columnSize),
-  );
+  return chapters.map((chapter) => groupVerticalLineColumns(chapter));
 }
 
 /** 各章首句的全局序号（0 起，跨章连续）。 */

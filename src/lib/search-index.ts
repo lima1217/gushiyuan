@@ -2,7 +2,12 @@ import type {
   SearchIndex,
   SearchIndexAuthor,
 } from "@/lib/search-index-types";
-import { getAllPoems, getPoemBySlug, type Poem } from "@/lib/poems";
+import {
+  getAllPoems,
+  getCatalogAuthorSlug,
+  getPoemBySlug,
+  type Poem,
+} from "@/lib/poems";
 
 export type {
   SearchIndex,
@@ -35,13 +40,15 @@ export function buildSearchIndex(): SearchIndex {
 
   const authorMap = new Map<string, SearchIndexAuthor>();
   for (const poem of allPoems) {
-    if (authorMap.has(poem.authorSlug)) {
+    const catalogAuthorSlug = getCatalogAuthorSlug(poem);
+    const key = `${poem.volume}/${catalogAuthorSlug}`;
+    if (authorMap.has(key)) {
       continue;
     }
 
-    authorMap.set(poem.authorSlug, {
+    authorMap.set(key, {
       name: poem.author,
-      authorSlug: poem.authorSlug,
+      authorSlug: catalogAuthorSlug,
       volume: poem.volume,
     });
   }

@@ -4,7 +4,7 @@ import {
   SITE_DESCRIPTION,
   SITE_URL,
 } from "./site-metadata";
-import { getAllPoems, getAllVolumes } from "./poems";
+import { getAllPoems, getAllVolumes, getAuthorsByVolume } from "./poems";
 
 describe("SITE_DESCRIPTION", () => {
   it("uses simplified Chinese for site metadata", () => {
@@ -35,15 +35,13 @@ describe("buildSitemapEntries", () => {
 
   it("includes author catalog pages under each volume", () => {
     const urls = new Set(buildSitemapEntries().map((entry) => entry.url));
-    const seen = new Set<string>();
 
-    for (const poem of getAllPoems()) {
-      const key = `${poem.volume}/${poem.authorSlug}`;
-      if (seen.has(key)) continue;
-      seen.add(key);
-      expect(urls.has(`${SITE_URL}/v/${poem.volume}/${poem.authorSlug}`)).toBe(
-        true,
-      );
+    for (const volume of getAllVolumes()) {
+      for (const author of getAuthorsByVolume(volume.slug)) {
+        expect(urls.has(`${SITE_URL}/v/${volume.slug}/${author.slug}`)).toBe(
+          true,
+        );
+      }
     }
   });
 });

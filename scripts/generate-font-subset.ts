@@ -62,8 +62,35 @@ export const WENKAI_SUBSET_PATH = "${publicPath}";
   fs.writeFileSync(PATH_OUT, contents);
 }
 
+function resolvePythonWithFontTools(): string {
+  const candidates = [
+    path.join(ROOT, ".venv-font/bin/python3"),
+    "python3",
+  ];
+
+  for (const python of candidates) {
+    try {
+      execFileSync(python, ["-c", "from fontTools.ttLib import TTFont"], {
+        stdio: ["ignore", "ignore", "ignore"],
+      });
+      return python;
+    } catch {
+      // try next candidate
+    }
+  }
+
+  console.log("Installing fonttools for subset validation…");
+  execFileSync(
+    "python3",
+    ["-m", "pip", "install", "--user", "--quiet", "-r", path.join(ROOT, "requirements.txt")],
+    { stdio: "inherit" },
+  );
+  return "python3";
+}
+
 function validateSubsetCmap(fontPath: string, glyphs: number[]): void {
-  execFileSync("python3", [VALIDATE_SCRIPT, fontPath], {
+  const python = resolvePythonWithFontTools();
+  execFileSync(python, [VALIDATE_SCRIPT, fontPath], {
     input: JSON.stringify(glyphs),
     stdio: ["pipe", "inherit", "inherit"],
   });
