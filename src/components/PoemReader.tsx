@@ -5,6 +5,7 @@ import type { BreadcrumbItem } from "@/components/Breadcrumbs";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { PoemNav } from "@/components/PoemNav";
 import { SiteChromeTrail } from "@/components/SiteChromeTrail";
+import { VariantText } from "@/components/VariantText";
 import { PoemLine, PoemSentence } from "@/components/PoemLine";
 import {
   useScriptVariant,
@@ -28,18 +29,23 @@ import {
   verticalReadingScrollLeft,
 } from "@/lib/vertical-layout";
 import { cn } from "@/lib/utils";
+import type { VariantableText } from "@/lib/script-variant";
 
 function PoemAttribution({
   dynasty,
   author,
 }: {
-  dynasty: string;
-  author: string;
+  dynasty: VariantableText;
+  author: VariantableText;
 }) {
   return (
-    <p className="poem-reader__meta" aria-label={`${dynasty} · ${author}`}>
-      <span className="poem-reader__meta-dynasty">{dynasty}</span>
-      <span className="poem-reader__meta-author">{author}</span>
+    <p className="poem-reader__meta">
+      <span className="poem-reader__meta-dynasty">
+        <VariantText text={dynasty} />
+      </span>
+      <span className="poem-reader__meta-author">
+        <VariantText text={author} />
+      </span>
     </p>
   );
 }
@@ -60,18 +66,6 @@ export function PoemReader({
   lineageByLine,
 }: PoemReaderProps) {
   const { variant } = useScriptVariant();
-  const title = useVariantText({
-    simplified: poem.title,
-    traditional: poem.titleTraditional,
-  });
-  const author = useVariantText({
-    simplified: poem.author,
-    traditional: poem.authorTraditional,
-  });
-  const dynasty = useVariantText({
-    simplified: poem.dynasty,
-    traditional: poem.dynastyTraditional,
-  });
   const body = useVariantText({
     simplified: poem.body,
     traditional: poem.bodyTraditional,
@@ -198,8 +192,24 @@ export function PoemReader({
               )}
             >
               <header className="poem-reader__masthead">
-                <h1 className="poem-reader__title">{title}</h1>
-                <PoemAttribution dynasty={dynasty} author={author} />
+                <h1 className="poem-reader__title">
+                  <VariantText
+                    text={{
+                      simplified: poem.title,
+                      traditional: poem.titleTraditional,
+                    }}
+                  />
+                </h1>
+                <PoemAttribution
+                  dynasty={{
+                    simplified: poem.dynasty,
+                    traditional: poem.dynastyTraditional,
+                  }}
+                  author={{
+                    simplified: poem.author,
+                    traditional: poem.authorTraditional,
+                  }}
+                />
               </header>
               {displayChapters.map((sentences, chapterIndex) => {
                 const startLineIndex = chapterOffsets[chapterIndex] ?? 0;

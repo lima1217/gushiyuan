@@ -1,10 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import {
-  useUiText,
-  useVariantText,
-} from "@/components/ScriptVariantProvider";
+import { VariantText } from "@/components/VariantText";
+import { useUiText } from "@/components/ScriptVariantProvider";
 import type { VariantableText } from "@/lib/script-variant";
 
 export type BreadcrumbItem = {
@@ -16,19 +14,17 @@ type BreadcrumbsProps = {
   items: BreadcrumbItem[];
 };
 
-type BreadcrumbLinkItem = BreadcrumbItem & { href: string };
-
 function BreadcrumbListItem({
   item,
   index,
+  isLast,
   separator,
 }: {
-  item: BreadcrumbLinkItem;
+  item: BreadcrumbItem;
   index: number;
+  isLast: boolean;
   separator: string;
 }) {
-  const label = useVariantText(item.label);
-
   return (
     <li className="breadcrumbs__item">
       {index > 0 ? (
@@ -36,31 +32,35 @@ function BreadcrumbListItem({
           {separator}
         </span>
       ) : null}
-      <Link href={item.href} className="breadcrumbs__link">
-        {label}
-      </Link>
+      {!isLast && item.href ? (
+        <Link href={item.href} className="breadcrumbs__link">
+          <VariantText text={item.label} />
+        </Link>
+      ) : (
+        <span className="breadcrumbs__current" aria-current="page">
+          <VariantText text={item.label} />
+        </span>
+      )}
     </li>
   );
 }
 
 export function Breadcrumbs({ items }: BreadcrumbsProps) {
   const ariaLabel = useUiText("breadcrumbsAria");
-  const links = items.filter(
-    (item): item is BreadcrumbLinkItem => Boolean(item.href),
-  );
 
-  if (links.length === 0) {
+  if (items.length === 0) {
     return null;
   }
 
   return (
     <nav aria-label={ariaLabel} className="breadcrumbs">
       <ol className="breadcrumbs__list">
-        {links.map((item, index) => (
+        {items.map((item, index) => (
           <BreadcrumbListItem
-            key={`${item.href}-${index}`}
+            key={`crumb-${index}`}
             item={item}
             index={index}
+            isLast={index === items.length - 1}
             separator="›"
           />
         ))}

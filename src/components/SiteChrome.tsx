@@ -7,17 +7,14 @@ import { SiteSearch } from "@/components/SiteSearch";
 import { SiteChromeActionsContext } from "@/components/SiteChromeActions";
 import { SiteChromeTrailContext } from "@/components/SiteChromeTrail";
 import { SkipLink } from "@/components/SkipLink";
-import type { SearchIndex } from "@/lib/search-index-types";
 import type { SiteUiText } from "@/lib/site-ui-text";
 
 type SiteChromeProviderProps = {
-  searchIndex: SearchIndex;
   uiText: SiteUiText;
   children: ReactNode;
 };
 
 export function SiteChromeProvider({
-  searchIndex,
   uiText,
   children,
 }: SiteChromeProviderProps) {
@@ -33,7 +30,7 @@ export function SiteChromeProvider({
             <div className="site-chrome__trail">{trail}</div>
             <div className="site-chrome__actions">
               {actions}
-              <SiteSearch index={searchIndex} />
+              <SiteSearch />
               <LanguageToggle />
             </div>
           </div>

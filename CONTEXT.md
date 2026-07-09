@@ -41,7 +41,7 @@
 
 ## 简繁切换（script variant）
 
-简体 Markdown 是唯一权威内容源；繁体由构建期 OpenCC s2t 派生，并叠加 `content/script-conversion-overrides.json` 的古文语境覆盖表。客户端只在已内嵌的简体/繁体文本之间切换，偏好存 localStorage，key `gushiyuan-script-variant`；切换时 `<html lang>` 同步为 `zh-CN` / `zh-Hant`。见 ADR 0004。
+简体 Markdown 是唯一权威内容源；繁体由构建期 OpenCC s2t 派生，并叠加 `content/script-conversion-overrides.json` 的古文语境覆盖表。客户端只在已内嵌的简体/繁体文本之间切换，偏好以 localStorage 为准（key `gushiyuan-script-variant`），并同步写入 cookie 作为 localStorage 清空时的 fallback；首屏 bootstrap 与 React 均按 localStorage → cookie 顺序读取。切换时 `<html lang>` 同步为 `zh-CN` / `zh-Hant`。见 ADR 0004。
 
 ## 字形演变（已移除）
 

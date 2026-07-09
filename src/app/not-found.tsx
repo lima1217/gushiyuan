@@ -5,7 +5,10 @@ import { SITE_NAME } from "@/lib/site-metadata";
 
 export default function NotFound() {
   return (
-    <div className="flex min-h-dvh flex-col items-center justify-center px-8 py-16 md:px-12 md:py-24">
+    <main
+      id="main-content"
+      className="flex min-h-dvh flex-col items-center justify-center px-8 py-16 md:px-12 md:py-24"
+    >
       <Link href="/" className="catalog__site-title">
         <VariantText text={makeTextVariant(SITE_NAME)} />
       </Link>
@@ -18,6 +21,6 @@ export default function NotFound() {
       <Link href="/" className="catalog__link mt-10">
         <VariantText text={makeTextVariant("回目录")} />
       </Link>
-    </div>
+    </main>
   );
 }

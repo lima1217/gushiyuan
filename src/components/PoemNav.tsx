@@ -1,12 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import {
-  useScriptVariant,
-  useUiText,
-} from "@/components/ScriptVariantProvider";
+import { VariantText } from "@/components/VariantText";
+import { useUiText } from "@/components/ScriptVariantProvider";
 import type { PoemMeta } from "@/lib/poems";
-import { textForScriptVariant } from "@/lib/script-variant";
 
 type PoemNavMeta = PoemMeta & {
   titleTraditional?: string;
@@ -18,14 +15,13 @@ type PoemNavProps = {
 };
 
 function PoemNavTitle({ poem }: { poem: PoemNavMeta }) {
-  const { variant } = useScriptVariant();
-
-  return textForScriptVariant(
-    {
-      simplified: poem.title,
-      traditional: poem.titleTraditional ?? poem.title,
-    },
-    variant,
+  return (
+    <VariantText
+      text={{
+        simplified: poem.title,
+        traditional: poem.titleTraditional ?? poem.title,
+      }}
+    />
   );
 }
 

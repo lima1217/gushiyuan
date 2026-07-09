@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { SiteChromeProvider } from "@/components/SiteChrome";
 import { buildSiteUiText } from "@/lib/script-conversion";
-import { buildSearchIndex } from "@/lib/search-index";
 import {
   createPageMetadata,
   SITE_DESCRIPTION,
   SITE_NAME,
   SITE_URL,
 } from "@/lib/site-metadata";
+import { SCRIPT_VARIANT_BOOTSTRAP } from "@/lib/script-variant-bootstrap";
 import { preloadWenkaiSubset } from "@/lib/wenkai-font";
 import "./globals.css";
 
@@ -23,13 +23,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   preloadWenkaiSubset();
-  const searchIndex = buildSearchIndex();
   const uiText = buildSiteUiText();
 
   return (
-    <html lang="zh-CN">
+    <html lang="zh-CN" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{ __html: SCRIPT_VARIANT_BOOTSTRAP }}
+        />
+      </head>
       <body>
-        <SiteChromeProvider searchIndex={searchIndex} uiText={uiText}>
+        <SiteChromeProvider uiText={uiText}>
           {children}
         </SiteChromeProvider>
       </body>

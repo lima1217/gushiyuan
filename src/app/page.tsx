@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { CatalogLayout } from "@/components/CatalogLayout";
 import { VariantText } from "@/components/VariantText";
-import { getAllVolumes, isVolumeEmpty } from "@/lib/poems";
+import { VolumesNav } from "@/components/VolumesNav";
+import { getAllPoems, getAllVolumes } from "@/lib/poems";
 import { makeTextVariant } from "@/lib/script-conversion";
 
 export default function HomePage() {
   const volumes = getAllVolumes();
+  const volumesWithPoems = new Set(getAllPoems().map((poem) => poem.volume));
 
   return (
     <CatalogLayout
@@ -15,10 +17,10 @@ export default function HomePage() {
         { label: makeTextVariant("目录") },
       ]}
     >
-      <nav aria-label="古诗源分卷">
+      <VolumesNav>
         <ol className="catalog__list">
           {volumes.map((volume) => {
-            const empty = isVolumeEmpty(volume.slug);
+            const empty = !volumesWithPoems.has(volume.slug);
 
             return (
               <li key={volume.slug} className="catalog__item">
@@ -40,7 +42,7 @@ export default function HomePage() {
             );
           })}
         </ol>
-      </nav>
+      </VolumesNav>
     </CatalogLayout>
   );
 }

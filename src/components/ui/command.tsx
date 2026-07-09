@@ -35,7 +35,7 @@ function Command({
 
 function CommandDialog({
   title = "Command Palette",
-  description = "Search for a command to run...",
+  description = "Search for a command to run…",
   children,
   className,
   showCloseButton = false,
@@ -82,7 +82,7 @@ function CommandInput({
           {...props}
         />
         <InputGroupAddon>
-          <SearchIcon className="size-4 shrink-0 opacity-50" />
+          <SearchIcon aria-hidden="true" className="size-4 shrink-0 opacity-50" />
         </InputGroupAddon>
       </InputGroup>
     </div>

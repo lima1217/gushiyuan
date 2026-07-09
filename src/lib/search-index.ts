@@ -3,12 +3,7 @@ import type {
   SearchIndexAuthor,
 } from "@/lib/search-index-types";
 import { toTraditional } from "@/lib/script-conversion";
-import {
-  getAllPoems,
-  getCatalogAuthorSlug,
-  getPoemBySlug,
-  type Poem,
-} from "@/lib/poems";
+import { getAllPoems, getCatalogAuthorSlug } from "@/lib/poems";
 
 export type {
   SearchIndex,
@@ -19,14 +14,8 @@ export type {
 
 export { filterSearchIndex } from "@/lib/search-filter";
 
-function loadAllPoems(): Poem[] {
-  return getAllPoems()
-    .map((meta) => getPoemBySlug(meta.slug))
-    .filter((poem): poem is Poem => poem !== undefined);
-}
-
 export function buildSearchIndex(): SearchIndex {
-  const allPoems = loadAllPoems();
+  const allPoems = getAllPoems();
 
   const poems = allPoems
     .map((poem) => ({

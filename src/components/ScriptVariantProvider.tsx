@@ -5,17 +5,20 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useState,
+  useSyncExternalStore,
   type ReactNode,
 } from "react";
 import type { SiteUiText, SiteUiTextKey } from "@/lib/site-ui-text";
 import {
-  DEFAULT_SCRIPT_VARIANT,
+  getScriptVariantServerSnapshot,
+  getScriptVariantSnapshot,
+  setScriptVariant,
+  subscribeScriptVariant,
+} from "@/lib/script-variant-client";
+import { applyScriptVariantToDocument } from "@/lib/script-variant-bootstrap";
+import {
   type ScriptVariant,
   type VariantableText,
-  langForScriptVariant,
-  persistScriptVariant,
-  readStoredScriptVariant,
   textForScriptVariant,
 } from "@/lib/script-variant";
 
@@ -36,28 +39,20 @@ export function ScriptVariantProvider({
   uiText,
   children,
 }: ScriptVariantProviderProps) {
-  const [variant, setVariantState] = useState<ScriptVariant>(
-    DEFAULT_SCRIPT_VARIANT,
+  const variant = useSyncExternalStore(
+    subscribeScriptVariant,
+    getScriptVariantSnapshot,
+    getScriptVariantServerSnapshot,
   );
 
   useEffect(() => {
-    const frame = requestAnimationFrame(() => {
-      setVariantState(readStoredScriptVariant(localStorage));
-    });
-    return () => cancelAnimationFrame(frame);
-  }, []);
-
-  useEffect(() => {
-    document.documentElement.lang = langForScriptVariant(variant);
+    applyScriptVariantToDocument(variant);
   }, [variant]);
 
   const value = useMemo<ScriptVariantContextValue>(
     () => ({
       variant,
-      setVariant(nextVariant) {
-        setVariantState(nextVariant);
-        persistScriptVariant(localStorage, nextVariant);
-      },
+      setVariant: setScriptVariant,
       uiText,
     }),
     [variant, uiText],

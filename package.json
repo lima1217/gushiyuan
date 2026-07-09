@@ -4,9 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "predev": "npm run font:subset",
-    "build": "npm run font:subset && next build",
+    "predev": "npm run font:subset && npm run search:index",
+    "build": "npm run font:subset && npm run search:index && next build",
     "font:subset": "tsx scripts/generate-font-subset.ts",
+    "search:index": "tsx scripts/generate-search-index.ts",
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",

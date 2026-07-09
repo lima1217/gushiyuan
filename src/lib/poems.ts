@@ -58,6 +58,16 @@ const POEMS_DIR = path.join(CONTENT_DIR, "poems");
 const VOLUMES_FILE = path.join(CONTENT_DIR, "volumes.json");
 const VOLUME_MANIFEST_DIR = path.join(CONTENT_DIR, "volumes");
 
+type PoemFileData = PoemMeta & {
+  body: string;
+  verticalLayout?: VerticalLayoutOverride;
+};
+
+const poemCacheEnabled = process.env.NODE_ENV === "production";
+
+let cachedAllPoems: PoemMeta[] | null = null;
+const poemFileCache = new Map<string, PoemFileData>();
+
 function getVolumeManifest(volumeSlug: string): string[] | undefined {
   const manifestPath = path.join(
     VOLUME_MANIFEST_DIR,
@@ -96,12 +106,23 @@ function requireField(
   return String(value);
 }
 
-function parsePoemFile(slug: string): Poem {
+function loadPoemFile(slug: string): PoemFileData | undefined {
+  if (poemCacheEnabled) {
+    const cached = poemFileCache.get(slug);
+    if (cached) {
+      return cached;
+    }
+  }
+
   const filePath = path.join(POEMS_DIR, `${slug}.md`);
+  if (!fs.existsSync(filePath)) {
+    return undefined;
+  }
+
   const raw = fs.readFileSync(filePath, "utf-8");
   const { data, content } = matter(raw);
 
-  return {
+  const poem: PoemFileData = {
     slug,
     title: requireField(data, "title", slug),
     author: requireField(data, "author", slug),
@@ -111,26 +132,65 @@ function parsePoemFile(slug: string): Poem {
     verticalLayout: parseVerticalLayoutOverride(data.verticalLayout),
     body: content.trim(),
   };
+
+  if (poemCacheEnabled) {
+    poemFileCache.set(slug, poem);
+  }
+  return poem;
+}
+
+function toPoemMeta(poem: PoemFileData): PoemMeta {
+  return {
+    slug: poem.slug,
+    title: poem.title,
+    author: poem.author,
+    authorSlug: poem.authorSlug,
+    dynasty: poem.dynasty,
+    volume: poem.volume,
+  };
+}
+
+function toPoem(poem: PoemFileData): Poem {
+  return {
+    slug: poem.slug,
+    title: poem.title,
+    author: poem.author,
+    authorSlug: poem.authorSlug,
+    dynasty: poem.dynasty,
+    volume: poem.volume,
+    body: poem.body,
+    verticalLayout: poem.verticalLayout,
+  };
 }
 
 export function getAllPoems(): PoemMeta[] {
+  if (poemCacheEnabled && cachedAllPoems) {
+    return cachedAllPoems;
+  }
+
   const files = fs.readdirSync(POEMS_DIR).filter((f) => f.endsWith(".md"));
 
-  return files
+  const poems = files
     .map((file) => {
       const slug = file.replace(/\.md$/, "");
-      const { title, author, authorSlug, dynasty, volume } = parsePoemFile(slug);
-      return { slug, title, author, authorSlug, dynasty, volume };
+      const poem = loadPoemFile(slug);
+      if (!poem) {
+        throw new Error(`Poem file "${slug}" disappeared during indexing`);
+      }
+      return toPoemMeta(poem);
     })
     .sort((a, b) => a.slug.localeCompare(b.slug, "zh-CN"));
+
+  if (poemCacheEnabled) {
+    cachedAllPoems = poems;
+  }
+
+  return poems;
 }
 
 export function getPoemBySlug(slug: string): Poem | undefined {
-  const filePath = path.join(POEMS_DIR, `${slug}.md`);
-  if (!fs.existsSync(filePath)) {
-    return undefined;
-  }
-  return parsePoemFile(slug);
+  const poem = loadPoemFile(slug);
+  return poem ? toPoem(poem) : undefined;
 }
 
 export function getAllVolumes(): Volume[] {

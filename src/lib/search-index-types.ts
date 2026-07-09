@@ -22,6 +22,8 @@ export type SearchIndex = {
   authors: SearchIndexAuthor[];
 };
 
+export const SEARCH_INDEX_URL = "/search-index.json";
+
 export type SearchResults = {
   poems: SearchIndexPoem[];
   authors: SearchIndexAuthor[];

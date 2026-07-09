@@ -13,6 +13,7 @@ export const SITE_UI_TEXT_SIMPLIFIED = {
   searchDescription: "按诗题或作者检索",
   searchPlaceholder: "诗题、作者…",
   searchNoMatch: "未找到匹配",
+  searchLoadError: "检索索引加载失败，请稍后重试",
   searchPrompt: "输入诗题或作者",
   searchPoemsHeading: "诗",
   searchAuthorsHeading: "作者",

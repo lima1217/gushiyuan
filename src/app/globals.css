@@ -5,6 +5,20 @@
 
 @custom-variant dark (&:is(.dark *));
 
+.variant-text__traditional {
+  display: none;
+}
+
+:root[data-script-variant="traditional"] .variant-text__simplified,
+html[lang="zh-Hant"] .variant-text__simplified {
+  display: none;
+}
+
+:root[data-script-variant="traditional"] .variant-text__traditional,
+html[lang="zh-Hant"] .variant-text__traditional {
+  display: inline;
+}
+
 :root {
   --color-paper: #faf8f4;
   --color-ink: #2c2a26;
@@ -164,9 +178,10 @@ body {
 
 .poem-reader__sentence--lineage:hover,
 .poem-reader__sentence--lineage:focus-visible {
-  outline: none;
   color: var(--color-ink);
   background: color-mix(in srgb, var(--color-ink) 4%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--color-ink) 24%, transparent);
+  outline-offset: 2px;
 }
 
 .poem-reader__sentence--lineage .poem-reader__lineage-mark {
@@ -208,9 +223,10 @@ body {
 
 .poem-reader__line--lineage:hover,
 .poem-reader__line--lineage:focus-visible {
-  outline: none;
   color: var(--color-ink);
   background: color-mix(in srgb, var(--color-ink) 4%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--color-ink) 24%, transparent);
+  outline-offset: 2px;
 }
 
 .poem-reader__lineage-mark {
@@ -267,6 +283,12 @@ body {
 
 .lineage-hint__link:hover {
   background: color-mix(in srgb, var(--color-ink) 4%, transparent);
+}
+
+.lineage-hint__link:focus-visible {
+  background: color-mix(in srgb, var(--color-ink) 4%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--color-ink) 24%, transparent);
+  outline-offset: 2px;
 }
 
 .lineage-hint__relation {
@@ -381,7 +403,19 @@ body {
 }
 
 /* 锚点句：从流句页跳回时轻微高亮 */
-.poem-reader__line:target {
+.poem-reader__line,
+.poem-reader__sentence,
+.poem-reader__line--lineage,
+.poem-reader__sentence--lineage {
+  scroll-margin-top: calc(
+    var(--site-header-clearance) + env(safe-area-inset-top, 0px)
+  );
+}
+
+.poem-reader__line:target,
+.poem-reader__sentence:target,
+.poem-reader__line--lineage:target,
+.poem-reader__sentence--lineage:target {
   animation: lineage-target 2.4s ease;
 }
 
@@ -677,11 +711,19 @@ body {
   color: var(--color-ink);
 }
 
+.catalog__site-title:focus-visible {
+  color: var(--color-ink);
+  outline: 2px solid color-mix(in srgb, var(--color-ink) 24%, transparent);
+  outline-offset: 3px;
+  border-radius: 0.125rem;
+}
+
 .catalog__title {
   font-size: 1.5rem;
   font-weight: 400;
   letter-spacing: 0.14em;
   line-height: 1.6;
+  text-wrap: balance;
   -webkit-font-smoothing: subpixel-antialiased;
   -moz-osx-font-smoothing: auto;
 }
@@ -723,6 +765,10 @@ body {
 }
 
 .catalog__link {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-size: 1.1875rem;
   color: var(--color-ink);
   letter-spacing: 0.08em;
@@ -733,6 +779,13 @@ body {
 
 .catalog__link:hover {
   color: var(--color-ink-muted);
+}
+
+.catalog__link:focus-visible {
+  color: var(--color-ink);
+  outline: 2px solid color-mix(in srgb, var(--color-ink) 24%, transparent);
+  outline-offset: 3px;
+  border-radius: 0.125rem;
 }
 
 .catalog__link--disabled {
@@ -972,6 +1025,13 @@ body:has(.catalog-layout) .site-chrome {
   color: var(--color-ink);
 }
 
+.breadcrumbs__link:focus-visible {
+  color: var(--color-ink);
+  outline: 2px solid color-mix(in srgb, var(--color-ink) 24%, transparent);
+  outline-offset: 3px;
+  border-radius: 0.125rem;
+}
+
 .breadcrumbs__current {
   color: var(--color-ink);
 }
@@ -990,6 +1050,7 @@ body:has(.catalog-layout) .site-chrome {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  min-width: 0;
   max-width: 45%;
   color: color-mix(in srgb, var(--color-ink) 44%, transparent);
   text-decoration: none;
@@ -998,6 +1059,13 @@ body:has(.catalog-layout) .site-chrome {
 
 .poem-nav__link:hover {
   color: var(--color-ink);
+}
+
+.poem-nav__link:focus-visible {
+  color: var(--color-ink);
+  outline: 2px solid color-mix(in srgb, var(--color-ink) 24%, transparent);
+  outline-offset: 3px;
+  border-radius: 0.125rem;
 }
 
 .poem-nav__link--next {
@@ -1012,6 +1080,10 @@ body:has(.catalog-layout) .site-chrome {
 }
 
 .poem-nav__title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
   font-size: 0.8125rem;
 }
 
@@ -1026,8 +1098,27 @@ body:has(.catalog-layout) .site-chrome {
 /* 站内检索：固定角落，低对比，唤起前不占正文空间 */
 
 @media (prefers-reduced-motion: reduce) {
-  .site-chrome__control {
+  .site-chrome__control,
+  .lineage-hint__link,
+  .catalog__link,
+  .lineage-page__source-link,
+  .poem-reader__line--lineage {
     transition: none;
+  }
+
+  .poem-reader__line:target,
+  .poem-reader__sentence:target,
+  .poem-reader__line--lineage:target,
+  .poem-reader__sentence--lineage:target {
+    animation: none;
+    background: color-mix(in srgb, var(--color-ink) 6%, transparent);
+  }
+
+  [data-slot="dialog-overlay"],
+  [data-slot="dialog-content"],
+  [data-slot="popover-content"] {
+    animation: none !important;
+    transition: none !important;
   }
 }
 
