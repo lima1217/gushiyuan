@@ -12,6 +12,7 @@ import { WEI_CONFIG } from "./wei-config.mjs";
 import {
   extractTitleFromHeading,
   firstLineTitle,
+  iterateMergedH4Entries,
   readEpubHtmlParts,
   stripPoemHtml,
 } from "./epub-poem-utils.mjs";
@@ -52,6 +53,7 @@ const SLUG_DISAMBIGUATION = {
   "陆云|为顾彦先赠妇": "lu-yun-wei-gu-yan-xian-zeng-fu",
   "张华|情诗": "zhang-hua-qing-shi",
   "陶潜|杂诗": "tao-qian-za-shi",
+  "束晳|补亡诗六章": "bu-wang-shi-liu-zhang",
 };
 
 /**
@@ -134,21 +136,7 @@ function parseCatalogEntries(html) {
       throw new Error(`Unexpected no-h4 node: ${author}`);
     }
 
-    for (let j = 0; j < h4Matches.length; j++) {
-      const title = extractTitleFromHeading(h4Matches[j][0]);
-      const h4Start = h4Matches[j].index + h4Matches[j][0].length;
-      const h4End =
-        j + 1 < h4Matches.length ? h4Matches[j + 1].index : section.length;
-      const h4Section = section.slice(h4Start, h4End);
-      const blocks = [
-        ...h4Section.matchAll(/<p class="kindle-cn-poem-left">([\s\S]*?)<\/p>/gi),
-      ];
-      const calibre5 = [
-        ...h4Section.matchAll(/<p class="calibre5">([\s\S]*?)<\/p>/gi),
-      ];
-      const mode =
-        blocks.length + calibre5.length > 1 ? "multi-chapter" : "single";
-
+    for (const { title, mode } of iterateMergedH4Entries(section, h4Matches)) {
       entries.push({ author, title, mode });
     }
   }

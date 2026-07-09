@@ -8,7 +8,13 @@ export default function HomePage() {
   const volumes = getAllVolumes();
 
   return (
-    <CatalogLayout title={makeTextVariant("目录")}>
+    <CatalogLayout
+      title={makeTextVariant("目录")}
+      breadcrumbs={[
+        { label: makeTextVariant("古诗源"), href: "/" },
+        { label: makeTextVariant("目录") },
+      ]}
+    >
       <nav aria-label="古诗源分卷">
         <ol className="catalog__list">
           {volumes.map((volume) => {

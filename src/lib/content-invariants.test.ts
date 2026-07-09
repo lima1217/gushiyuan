@@ -95,6 +95,12 @@ describe("imported volume content invariants", () => {
           }
         }
       });
+
+      it("has non-empty body text", () => {
+        for (const { slug, body } of poems) {
+          expect(body.trim().length, `${slug} has empty body`).toBeGreaterThan(0);
+        }
+      });
     });
   }
 });
@@ -205,6 +211,16 @@ describe("jin volume spot checks", () => {
     expect(getPoemBySlug("duan-ge-xing")?.volume).toBe("wei");
     expect(getPoemBySlug("zhang-hua-za-shi")?.volume).toBe("jin");
     expect(getPoemBySlug("za-shi")?.volume).toBe("han");
+  });
+
+  it("补亡诗六章 keeps six merged chapters in one poem", () => {
+    const poem = getPoemBySlug("bu-wang-shi-liu-zhang");
+    expect(poem?.volume).toBe("jin");
+    expect(poem?.title).toBe("补亡诗六章");
+    const chapters = parseChapters(poem!.body);
+    expect(chapters).toHaveLength(6);
+    expect(chapters[0][0]).toBe("循彼南陔。");
+    expect(chapters[5][0]).toBe("肃肃君子。");
   });
 });
 

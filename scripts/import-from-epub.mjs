@@ -21,6 +21,7 @@ import {
   extractTitleFromHeading,
   firstLineTitle,
   formatBody,
+  iterateMergedH4Entries,
   processPoemBlocks,
   readEpubHtmlParts,
   renderPoemMarkdown,
@@ -95,18 +96,10 @@ export function parseHanPoemBodies(html, options) {
       throw new Error(`Unexpected no-h4 node: ${author}`);
     }
 
-    for (let j = 0; j < h4Matches.length; j++) {
-      const title = extractTitleFromHeading(h4Matches[j][0]);
-      const h4Start = h4Matches[j].index + h4Matches[j][0].length;
-      const h4End =
-        j + 1 < h4Matches.length ? h4Matches[j + 1].index : section.length;
-      const h4Section = section.slice(h4Start, h4End);
-
-      const rawBlocks = [
-        ...h4Section.matchAll(/<p class="kindle-cn-poem-left">([\s\S]*?)<\/p>/gi),
-        ...h4Section.matchAll(/<p class="calibre5">([\s\S]*?)<\/p>/gi),
-      ].map((match) => match[1]);
-
+    for (const { title, rawBlocks } of iterateMergedH4Entries(
+      section,
+      h4Matches,
+    )) {
       const chapters = processPoemBlocks(rawBlocks, {
         title,
         onReject: options.onReject,

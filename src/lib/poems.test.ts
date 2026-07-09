@@ -314,7 +314,7 @@ describe("getPoemsByVolume", () => {
   it("orders jin poems by volume manifest", () => {
     const poems = getPoemsByVolume("jin");
 
-    expect(poems.length).toBe(109);
+    expect(poems.length).toBe(103);
     expect(poems[0]?.slug).toBe("yan-yin-shi");
     expect(poems.at(-1)?.slug).toBe("mian-zhou-ba-ge");
   });

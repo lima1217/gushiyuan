@@ -10,7 +10,7 @@ export const JIN_CONFIG = {
     "text/part0014.html",
     "text/part0015.html"
   ],
-  expectedCount: 109,
+  expectedCount: 103,
   entries: [
   { slug: "yan-yin-shi", title: "燕饮诗", author: "司马懿", authorSlug: "si-ma-yi", mode: "single" },
   { slug: "li-zhi-shi", title: "励志诗", author: "张华", authorSlug: "zhang-hua", mode: "multi-chapter" },
@@ -23,13 +23,7 @@ export const JIN_CONFIG = {
   { slug: "za-yan", title: "杂言", author: "傅玄", authorSlug: "fu-xuan", mode: "single" },
   { slug: "wu-chu-ge", title: "吴楚歌", author: "傅玄", authorSlug: "fu-xuan", mode: "single" },
   { slug: "che-yao-yao-pian", title: "车遥遥篇", author: "傅玄", authorSlug: "fu-xuan", mode: "single" },
-  { slug: "bu-wang-shi-liu-zhang", title: "补亡诗六章", author: "束晳", authorSlug: "shu-xi", mode: "single" },
-  { slug: "nan-gai", title: "南陔", author: "束晳", authorSlug: "shu-xi", mode: "single" },
-  { slug: "bai-hua", title: "白华", author: "束晳", authorSlug: "shu-xi", mode: "single" },
-  { slug: "hua-shu", title: "华黍", author: "束晳", authorSlug: "shu-xi", mode: "single" },
-  { slug: "you-geng", title: "由庚", author: "束晳", authorSlug: "shu-xi", mode: "single" },
-  { slug: "chong-qiu", title: "崇丘", author: "束晳", authorSlug: "shu-xi", mode: "single" },
-  { slug: "you-yi", title: "由仪", author: "束晳", authorSlug: "shu-xi", mode: "single" },
+  { slug: "bu-wang-shi-liu-zhang", title: "补亡诗六章", author: "束晳", authorSlug: "shu-xi", mode: "multi-chapter" },
   { slug: "si-ma-biao-za-shi", title: "杂诗", author: "司马彪", authorSlug: "si-ma-biao", mode: "single" },
   { slug: "lu-ji-duan-ge-xing", title: "短歌行", author: "陆机", authorSlug: "lu-ji", mode: "single" },
   { slug: "lu-ji-long-xi-xing", title: "陇西行", author: "陆机", authorSlug: "lu-ji", mode: "single" },

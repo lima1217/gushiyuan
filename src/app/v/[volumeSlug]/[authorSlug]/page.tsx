@@ -51,7 +51,11 @@ export default async function AuthorPage({ params }: PageProps) {
   return (
     <CatalogLayout
       title={makeTextVariant(author.name)}
-      breadcrumbs={[{ label: makeTextVariant(volume.name), href: `/v/${volumeSlug}` }]}
+      breadcrumbs={[
+        { label: makeTextVariant("古诗源"), href: "/" },
+        { label: makeTextVariant(volume.name), href: `/v/${volumeSlug}` },
+        { label: makeTextVariant(author.name) },
+      ]}
     >
       <nav aria-label={`${author.name}诗作`}>
         <ol className="catalog__list">

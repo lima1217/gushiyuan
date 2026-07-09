@@ -17,6 +17,7 @@ import { WEI_CONFIG } from "./wei-config.mjs";
 import {
   extractTitleFromHeading,
   firstLineTitle,
+  iterateMergedH4Entries,
   readEpubHtmlParts,
   stripPoemHtml,
 } from "./epub-poem-utils.mjs";
@@ -142,21 +143,10 @@ function parseAuthorSection(section, dynasty) {
       throw new Error(`Unexpected no-h4 node: ${author}`);
     }
 
-    for (let j = 0; j < h4Matches.length; j++) {
-      const title = extractTitleFromHeading(h4Matches[j][0]);
-      const h4Start = h4Matches[j].index + h4Matches[j][0].length;
-      const h4End =
-        j + 1 < h4Matches.length ? h4Matches[j + 1].index : authorSection.length;
-      const h4Section = authorSection.slice(h4Start, h4End);
-      const blocks = [
-        ...h4Section.matchAll(/<p class="kindle-cn-poem-left">([\s\S]*?)<\/p>/gi),
-      ];
-      const calibre5 = [
-        ...h4Section.matchAll(/<p class="calibre5">([\s\S]*?)<\/p>/gi),
-      ];
-      const mode =
-        blocks.length + calibre5.length > 1 ? "multi-chapter" : "single";
-
+    for (const { title, mode } of iterateMergedH4Entries(
+      authorSection,
+      h4Matches,
+    )) {
       entries.push({ author, title, dynasty, mode });
     }
   }

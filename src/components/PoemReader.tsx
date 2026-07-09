@@ -18,9 +18,13 @@ import { parsePoemBody } from "@/lib/poem-body";
 import {
   VERTICAL_LAYOUT_LINE_PER_COLUMN,
   alignVerticalScrollToFirstColumn,
+  applyVerticalReadingWheelDelta,
   chapterSentenceOffsets,
+  hasVerticalReadingHorizontalOverflow,
   prepareVerticalDisplayChapters,
   resolveVerticalLayout,
+  resolveVerticalHeadAlignment,
+  shouldConsumeVerticalReadingWheel,
   verticalReadingScrollLeft,
 } from "@/lib/vertical-layout";
 import { cn } from "@/lib/utils";
@@ -91,17 +95,49 @@ export function PoemReader({
     0,
   );
 
+  const readingAreaRef = useRef<HTMLDivElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
+  const layoutRef = useRef<HTMLDivElement>(null);
+  const headRef = useRef<HTMLDivElement>(null);
+  const columnsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const viewport = viewportRef.current;
-    if (!viewport) {
+    const head = headRef.current;
+    const columns = columnsRef.current;
+    if (!viewport || !head || !columns) {
       return;
     }
 
     let cancelled = false;
 
-    function alignVerticalReadingStart() {
+    function applyHeadAlignment() {
+      const layout = layoutRef.current;
+      if (!layout || !head || !columns || !viewport) {
+        return;
+      }
+
+      const columnsRect = columns.getBoundingClientRect();
+      const layoutRect = layout.getBoundingClientRect();
+      const alignment = resolveVerticalHeadAlignment({
+        viewportWidth: viewport.clientWidth,
+        columnsWidth: columnsRect.width,
+        columnsOffsetLeft: columnsRect.left - layoutRect.left,
+      });
+
+      if (alignment.mode === "gutter") {
+        head.style.removeProperty("width");
+        head.style.removeProperty("margin-inline-start");
+        head.style.removeProperty("padding-inline-end");
+        return;
+      }
+
+      head.style.width = `${alignment.width}px`;
+      head.style.marginInlineStart = `${alignment.offsetLeft}px`;
+      head.style.paddingInlineEnd = "0";
+    }
+
+    function syncVerticalReadingLayout() {
       if (!viewport) {
         return;
       }
@@ -110,19 +146,21 @@ export function PoemReader({
         viewport.clientWidth,
       );
       alignVerticalScrollToFirstColumn(viewport, target);
+      applyHeadAlignment();
     }
 
-    alignVerticalReadingStart();
-    const frame = requestAnimationFrame(alignVerticalReadingStart);
+    syncVerticalReadingLayout();
+    const frame = requestAnimationFrame(syncVerticalReadingLayout);
 
     const observer = new ResizeObserver(() => {
-      alignVerticalReadingStart();
+      syncVerticalReadingLayout();
     });
     observer.observe(viewport);
+    observer.observe(columns);
 
     void document.fonts.ready.then(() => {
       if (!cancelled) {
-        alignVerticalReadingStart();
+        syncVerticalReadingLayout();
       }
     });
 
@@ -130,6 +168,47 @@ export function PoemReader({
       cancelled = true;
       cancelAnimationFrame(frame);
       observer.disconnect();
+      head.style.removeProperty("width");
+      head.style.removeProperty("margin-inline-start");
+      head.style.removeProperty("padding-inline-end");
+    };
+  }, [sentenceCount, variant, verticalLayout]);
+
+  useEffect(() => {
+    const readingArea = readingAreaRef.current;
+    const scrollViewport = viewportRef.current;
+    if (!readingArea || !scrollViewport) {
+      return;
+    }
+
+    function onWheel(event: WheelEvent) {
+      if (
+        event.target instanceof Element &&
+        event.target.closest('[data-slot="popover-content"]')
+      ) {
+        return;
+      }
+
+      if (
+        !hasVerticalReadingHorizontalOverflow(
+          scrollViewport.scrollWidth,
+          scrollViewport.clientWidth,
+        )
+      ) {
+        return;
+      }
+
+      if (!shouldConsumeVerticalReadingWheel(event.deltaX, event.deltaY)) {
+        return;
+      }
+
+      event.preventDefault();
+      applyVerticalReadingWheelDelta(scrollViewport, event.deltaY);
+    }
+
+    readingArea.addEventListener("wheel", onWheel, { passive: false });
+    return () => {
+      readingArea.removeEventListener("wheel", onWheel);
     };
   }, [sentenceCount, variant, verticalLayout]);
 
@@ -138,13 +217,14 @@ export function PoemReader({
       id="main-content"
       className="poem-reader poem-reader--vertical relative flex min-h-dvh flex-col"
     >
-      <div className="poem-reader__viewport">
-        <div className="poem-reader__vertical-layout">
-          <div className="poem-reader__vertical-head">
+      <div ref={readingAreaRef} className="poem-reader__viewport">
+        <div ref={layoutRef} className="poem-reader__vertical-layout">
+          <div ref={headRef} className="poem-reader__vertical-head site-breadcrumbs-bar">
             <Breadcrumbs items={breadcrumbs} />
           </div>
           <div ref={viewportRef} className="poem-reader__columns-viewport">
             <div
+              ref={columnsRef}
               className={cn(
                 "poem-reader__columns",
                 verticalLayout === VERTICAL_LAYOUT_LINE_PER_COLUMN

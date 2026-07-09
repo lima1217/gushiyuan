@@ -135,3 +135,58 @@ export function alignVerticalScrollToFirstColumn(
     viewport.scrollTo({ left: -target, behavior: "instant" });
   }
 }
+
+export type VerticalHeadAlignment =
+  | { mode: "gutter" }
+  | { mode: "columns"; offsetLeft: number; width: number };
+
+/**
+ * 窄内容时让顶栏面包屑与诗列同宽同位；溢出时回退到版心左对齐。
+ */
+export function hasVerticalReadingHorizontalOverflow(
+  scrollWidth: number,
+  clientWidth: number,
+): boolean {
+  return scrollWidth > clientWidth + 1;
+}
+
+/** 触控板已有横向 delta 时不劫持；否则把纵向滚轮映射为横向阅读滚动。 */
+export function shouldConsumeVerticalReadingWheel(
+  deltaX: number,
+  deltaY: number,
+): boolean {
+  return Math.abs(deltaY) >= Math.abs(deltaX);
+}
+
+/** 滚轮下滚 → 视口向左移，沿竖排阅读方向推进。 */
+export function verticalReadingWheelScrollLeft(deltaY: number): number {
+  return -deltaY;
+}
+
+export function applyVerticalReadingWheelDelta(
+  viewport: HTMLElement,
+  deltaY: number,
+): void {
+  viewport.scrollBy({
+    left: verticalReadingWheelScrollLeft(deltaY),
+    behavior: "instant",
+  });
+}
+
+export function resolveVerticalHeadAlignment(input: {
+  viewportWidth: number;
+  columnsWidth: number;
+  columnsOffsetLeft: number;
+}): VerticalHeadAlignment {
+  const { viewportWidth, columnsWidth, columnsOffsetLeft } = input;
+
+  if (columnsWidth <= 0 || columnsWidth > viewportWidth + 0.5) {
+    return { mode: "gutter" };
+  }
+
+  return {
+    mode: "columns",
+    offsetLeft: Math.max(0, columnsOffsetLeft),
+    width: columnsWidth,
+  };
+}

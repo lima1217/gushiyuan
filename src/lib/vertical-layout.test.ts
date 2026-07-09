@@ -6,13 +6,18 @@ import {
   VERTICAL_LAYOUT_OVERRIDE_REFLOW,
   VERTICAL_LAYOUT_REFLOW,
   alignVerticalScrollToFirstColumn,
+  applyVerticalReadingWheelDelta,
   chapterSentenceOffsets,
+  hasVerticalReadingHorizontalOverflow,
   inferVerticalLayout,
   parseVerticalLayoutOverride,
   prepareVerticalDisplayChapters,
   resolveVerticalLayout,
+  resolveVerticalHeadAlignment,
+  shouldConsumeVerticalReadingWheel,
   stripVerticalPunctuation,
   verticalReadingScrollLeft,
+  verticalReadingWheelScrollLeft,
 } from "./vertical-layout";
 
 function repeatedLines(line: string, count: number): string[] {
@@ -203,5 +208,99 @@ describe("alignVerticalScrollToFirstColumn", () => {
     expect(viewport.scrollTo).toHaveBeenCalledWith(
       expect.objectContaining({ left: 0 }),
     );
+  });
+});
+
+describe("hasVerticalReadingHorizontalOverflow", () => {
+  it("is false when content fits the viewport", () => {
+    expect(hasVerticalReadingHorizontalOverflow(320, 320)).toBe(false);
+    expect(hasVerticalReadingHorizontalOverflow(320, 321)).toBe(false);
+  });
+
+  it("is true when content overflows by more than one pixel", () => {
+    expect(hasVerticalReadingHorizontalOverflow(322, 320)).toBe(true);
+  });
+});
+
+describe("shouldConsumeVerticalReadingWheel", () => {
+  it("consumes vertical-dominant wheel deltas", () => {
+    expect(shouldConsumeVerticalReadingWheel(0, 120)).toBe(true);
+    expect(shouldConsumeVerticalReadingWheel(40, 120)).toBe(true);
+  });
+
+  it("ignores horizontal-dominant wheel deltas", () => {
+    expect(shouldConsumeVerticalReadingWheel(120, 40)).toBe(false);
+  });
+});
+
+describe("verticalReadingWheelScrollLeft", () => {
+  it("maps wheel down to leftward reading progress", () => {
+    expect(verticalReadingWheelScrollLeft(120)).toBe(-120);
+    expect(verticalReadingWheelScrollLeft(-120)).toBe(120);
+  });
+});
+
+describe("applyVerticalReadingWheelDelta", () => {
+  it("scrolls the viewport by the mapped wheel delta", () => {
+    const viewport = {
+      scrollBy: vi.fn(),
+    } as unknown as HTMLElement;
+
+    applyVerticalReadingWheelDelta(viewport, 120);
+
+    expect(viewport.scrollBy).toHaveBeenCalledWith({
+      left: -120,
+      behavior: "instant",
+    });
+  });
+});
+
+describe("resolveVerticalHeadAlignment", () => {
+  it("syncs to centered columns when content fits the viewport", () => {
+    expect(
+      resolveVerticalHeadAlignment({
+        viewportWidth: 800,
+        columnsWidth: 320,
+        columnsOffsetLeft: 240,
+      }),
+    ).toEqual({
+      mode: "columns",
+      offsetLeft: 240,
+      width: 320,
+    });
+  });
+
+  it("falls back to gutter alignment when columns overflow", () => {
+    expect(
+      resolveVerticalHeadAlignment({
+        viewportWidth: 800,
+        columnsWidth: 801,
+        columnsOffsetLeft: 0,
+      }),
+    ).toEqual({ mode: "gutter" });
+  });
+
+  it("falls back to gutter alignment before columns are measured", () => {
+    expect(
+      resolveVerticalHeadAlignment({
+        viewportWidth: 800,
+        columnsWidth: 0,
+        columnsOffsetLeft: 0,
+      }),
+    ).toEqual({ mode: "gutter" });
+  });
+
+  it("clamps negative offsets to zero", () => {
+    expect(
+      resolveVerticalHeadAlignment({
+        viewportWidth: 800,
+        columnsWidth: 320,
+        columnsOffsetLeft: -4,
+      }),
+    ).toEqual({
+      mode: "columns",
+      offsetLeft: 0,
+      width: 320,
+    });
   });
 });

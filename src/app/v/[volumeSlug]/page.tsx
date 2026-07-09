@@ -38,7 +38,13 @@ export default async function VolumePage({ params }: PageProps) {
   const authors = getAuthorsByVolume(volumeSlug);
 
   return (
-    <CatalogLayout title={makeTextVariant(volume.name)}>
+    <CatalogLayout
+      title={makeTextVariant(volume.name)}
+      breadcrumbs={[
+        { label: makeTextVariant("古诗源"), href: "/" },
+        { label: makeTextVariant(volume.name) },
+      ]}
+    >
       {authors.length === 0 ? (
         <p className="catalog__empty">
           <VariantText text={makeTextVariant("此卷尚无收录。")} />
