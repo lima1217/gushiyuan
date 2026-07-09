@@ -1,7 +1,6 @@
 "use client";
 
 import { useUiText } from "@/components/ScriptVariantProvider";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import type { ReadingDirection } from "@/lib/reading-direction";
 
 type ReadingDirectionToggleProps = {
@@ -13,32 +12,27 @@ export function ReadingDirectionToggle({
   direction,
   onDirectionChange,
 }: ReadingDirectionToggleProps) {
-  const ariaLabel = useUiText("readingDirectionAria");
   const horizontal = useUiText("readingHorizontal");
   const vertical = useUiText("readingVertical");
-  const horizontalAria = useUiText("readingHorizontalAria");
-  const verticalAria = useUiText("readingVerticalAria");
+  const ariaLabel = useUiText(
+    direction === "horizontal"
+      ? "readingDirectionAriaHorizontal"
+      : "readingDirectionAriaVertical",
+  );
+  const label = direction === "horizontal" ? horizontal : vertical;
 
   return (
-    <ToggleGroup
-      value={[direction]}
-      onValueChange={(value) => {
-        const nextDirection = value.at(-1);
-        if (nextDirection === "horizontal" || nextDirection === "vertical") {
-          onDirectionChange(nextDirection);
-        }
-      }}
-      variant="outline"
-      size="sm"
-      spacing={0}
+    <button
+      type="button"
+      className="site-chrome__control site-chrome__control--text"
       aria-label={ariaLabel}
+      onClick={() =>
+        onDirectionChange(
+          direction === "horizontal" ? "vertical" : "horizontal",
+        )
+      }
     >
-      <ToggleGroupItem value="horizontal" aria-label={horizontalAria}>
-        {horizontal}
-      </ToggleGroupItem>
-      <ToggleGroupItem value="vertical" aria-label={verticalAria}>
-        {vertical}
-      </ToggleGroupItem>
-    </ToggleGroup>
+      {label}
+    </button>
   );
 }

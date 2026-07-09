@@ -77,7 +77,7 @@ export function SiteSearch({ index }: SiteSearchProps) {
     <>
       <button
         type="button"
-        className="site-search__trigger"
+        className="site-chrome__control site-chrome__control--icon"
         onClick={() => setOpen(true)}
         aria-label={openSearch}
       >

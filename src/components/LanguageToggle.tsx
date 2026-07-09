@@ -1,6 +1,5 @@
 "use client";
 
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
   useScriptVariant,
   useUiText,
@@ -8,30 +7,25 @@ import {
 
 export function LanguageToggle() {
   const { variant, setVariant } = useScriptVariant();
-  const ariaLabel = useUiText("languageToggleAria");
   const simplified = useUiText("languageSimplified");
   const traditional = useUiText("languageTraditional");
+  const ariaLabel = useUiText(
+    variant === "simplified"
+      ? "languageToggleAriaSimplified"
+      : "languageToggleAriaTraditional",
+  );
+  const label = variant === "simplified" ? simplified : traditional;
 
   return (
-    <ToggleGroup
-      value={[variant]}
-      onValueChange={(value) => {
-        const nextVariant = value.at(-1);
-        if (nextVariant === "simplified" || nextVariant === "traditional") {
-          setVariant(nextVariant);
-        }
-      }}
-      variant="outline"
-      size="sm"
-      spacing={0}
+    <button
+      type="button"
+      className="site-chrome__control site-chrome__control--text"
       aria-label={ariaLabel}
+      onClick={() =>
+        setVariant(variant === "simplified" ? "traditional" : "simplified")
+      }
     >
-      <ToggleGroupItem value="simplified" aria-label={simplified}>
-        {simplified}
-      </ToggleGroupItem>
-      <ToggleGroupItem value="traditional" aria-label={traditional}>
-        {traditional}
-      </ToggleGroupItem>
-    </ToggleGroup>
+      {label}
+    </button>
   );
 }
