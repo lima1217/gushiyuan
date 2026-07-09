@@ -41,6 +41,8 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --site-header-top: 1.25rem;
+  --site-header-row-height: 1.75rem;
 }
 
 @theme inline {
@@ -404,7 +406,7 @@ body {
 .poem-reader--vertical {
   align-items: stretch;
   justify-content: flex-start;
-  --poem-header-clearance: 2.5rem;
+  --poem-header-clearance: var(--site-header-top);
   padding-top: calc(var(--poem-header-clearance) + env(safe-area-inset-top, 0px));
   /*
    * 竖排节律：
@@ -418,12 +420,6 @@ body {
   --vertical-column-gap: 2em;
   --vertical-chapter-gap: 3em;
   --vertical-reflow-height: 18em;
-}
-
-@media (min-width: 768px) {
-  .poem-reader--vertical {
-    --poem-header-clearance: 2.625rem;
-  }
 }
 
 .poem-reader--vertical .poem-reader__viewport {
@@ -444,8 +440,11 @@ body {
 /* 顶栏面包屑：诗页与目录页共用 */
 .site-breadcrumbs-bar {
   position: sticky;
-  top: max(1.25rem, env(safe-area-inset-top, 0px));
+  top: max(var(--site-header-top), env(safe-area-inset-top, 0px));
   z-index: 11;
+  display: flex;
+  align-items: center;
+  min-height: var(--site-header-row-height);
   flex-shrink: 0;
   width: 100%;
   writing-mode: horizontal-tb;
@@ -463,6 +462,7 @@ body {
   justify-content: flex-start;
   gap: 0.25rem 0.375rem;
   font-size: 0.8125rem;
+  line-height: 1;
   color: color-mix(in srgb, var(--color-ink) 52%, transparent);
   letter-spacing: 0.1em;
   pointer-events: auto;
@@ -519,7 +519,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 1.2em;
+  gap: 0.9em;
   flex-shrink: 0;
 }
 
@@ -546,7 +546,7 @@ body {
   /* vertical-rl 下 inline 轴为纵轴，row 让朝代/作者自上而下叠放 */
   flex-direction: row;
   align-items: center;
-  gap: 1em;
+  gap: 0.8em;
   font-size: clamp(0.75rem, 2.2vw, 0.8125rem);
   color: var(--color-ink-muted);
   letter-spacing: 0.12em;
@@ -656,7 +656,7 @@ body {
 }
 .catalog-layout {
   --poem-page-gutter: 3.25rem;
-  --catalog-header-clearance: 2.5rem;
+  --catalog-header-clearance: var(--site-header-top);
   padding-top: calc(
     var(--catalog-header-clearance) + env(safe-area-inset-top, 0px)
   );
@@ -673,7 +673,6 @@ body {
 @media (min-width: 768px) {
   .catalog-layout {
     --poem-page-gutter: 3.75rem;
-    --catalog-header-clearance: 2.625rem;
   }
 }
 
@@ -787,7 +786,7 @@ body {
 
 .site-chrome {
   position: fixed;
-  top: max(1.25rem, env(safe-area-inset-top, 0px));
+  top: max(var(--site-header-top), env(safe-area-inset-top, 0px));
   left: 50%;
   width: min(
     calc(100% - 2.5rem),
@@ -797,6 +796,7 @@ body {
   z-index: 10;
   display: flex;
   align-items: center;
+  min-height: var(--site-header-row-height);
   justify-content: space-between;
   gap: 1rem;
   pointer-events: none;
@@ -879,14 +879,14 @@ body:has(.catalog-layout) .site-chrome {
 }
 
 .site-chrome__control--icon {
-  width: 1.75rem;
-  height: 1.75rem;
+  width: var(--site-header-row-height);
+  height: var(--site-header-row-height);
   padding: 0;
   border-radius: 9999px;
 }
 
 .site-chrome__control--text {
-  height: 1.75rem;
+  height: var(--site-header-row-height);
   padding: 0 0.5rem;
   border-radius: min(var(--radius-md), 12px);
   font-size: 0.8125rem;
