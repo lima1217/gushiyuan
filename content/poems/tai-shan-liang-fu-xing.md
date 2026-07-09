@@ -1,0 +1,16 @@
+---
+title: 泰山梁甫行
+author: 曹植
+authorSlug: cao-zhi
+dynasty: 魏
+volume: wei
+---
+
+八方各异气。
+千里殊风雨。
+剧哉边海民。
+寄身于草野。
+妻子象禽兽。
+行止依林阻。
+柴门何萧条。
+狐兔翔我宇。

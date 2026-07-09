@@ -158,6 +158,13 @@ export function readEpubHtmlParts(epubPath, htmlPaths) {
 }
 
 /**
+ * @param {string} text
+ */
+export function hasCjk(text) {
+  return /[\u4e00-\u9fff]/.test(text);
+}
+
+/**
  * Process raw poem HTML blocks into validated chapters.
  * @param {string[]} rawBlocks
  * @param {{ title: string, onReject?: (item: { title: string, text: string }) => void }} context
@@ -168,7 +175,7 @@ export function processPoemBlocks(rawBlocks, context) {
 
   for (const raw of rawBlocks) {
     const text = stripPoemHtml(raw);
-    if (!text) {
+    if (!text || !hasCjk(text)) {
       continue;
     }
 

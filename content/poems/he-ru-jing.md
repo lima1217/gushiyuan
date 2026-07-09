@@ -1,0 +1,16 @@
+---
+title: 和入京
+author: 吕让
+authorSlug: lv-rang
+dynasty: 隋
+volume: sui
+---
+
+俘囚经万里。
+憔悴度三春。
+发改河阳鬓。
+衣余京洛尘。
+钟仪悲去楚。
+随会泣留秦。
+既谢平吴利。
+终成失路人。

@@ -1,0 +1,14 @@
+---
+title: 车遥遥篇
+author: 傅玄
+authorSlug: fu-xuan
+dynasty: 晋
+volume: jin
+---
+
+车遥遥兮马洋洋。
+追思君兮不可忘。
+君安游兮西入秦。
+愿为影兮随君身。
+君在阴兮影不见。
+君依光兮妾所愿。

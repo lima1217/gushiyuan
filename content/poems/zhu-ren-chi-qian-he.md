@@ -1,0 +1,16 @@
+---
+title: 主人池前鹤
+author: 吴均
+authorSlug: wu-jun
+dynasty: 梁
+volume: liang
+---
+
+本自乘轩者。
+为君阶下禽。
+摧藏多好貌。
+清唳有奇音。
+稻粱惠既重。
+华池遇亦深。
+怀恩未忍去。
+非无江海心。

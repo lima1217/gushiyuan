@@ -1,0 +1,16 @@
+---
+title: 临高台
+author: 简文帝
+authorSlug: jian-wen-di
+dynasty: 梁
+volume: liang
+---
+
+高台半行云。
+望望高不极。
+草树无参差。
+山河同一色。
+仿佛洛阳道。
+道远难别识。
+玉阶故情人。
+情来共相忆。

@@ -1,0 +1,16 @@
+---
+title: 诸人共游周家墓柏下
+author: 陶潜
+authorSlug: tao-qian
+dynasty: 晋
+volume: jin
+---
+
+今日天气佳。
+清吹与鸣弹。
+感彼柏下人。
+安得不为欢。
+清歌散新声。
+绿酒开芳颜。
+未知明日事。
+余襟良已殚。

@@ -1,0 +1,16 @@
+---
+title: 秋思
+author: 萧悫
+authorSlug: xiao-que
+dynasty: 北齐
+volume: bei-chao
+---
+
+清波收潦日。
+华林鸣籁初。
+芙蓉露下落。
+杨柳月中疏。
+燕帏缃绮被。
+赵带流黄裾。
+相思阻音息。
+结梦感离居。

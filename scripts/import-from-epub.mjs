@@ -3,12 +3,20 @@
  *
  * Usage: node scripts/import-from-epub.mjs <path-to.epub> <volume-slug>
  *
- * Currently supports: han
+ * Currently supports: han, wei, jin, song, qi, liang, chen, bei-chao, sui
  */
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import { BEI_CHAO_CONFIG } from "./bei-chao-config.mjs";
+import { CHEN_CONFIG } from "./chen-config.mjs";
 import { HAN_CONFIG } from "./han-config.mjs";
+import { JIN_CONFIG } from "./jin-config.mjs";
+import { LIANG_CONFIG } from "./liang-config.mjs";
+import { QI_CONFIG } from "./qi-config.mjs";
+import { SONG_CONFIG } from "./song-config.mjs";
+import { SUI_CONFIG } from "./sui-config.mjs";
+import { WEI_CONFIG } from "./wei-config.mjs";
 import {
   extractTitleFromHeading,
   firstLineTitle,
@@ -147,7 +155,7 @@ export function importHanFromEpub(epubPath, config) {
         title: meta.title,
         author: meta.author,
         authorSlug: meta.authorSlug,
-        dynasty: config.dynasty,
+        dynasty: meta.dynasty ?? config.dynasty,
         volume: config.volume,
         body,
       }),
@@ -165,6 +173,14 @@ export function importHanFromEpub(epubPath, config) {
 
 const VOLUME_IMPORTERS = {
   han: (epubPath) => importHanFromEpub(epubPath, HAN_CONFIG),
+  wei: (epubPath) => importHanFromEpub(epubPath, WEI_CONFIG),
+  jin: (epubPath) => importHanFromEpub(epubPath, JIN_CONFIG),
+  song: (epubPath) => importHanFromEpub(epubPath, SONG_CONFIG),
+  qi: (epubPath) => importHanFromEpub(epubPath, QI_CONFIG),
+  liang: (epubPath) => importHanFromEpub(epubPath, LIANG_CONFIG),
+  chen: (epubPath) => importHanFromEpub(epubPath, CHEN_CONFIG),
+  "bei-chao": (epubPath) => importHanFromEpub(epubPath, BEI_CHAO_CONFIG),
+  sui: (epubPath) => importHanFromEpub(epubPath, SUI_CONFIG),
 };
 
 function main() {

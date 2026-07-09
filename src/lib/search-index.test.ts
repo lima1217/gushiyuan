@@ -31,13 +31,51 @@ describe("buildSearchIndex", () => {
     ]);
   });
 
-  it("includes han poems and excludes removed wei poems", () => {
+  it("includes han, wei, jin, song, qi, liang, chen, bei-chao, and sui poems", () => {
     const index = buildSearchIndex();
 
     expect(index.poems.some((p) => p.volume === "han")).toBe(true);
     expect(index.poems.some((p) => p.slug === "da-feng-ge")).toBe(true);
-    expect(index.poems.some((p) => p.volume === "wei")).toBe(false);
-    expect(index.poems.some((p) => p.slug === "duan-ge-xing")).toBe(false);
+    expect(index.poems.some((p) => p.volume === "wei")).toBe(true);
+    expect(index.poems.some((p) => p.slug === "duan-ge-xing")).toBe(true);
+    expect(
+      index.poems.find((p) => p.slug === "duan-ge-xing")?.author,
+    ).toBe("武帝");
+    expect(index.poems.some((p) => p.volume === "jin")).toBe(true);
+    expect(index.poems.some((p) => p.slug === "yin-jiu")).toBe(true);
+    expect(
+      index.poems.find((p) => p.slug === "yin-jiu")?.author,
+    ).toBe("陶潜");
+    expect(index.poems.some((p) => p.volume === "song")).toBe(true);
+    expect(index.poems.some((p) => p.slug === "ni-xing-lu-nan")).toBe(true);
+    expect(
+      index.poems.find((p) => p.slug === "ni-xing-lu-nan")?.author,
+    ).toBe("鲍照");
+    expect(index.poems.some((p) => p.volume === "qi")).toBe(true);
+    expect(index.poems.some((p) => p.slug === "yu-jie-yuan")).toBe(true);
+    expect(
+      index.poems.find((p) => p.slug === "yu-jie-yuan")?.author,
+    ).toBe("谢朓");
+    expect(index.poems.some((p) => p.volume === "liang")).toBe(true);
+    expect(index.poems.some((p) => p.slug === "xiang-song")).toBe(true);
+    expect(
+      index.poems.find((p) => p.slug === "xiang-song")?.author,
+    ).toBe("何逊");
+    expect(index.poems.some((p) => p.volume === "chen")).toBe(true);
+    expect(index.poems.some((p) => p.slug === "du-qing-cao-hu")).toBe(true);
+    expect(
+      index.poems.find((p) => p.slug === "du-qing-cao-hu")?.author,
+    ).toBe("阴铿");
+    expect(index.poems.some((p) => p.volume === "bei-chao")).toBe(true);
+    expect(index.poems.some((p) => p.slug === "chi-le-ge")).toBe(true);
+    expect(
+      index.poems.find((p) => p.slug === "chi-le-ge")?.author,
+    ).toBe("斛律金");
+    expect(index.poems.some((p) => p.volume === "sui")).toBe(true);
+    expect(index.poems.some((p) => p.slug === "xi-xi-yan")).toBe(true);
+    expect(
+      index.poems.find((p) => p.slug === "xi-xi-yan")?.author,
+    ).toBe("薛道衡");
   });
 });
 
