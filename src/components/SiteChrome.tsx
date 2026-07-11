@@ -3,6 +3,7 @@
 import { useState, type ReactNode } from "react";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { ScriptVariantProvider } from "@/components/ScriptVariantProvider";
+import { RandomPoemButton } from "@/components/RandomPoemButton";
 import { SiteSearch } from "@/components/SiteSearch";
 import { SiteChromeActionsContext } from "@/components/SiteChromeActions";
 import { SiteChromeTrailContext } from "@/components/SiteChromeTrail";
@@ -30,6 +31,7 @@ export function SiteChromeProvider({
             <div className="site-chrome__trail">{trail}</div>
             <div className="site-chrome__actions">
               {actions}
+              <RandomPoemButton />
               <SiteSearch />
               <LanguageToggle />
             </div>

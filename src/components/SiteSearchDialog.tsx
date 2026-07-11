@@ -12,40 +12,17 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
+  CommandSeparator,
 } from "@/components/ui/command";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
+import { loadSearchIndex } from "@/lib/load-search-index";
 import { filterSearchIndex } from "@/lib/search-filter";
-import {
-  SEARCH_INDEX_URL,
-  type SearchIndex,
-} from "@/lib/search-index-types";
+import type { SearchIndex } from "@/lib/search-index-types";
 
 type SiteSearchDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 };
-
-let searchIndexPromise: Promise<SearchIndex> | null = null;
-
-function loadSearchIndex(): Promise<SearchIndex> {
-  if (searchIndexPromise) {
-    return searchIndexPromise;
-  }
-
-  searchIndexPromise = fetch(SEARCH_INDEX_URL)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`Failed to load search index (${response.status})`);
-      }
-      return response.json() as Promise<SearchIndex>;
-    })
-    .catch((error) => {
-      searchIndexPromise = null;
-      throw error;
-    });
-
-  return searchIndexPromise;
-}
 
 export function SiteSearchDialog({ open, onOpenChange }: SiteSearchDialogProps) {
   const router = useRouter();
@@ -54,7 +31,6 @@ export function SiteSearchDialog({ open, onOpenChange }: SiteSearchDialogProps) 
   const searchPlaceholder = useUiText("searchPlaceholder");
   const searchNoMatch = useUiText("searchNoMatch");
   const searchLoadError = useUiText("searchLoadError");
-  const searchPrompt = useUiText("searchPrompt");
   const searchPoemsHeading = useUiText("searchPoemsHeading");
   const searchAuthorsHeading = useUiText("searchAuthorsHeading");
   const [index, setIndex] = useState<SearchIndex | null>(null);
@@ -119,7 +95,9 @@ export function SiteSearchDialog({ open, onOpenChange }: SiteSearchDialogProps) 
     ? searchLoadError
     : debouncedQuery.trim()
       ? searchNoMatch
-      : searchPrompt;
+      : null;
+
+  const showList = hasResults || Boolean(emptyMessage);
 
   return (
     <CommandDialog
@@ -127,9 +105,12 @@ export function SiteSearchDialog({ open, onOpenChange }: SiteSearchDialogProps) 
       onOpenChange={handleOpenChange}
       title={searchTitle}
       description={searchDescription}
-      className="border-[color-mix(in_srgb,var(--color-ink)_10%,transparent)] bg-[var(--color-paper)] text-[var(--color-ink)] sm:max-w-lg"
+      className="w-[min(100%,26rem)] gap-0 overflow-hidden rounded-xl border-0 bg-[var(--color-paper)] p-0 text-[var(--color-ink)] shadow-[0_24px_56px_-18px_color-mix(in_srgb,var(--color-ink)_30%,transparent)] ring-1 ring-[color-mix(in_srgb,var(--color-ink)_14%,transparent)] sm:max-w-md"
     >
-      <Command shouldFilter={false}>
+      <Command
+        shouldFilter={false}
+        className="rounded-none bg-transparent p-0 text-[var(--color-ink)]"
+      >
         <CommandInput
           aria-label={searchTitle}
           name="site-search"
@@ -137,24 +118,35 @@ export function SiteSearchDialog({ open, onOpenChange }: SiteSearchDialogProps) 
           placeholder={searchPlaceholder}
           value={query}
           onValueChange={setQuery}
-          className="text-[var(--color-ink)] placeholder:text-[var(--color-ink-muted)]"
+          className="text-center text-[1.05rem] tracking-[0.02em] text-[var(--color-ink)] placeholder:text-[var(--color-ink-muted)] md:text-[1.05rem]"
         />
-        <CommandList className="max-h-80">
-          {!hasResults ? (
-            <CommandEmpty className="text-[var(--color-ink-muted)]">
-              {emptyMessage}
-            </CommandEmpty>
-          ) : null}
+
+        {showList ? (
+          <>
+            <div
+              aria-hidden="true"
+              className="mx-3 h-px bg-[color-mix(in_srgb,var(--color-ink)_10%,transparent)]"
+            />
+            <CommandList className="max-h-80 px-1.5 py-1.5">
+            {!hasResults && emptyMessage ? (
+              <CommandEmpty className="py-8 text-[var(--color-ink-muted)]">
+                {emptyMessage}
+              </CommandEmpty>
+            ) : null}
 
             {results.poems.length > 0 ? (
-              <CommandGroup heading={searchPoemsHeading}>
+              <CommandGroup
+                heading={searchPoemsHeading}
+                className="**:[[cmdk-group-heading]]:px-3 **:[[cmdk-group-heading]]:pt-2 **:[[cmdk-group-heading]]:pb-1 **:[[cmdk-group-heading]]:text-[0.7rem] **:[[cmdk-group-heading]]:font-normal **:[[cmdk-group-heading]]:tracking-[0.18em] **:[[cmdk-group-heading]]:text-[var(--color-ink-muted)]"
+              >
                 {results.poems.map((poem) => (
                   <CommandItem
                     key={`poem-${poem.slug}`}
                     value={`${poem.title} ${poem.titleTraditional} ${poem.author} ${poem.authorTraditional}`}
                     onSelect={() => navigate(`/p/${poem.slug}`)}
+                    className="min-h-10 gap-3 rounded-lg px-3 py-2 data-selected:bg-[color-mix(in_srgb,var(--color-ink)_6%,transparent)] data-selected:text-[var(--color-ink)] [&>svg:last-child]:hidden"
                   >
-                    <span>
+                    <span className="min-w-0 truncate text-[0.95rem] tracking-[0.02em]">
                       <VariantText
                         text={{
                           simplified: poem.title,
@@ -162,7 +154,7 @@ export function SiteSearchDialog({ open, onOpenChange }: SiteSearchDialogProps) 
                         }}
                       />
                     </span>
-                    <span className="ml-auto text-xs text-[var(--color-ink-muted)]">
+                    <span className="ml-auto shrink-0 text-xs tracking-[0.06em] text-[var(--color-ink-muted)]">
                       <VariantText
                         text={{
                           simplified: poem.author,
@@ -175,8 +167,15 @@ export function SiteSearchDialog({ open, onOpenChange }: SiteSearchDialogProps) 
               </CommandGroup>
             ) : null}
 
+            {results.poems.length > 0 && results.authors.length > 0 ? (
+              <CommandSeparator className="my-1.5 bg-[color-mix(in_srgb,var(--color-ink)_10%,transparent)]" />
+            ) : null}
+
             {results.authors.length > 0 ? (
-              <CommandGroup heading={searchAuthorsHeading}>
+              <CommandGroup
+                heading={searchAuthorsHeading}
+                className="**:[[cmdk-group-heading]]:px-3 **:[[cmdk-group-heading]]:pt-2 **:[[cmdk-group-heading]]:pb-1 **:[[cmdk-group-heading]]:text-[0.7rem] **:[[cmdk-group-heading]]:font-normal **:[[cmdk-group-heading]]:tracking-[0.18em] **:[[cmdk-group-heading]]:text-[var(--color-ink-muted)]"
+              >
                 {results.authors.map((author) => (
                   <CommandItem
                     key={`author-${author.authorSlug}`}
@@ -184,8 +183,9 @@ export function SiteSearchDialog({ open, onOpenChange }: SiteSearchDialogProps) 
                     onSelect={() =>
                       navigate(`/v/${author.volume}/${author.authorSlug}`)
                     }
+                    className="min-h-10 rounded-lg px-3 py-2 data-selected:bg-[color-mix(in_srgb,var(--color-ink)_6%,transparent)] data-selected:text-[var(--color-ink)] [&>svg:last-child]:hidden"
                   >
-                    <span>
+                    <span className="tracking-[0.02em]">
                       <VariantText
                         text={{
                           simplified: author.name,
@@ -197,7 +197,9 @@ export function SiteSearchDialog({ open, onOpenChange }: SiteSearchDialogProps) 
                 ))}
               </CommandGroup>
             ) : null}
-        </CommandList>
+          </CommandList>
+          </>
+        ) : null}
       </Command>
     </CommandDialog>
   );
