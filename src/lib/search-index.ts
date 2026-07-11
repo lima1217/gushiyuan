@@ -3,7 +3,7 @@ import type {
   SearchIndexAuthor,
 } from "@/lib/search-index-types";
 import { toTraditional } from "@/lib/script-conversion";
-import { getAllPoems, getCatalogAuthorSlug } from "@/lib/poems";
+import { getAllPoems, getCatalogAuthorSlug, getPoemBySlug } from "@/lib/poems";
 
 export type {
   SearchIndex,
@@ -18,17 +18,26 @@ export function buildSearchIndex(): SearchIndex {
   const allPoems = getAllPoems();
 
   const poems = allPoems
-    .map((poem) => ({
-      slug: poem.slug,
-      title: poem.title,
-      titleTraditional: toTraditional(poem.title),
-      author: poem.author,
-      authorTraditional: toTraditional(poem.author),
-      authorSlug: poem.authorSlug,
-      volume: poem.volume,
-      dynasty: poem.dynasty,
-      dynastyTraditional: toTraditional(poem.dynasty),
-    }))
+    .map((meta) => {
+      const poem = getPoemBySlug(meta.slug);
+      if (!poem) {
+        throw new Error(`Missing poem body for search index: ${meta.slug}`);
+      }
+      const body = poem.body.replace(/\n/g, "");
+      return {
+        slug: poem.slug,
+        title: poem.title,
+        titleTraditional: toTraditional(poem.title),
+        author: poem.author,
+        authorTraditional: toTraditional(poem.author),
+        authorSlug: poem.authorSlug,
+        volume: poem.volume,
+        dynasty: poem.dynasty,
+        dynastyTraditional: toTraditional(poem.dynasty),
+        body,
+        bodyTraditional: toTraditional(body),
+      };
+    })
     .sort((a, b) => a.title.localeCompare(b.title, "zh-CN"));
 
   const authorMap = new Map<string, SearchIndexAuthor>();

@@ -12,11 +12,22 @@ describe("buildSearchIndex", () => {
       index.poems.some((p) => p.slug === "ji-rang-ge" && p.title === "击壤歌"),
     ).toBe(true);
     expect(
-      index.poems.every((p) => p.title && p.author && p.authorSlug && p.volume),
+      index.poems.every(
+        (p) => p.title && p.author && p.authorSlug && p.volume && p.body,
+      ),
     ).toBe(true);
     expect(index.poems.find((p) => p.slug === "yin-jiu")?.authorTraditional).toBe(
       "陶潛",
     );
+  });
+
+  it("indexes poem body for line search", () => {
+    const index = buildSearchIndex();
+    const yinJiu = index.poems.find((p) => p.slug === "yin-jiu");
+
+    expect(yinJiu?.body).toContain("采菊东篱下");
+    expect(yinJiu?.bodyTraditional).toContain("採菊東籬下");
+    expect(yinJiu?.body.includes("\n")).toBe(false);
   });
 
   it("lists distinct authors with volume metadata", () => {
@@ -117,6 +128,33 @@ describe("filterSearchIndex", () => {
     expect(authorResults.authors.some((a) => a.name === "鲍照")).toBe(true);
   });
 
+  it("matches poem body lines and returns matchedLine", () => {
+    const results = filterSearchIndex(index, "采菊东篱下");
+    const yinJiu = results.poems.find((p) => p.slug === "yin-jiu");
+
+    expect(yinJiu).toBeDefined();
+    expect(yinJiu?.matchedLine?.simplified).toContain("采菊东篱下");
+    expect(yinJiu?.matchedLine?.traditional).toContain("採菊東籬下");
+  });
+
+  it("matches traditional body queries", () => {
+    const results = filterSearchIndex(index, "採菊東籬下");
+    const yinJiu = results.poems.find((p) => p.slug === "yin-jiu");
+
+    expect(yinJiu?.matchedLine?.simplified).toContain("采菊东篱下");
+    expect(yinJiu?.matchedLine?.traditional).toContain("採菊東籬下");
+  });
+
+  it("omits matchedLine when title or author matches", () => {
+    const byTitle = filterSearchIndex(index, "饮酒");
+    const byAuthor = filterSearchIndex(index, "陶潜");
+
+    expect(byTitle.poems.find((p) => p.slug === "yin-jiu")?.matchedLine).toBeUndefined();
+    expect(
+      byAuthor.poems.find((p) => p.slug === "yin-jiu")?.matchedLine,
+    ).toBeUndefined();
+  });
+
   it("limits results to keep the palette concise", () => {
     const bigIndex: SearchIndex = {
       poems: Array.from({ length: 20 }, (_, index) => ({
@@ -129,6 +167,8 @@ describe("filterSearchIndex", () => {
         volume: "han",
         dynasty: "汉",
         dynastyTraditional: "漢",
+        body: `正文${index}`,
+        bodyTraditional: `正文${index}`,
       })),
       authors: Array.from({ length: 10 }, (_, index) => ({
         name: `作者${index}`,

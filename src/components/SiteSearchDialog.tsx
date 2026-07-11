@@ -142,20 +142,27 @@ export function SiteSearchDialog({ open, onOpenChange }: SiteSearchDialogProps) 
                 {results.poems.map((poem) => (
                   <CommandItem
                     key={`poem-${poem.slug}`}
-                    value={`${poem.title} ${poem.titleTraditional} ${poem.author} ${poem.authorTraditional}`}
+                    value={`${poem.title} ${poem.titleTraditional} ${poem.author} ${poem.authorTraditional} ${poem.body} ${poem.bodyTraditional}`}
                     onSelect={() => navigate(`/p/${poem.slug}`)}
                     className="min-h-10 gap-3 rounded-lg px-3 py-2 data-selected:bg-[color-mix(in_srgb,var(--color-ink)_6%,transparent)] data-selected:text-[var(--color-ink)] [&>svg:last-child]:hidden"
                   >
-                    <span className="min-w-0 truncate text-[0.95rem] tracking-[0.02em]">
-                      <VariantText
-                        text={{
-                          simplified: poem.title,
-                          traditional: poem.titleTraditional,
-                        }}
-                      />
+                    <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+                      <span className="truncate text-[0.95rem] tracking-[0.02em]">
+                        <VariantText
+                          text={{
+                            simplified: poem.title,
+                            traditional: poem.titleTraditional,
+                          }}
+                        />
+                      </span>
+                      {poem.matchedLine ? (
+                        <span className="truncate text-xs tracking-[0.04em] text-[var(--color-ink-muted)]">
+                          <VariantText text={poem.matchedLine} />
+                        </span>
+                      ) : null}
                     </span>
                     {poem.author === poem.title ? null : (
-                      <span className="ml-auto shrink-0 text-xs tracking-[0.06em] text-[var(--color-ink-muted)]">
+                      <span className="ml-auto shrink-0 self-center text-xs tracking-[0.06em] text-[var(--color-ink-muted)]">
                         <VariantText
                           text={{
                             simplified: poem.author,
