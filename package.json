@@ -13,7 +13,9 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "verify": "npm run typecheck && npm run lint && npm test",
+    "verify:generated": "tsx scripts/verify-generated-artifacts.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",

@@ -15,8 +15,10 @@ npm run dev
 
 ```bash
 npm run build   # 静态站输出到 out/
+npm run lint
 npm test
 npm run typecheck
+npm run verify  # 提交 PR 前的本地门禁：typecheck + lint + test
 ```
 
 ## 浏览结构

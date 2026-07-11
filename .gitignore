@@ -15,6 +15,7 @@
 /.next/
 /out/
 /public/search-index.json
+/public/poem-slugs.json
 
 # production
 /build

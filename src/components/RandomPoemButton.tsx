@@ -4,7 +4,7 @@ import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Dices } from "lucide-react";
 import { useUiText } from "@/components/ScriptVariantProvider";
-import { loadSearchIndex } from "@/lib/load-search-index";
+import { loadPoemSlugs } from "@/lib/load-poem-slugs";
 import {
   pickRandomPoemSlug,
   poemSlugFromPathname,
@@ -23,9 +23,9 @@ export function RandomPoemButton() {
 
     setPending(true);
     try {
-      const index = await loadSearchIndex();
+      const slugs = await loadPoemSlugs();
       const slug = pickRandomPoemSlug(
-        index.poems.map((poem) => poem.slug),
+        slugs,
         poemSlugFromPathname(pathname),
       );
       if (!slug) {

@@ -14,9 +14,17 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..")
 const VALIDATE_SCRIPT = path.join(ROOT, "scripts/validate-subset-cmap.py");
 const MANIFEST_PATH = path.join(ROOT, "scripts/.cache/wenkai.manifest.json");
 
+function resolvePython(): string {
+  const venvPython = path.join(ROOT, ".venv-font/bin/python3");
+  if (fs.existsSync(venvPython)) {
+    return venvPython;
+  }
+  return "python3";
+}
+
 function pythonAvailable(): boolean {
   try {
-    execFileSync("python3", ["-c", "import fontTools"], { stdio: "ignore" });
+    execFileSync(resolvePython(), ["-c", "import fontTools"], { stdio: "ignore" });
     return true;
   } catch {
     return false;
@@ -63,7 +71,7 @@ describe("font subset", () => {
           true,
         );
 
-        execFileSync("python3", [VALIDATE_SCRIPT, fontPath], {
+        execFileSync(resolvePython(), [VALIDATE_SCRIPT, fontPath], {
           input: JSON.stringify(slices[index]),
           stdio: ["pipe", "inherit", "inherit"],
         });
