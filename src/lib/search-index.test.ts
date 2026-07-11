@@ -157,7 +157,7 @@ describe("filterSearchIndex", () => {
 
   it("limits results to keep the palette concise", () => {
     const bigIndex: SearchIndex = {
-      poems: Array.from({ length: 20 }, (_, index) => ({
+      poems: Array.from({ length: 50 }, (_, index) => ({
         slug: `poem-${index}`,
         title: `测试诗${index}`,
         titleTraditional: `測試詩${index}`,
@@ -180,7 +180,7 @@ describe("filterSearchIndex", () => {
 
     const results = filterSearchIndex(bigIndex, "测试");
 
-    expect(results.poems.length).toBeLessThanOrEqual(8);
+    expect(results.poems.length).toBeLessThanOrEqual(42);
     expect(results.authors.length).toBeLessThanOrEqual(5);
   });
 });

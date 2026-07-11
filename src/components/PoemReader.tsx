@@ -31,6 +31,7 @@ import {
 } from "@/lib/vertical-layout";
 import { cn } from "@/lib/utils";
 import type { VariantableText } from "@/lib/script-variant";
+import { schedulePreloadRemainingWenkaiSubsets } from "@/lib/wenkai-font";
 
 function PoemAttribution({
   dynasty,
@@ -101,6 +102,16 @@ export function PoemReader({
 
   const readingAreaRef = useRef<HTMLDivElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    for (const neighbor of [prev, next, prevVolume, nextVolume]) {
+      if (neighbor) {
+        router.prefetch(`/p/${neighbor.slug}`);
+      }
+    }
+  }, [next, nextVolume, prev, prevVolume, router]);
+
+  useEffect(() => schedulePreloadRemainingWenkaiSubsets(), []);
 
   useEffect(() => {
     function isTypingTarget(target: EventTarget | null): boolean {

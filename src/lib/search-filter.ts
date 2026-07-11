@@ -5,7 +5,7 @@ import type {
   SearchResults,
 } from "@/lib/search-index-types";
 
-const MAX_POEM_RESULTS = 8;
+const MAX_POEM_RESULTS = 42;
 const MAX_AUTHOR_RESULTS = 5;
 
 function includesQuery(text: string, query: string): boolean {
