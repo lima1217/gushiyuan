@@ -923,26 +923,23 @@ body:has(.catalog-layout) .site-chrome {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid color-mix(in srgb, var(--color-ink) 8%, transparent);
-  background: color-mix(in srgb, var(--color-paper) 92%, var(--color-ink));
+  border: none;
+  background: transparent;
   color: var(--color-ink-muted);
   cursor: pointer;
   touch-action: manipulation;
   transition:
     color 160ms ease,
-    border-color 160ms ease,
     background-color 160ms ease;
 }
 
 .site-chrome__control:hover {
   color: var(--color-ink);
-  border-color: color-mix(in srgb, var(--color-ink) 16%, transparent);
-  background: color-mix(in srgb, var(--color-paper) 84%, var(--color-ink));
+  background: color-mix(in srgb, var(--color-ink) 6%, transparent);
 }
 
 .site-chrome__control:focus-visible {
   color: var(--color-ink);
-  border-color: color-mix(in srgb, var(--color-ink) 20%, transparent);
   outline: 2px solid color-mix(in srgb, var(--color-ink) 24%, transparent);
   outline-offset: 2px;
 }
