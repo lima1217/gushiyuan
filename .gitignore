@@ -25,6 +25,7 @@
 # misc
 .DS_Store
 *.pem
+icon-built-preview.png
 scripts/fonts/LXGWWenKai-Light.ttf
 scripts/fonts/LXGWWenKai-Regular.ttf
 scripts/.cache/

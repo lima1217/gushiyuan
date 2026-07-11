@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
+import { useRouter } from "next/navigation";
 import type { BreadcrumbItem } from "@/components/Breadcrumbs";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { PoemNav } from "@/components/PoemNav";
@@ -69,6 +70,7 @@ export function PoemReader({
   next,
   lineageByLine,
 }: PoemReaderProps) {
+  const router = useRouter();
   const { variant } = useScriptVariant();
   const body = useVariantText({
     simplified: poem.body,
@@ -95,6 +97,50 @@ export function PoemReader({
 
   const readingAreaRef = useRef<HTMLDivElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function isTypingTarget(target: EventTarget | null): boolean {
+      if (!(target instanceof HTMLElement)) {
+        return false;
+      }
+      const tag = target.tagName;
+      return (
+        tag === "INPUT" ||
+        tag === "TEXTAREA" ||
+        tag === "SELECT" ||
+        target.isContentEditable
+      );
+    }
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) {
+        return;
+      }
+      if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") {
+        return;
+      }
+      if (isTypingTarget(event.target)) {
+        return;
+      }
+      if (document.querySelector('[role="dialog"]')) {
+        return;
+      }
+
+      // 竖排自右向左：← 下一首，→ 上一首
+      if (event.key === "ArrowLeft" && next) {
+        event.preventDefault();
+        router.push(`/p/${next.slug}`);
+        return;
+      }
+      if (event.key === "ArrowRight" && prev) {
+        event.preventDefault();
+        router.push(`/p/${prev.slug}`);
+      }
+    }
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [next, prev, router]);
 
   useEffect(() => {
     const scrollViewport = viewportRef.current;

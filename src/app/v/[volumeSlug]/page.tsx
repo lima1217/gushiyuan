@@ -6,6 +6,7 @@ import { VariantText } from "@/components/VariantText";
 import {
   getAllVolumes,
   getAuthorsByVolume,
+  getPoemsByAuthor,
   getVolumeBySlug,
 } from "@/lib/poems";
 import { makeTextVariant } from "@/lib/script-conversion";
@@ -52,16 +53,20 @@ export default async function VolumePage({ params }: PageProps) {
       ) : (
         <nav aria-label={`${volume.name}诗人`}>
           <ol className="catalog__list">
-            {authors.map((author) => (
-              <li key={author.slug} className="catalog__item">
-                <Link
-                  href={`/v/${volumeSlug}/${author.slug}`}
-                  className="catalog__link"
-                >
-                  <VariantText text={makeTextVariant(author.name)} />
-                </Link>
-              </li>
-            ))}
+            {authors.map((author) => {
+              const poemCount = getPoemsByAuthor(volumeSlug, author.slug).length;
+              return (
+                <li key={author.slug} className="catalog__item">
+                  <Link
+                    href={`/v/${volumeSlug}/${author.slug}`}
+                    className="catalog__link"
+                  >
+                    <VariantText text={makeTextVariant(author.name)} />
+                  </Link>
+                  <span className="catalog__meta">{poemCount} 首</span>
+                </li>
+              );
+            })}
           </ol>
         </nav>
       )}
