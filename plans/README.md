@@ -26,7 +26,7 @@ when done.
 | 002 | Verify generated runtime artifacts in CI | P1 | M | 001 | DONE · [#38](https://github.com/lima1217/gushiyuan/issues/38) |
 | 003 | Make EPUB imports fail before corrupting content | P1 | M | 001 | TODO |
 | 004 | Make the catalog glyph audit understand sliced fonts | P1 | S | 002 | TODO |
-| 005 | Load a slug-only artifact for random navigation | P2 | S | 002 | TODO · [#39](https://github.com/lima1217/gushiyuan/issues/39) |
+| 005 | Load a slug-only artifact for random navigation | P2 | S | 002 | DONE · [#39](https://github.com/lima1217/gushiyuan/issues/39) |
 | 006 | Consolidate the nine EPUB volume config generators | P2 | M | 001 | TODO · [#40](https://github.com/lima1217/gushiyuan/issues/40) |
 | 007 | Cache font, search, and OpenCC generation safely | P2 | L | 002, 005 | TODO · [#41](https://github.com/lima1217/gushiyuan/issues/41) |
 
