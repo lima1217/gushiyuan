@@ -7,6 +7,7 @@ import type { PoemMeta } from "@/lib/poems";
 
 type PoemNavMeta = PoemMeta & {
   titleTraditional?: string;
+  crossVolume?: boolean;
 };
 
 type PoemNavProps = {
@@ -27,12 +28,17 @@ function PoemNavTitle({ poem }: { poem: PoemNavMeta }) {
 
 export function PoemNav({ prev, next }: PoemNavProps) {
   const ariaLabel = useUiText("poemNavAria");
-  const prevLabel = useUiText("prevPoem");
-  const nextLabel = useUiText("nextPoem");
+  const prevPoemLabel = useUiText("prevPoem");
+  const nextPoemLabel = useUiText("nextPoem");
+  const prevVolumeLabel = useUiText("prevVolume");
+  const nextVolumeLabel = useUiText("nextVolume");
 
   if (!prev && !next) {
     return null;
   }
+
+  const prevLabel = prev?.crossVolume ? prevVolumeLabel : prevPoemLabel;
+  const nextLabel = next?.crossVolume ? nextVolumeLabel : nextPoemLabel;
 
   return (
     <nav aria-label={ariaLabel} className="poem-nav">

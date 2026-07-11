@@ -59,8 +59,8 @@ function PoemAttribution({
 type PoemReaderProps = {
   poem: PoemWithTraditional;
   breadcrumbs: BreadcrumbItem[];
-  prev?: PoemMetaWithTraditional;
-  next?: PoemMetaWithTraditional;
+  prev?: PoemMetaWithTraditional & { crossVolume?: boolean };
+  next?: PoemMetaWithTraditional & { crossVolume?: boolean };
   prevVolume?: PoemMetaWithTraditional;
   nextVolume?: PoemMetaWithTraditional;
   lineageByLine: LineageByLineWithTraditional;

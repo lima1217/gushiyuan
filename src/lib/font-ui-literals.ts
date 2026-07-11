@@ -8,7 +8,7 @@ export const FONT_UI_LITERALS =
   Object.values(SITE_UI_TEXT_SIMPLIFIED).join("") +
   "化用脱胎意象承接" +
   "跳到正文" +
-  "同卷诗作上一首下一首" +
+  "同卷诗作相邻诗作上一首下一首上一卷下一卷" +
   "查看此句的源流线索源后世化用" +
   "面包屑" +
   "此卷尚无收录。" +

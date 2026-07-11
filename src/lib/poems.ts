@@ -355,6 +355,59 @@ export function getAdjacentPoemsInVolume(slug: string): {
   };
 }
 
+/** Neighbor for continuous reading; may cross a volume boundary. */
+export type ReadingNeighbor = PoemMeta & {
+  crossVolume?: boolean;
+};
+
+/**
+ * Same-volume neighbors when available; at volume edges, continue into the
+ * previous volume's last poem / next volume's first poem.
+ */
+export function getReadingAdjacentPoems(slug: string): {
+  prev?: ReadingNeighbor;
+  next?: ReadingNeighbor;
+} {
+  const poem = getPoemBySlug(slug);
+  if (!poem) {
+    return {};
+  }
+
+  const inVolume = getAdjacentPoemsInVolume(slug);
+  const volumes = getAllVolumes();
+  const volumeIndex = volumes.findIndex(
+    (volume) => volume.slug === poem.volume,
+  );
+  if (volumeIndex === -1) {
+    return {};
+  }
+
+  let prev: ReadingNeighbor | undefined = inVolume.prev;
+  let next: ReadingNeighbor | undefined = inVolume.next;
+
+  if (!prev) {
+    for (let i = volumeIndex - 1; i >= 0; i--) {
+      const last = getPoemsByVolume(volumes[i]!.slug).at(-1);
+      if (last) {
+        prev = { ...last, crossVolume: true };
+        break;
+      }
+    }
+  }
+
+  if (!next) {
+    for (let i = volumeIndex + 1; i < volumes.length; i++) {
+      const first = getPoemsByVolume(volumes[i]!.slug)[0];
+      if (first) {
+        next = { ...first, crossVolume: true };
+        break;
+      }
+    }
+  }
+
+  return { prev, next };
+}
+
 /** First poem of the previous/next non-empty volume in catalog order. */
 export function getAdjacentVolumeEntryPoems(slug: string): {
   prevVolume?: PoemMeta;

@@ -667,7 +667,7 @@ body {
   font-size: 0.85em;
 }
 
-/* 底栏：同卷导航横排；分隔线只由 .poem-nav 画一条 */
+/* 底栏：相邻诗作导航横排；分隔线只由 .poem-nav 画一条 */
 .poem-reader__vertical-foot {
   flex-shrink: 0;
   writing-mode: horizontal-tb;

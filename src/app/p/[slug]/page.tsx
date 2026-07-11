@@ -3,11 +3,11 @@ import { notFound } from "next/navigation";
 import { PoemReader } from "@/components/PoemReader";
 import { getLineageForPoem } from "@/lib/lineage";
 import {
-  getAdjacentPoemsInVolume,
   getAdjacentVolumeEntryPoems,
   getAllPoems,
   getCatalogAuthorSlug,
   getPoemBySlug,
+  getReadingAdjacentPoems,
   getVolumeBySlug,
 } from "@/lib/poems";
 import {
@@ -55,7 +55,7 @@ export default async function PoemPage({ params }: PageProps) {
     notFound();
   }
 
-  const { prev, next } = getAdjacentPoemsInVolume(slug);
+  const { prev, next } = getReadingAdjacentPoems(slug);
   const { prevVolume, nextVolume } = getAdjacentVolumeEntryPoems(slug);
   const lineageByLine = getLineageForPoem(slug);
 
@@ -70,8 +70,16 @@ export default async function PoemPage({ params }: PageProps) {
           href: `/v/${volume.slug}/${getCatalogAuthorSlug(poem)}`,
         },
       ]}
-      prev={prev ? withTraditionalPoemMeta(prev) : undefined}
-      next={next ? withTraditionalPoemMeta(next) : undefined}
+      prev={
+        prev
+          ? { ...withTraditionalPoemMeta(prev), crossVolume: prev.crossVolume }
+          : undefined
+      }
+      next={
+        next
+          ? { ...withTraditionalPoemMeta(next), crossVolume: next.crossVolume }
+          : undefined
+      }
       prevVolume={prevVolume ? withTraditionalPoemMeta(prevVolume) : undefined}
       nextVolume={nextVolume ? withTraditionalPoemMeta(nextVolume) : undefined}
       lineageByLine={withTraditionalLineage(lineageByLine)}

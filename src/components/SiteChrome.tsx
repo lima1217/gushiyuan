@@ -6,7 +6,10 @@ import { ScriptVariantProvider } from "@/components/ScriptVariantProvider";
 import { RandomPoemButton } from "@/components/RandomPoemButton";
 import { SiteSearch } from "@/components/SiteSearch";
 import { SiteChromeActionsContext } from "@/components/SiteChromeActions";
-import { SiteChromeTrailContext } from "@/components/SiteChromeTrail";
+import {
+  SiteChromeTrailContext,
+  useTrailOwnership,
+} from "@/components/SiteChromeTrail";
 import { SkipLink } from "@/components/SkipLink";
 import type { SiteUiText } from "@/lib/site-ui-text";
 
@@ -21,10 +24,13 @@ export function SiteChromeProvider({
 }: SiteChromeProviderProps) {
   const [trail, setTrail] = useState<ReactNode>(null);
   const [actions, setActions] = useState<ReactNode>(null);
+  const { beginTrail, endTrail } = useTrailOwnership(setTrail);
 
   return (
     <ScriptVariantProvider uiText={uiText}>
-      <SiteChromeTrailContext.Provider value={{ setTrail }}>
+      <SiteChromeTrailContext.Provider
+        value={{ setTrail, beginTrail, endTrail }}
+      >
         <SiteChromeActionsContext.Provider value={{ setActions }}>
           <SkipLink />
           <div className="site-chrome">

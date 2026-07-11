@@ -13,6 +13,7 @@ import {
   getPoemBySlug,
   getPoemsByAuthor,
   getPoemsByVolume,
+  getReadingAdjacentPoems,
   getVolumeBySlug,
   isVolumeEmpty,
 } from "./poems";
@@ -405,6 +406,60 @@ describe("getAdjacentPoemsInVolume", () => {
 
   it("returns empty neighbors for an unknown slug", () => {
     expect(getAdjacentPoemsInVolume("not-a-poem")).toEqual({});
+  });
+});
+
+describe("getReadingAdjacentPoems", () => {
+  it("returns same-volume neighbors without crossVolume", () => {
+    const { prev, next } = getReadingAdjacentPoems("kang-qu-yao");
+
+    expect(prev?.slug).toBe("ji-rang-ge");
+    expect(prev?.crossVolume).toBeUndefined();
+    expect(next?.slug).toBe("yi-qi-shi-la-ci");
+    expect(next?.crossVolume).toBeUndefined();
+  });
+
+  it("continues into the next volume after the last poem", () => {
+    const last = getPoemsByVolume("gu-yi").at(-1);
+    expect(last).toBeDefined();
+
+    const { next } = getReadingAdjacentPoems(last!.slug);
+    const hanFirst = getPoemsByVolume("han")[0];
+
+    expect(next?.slug).toBe(hanFirst?.slug);
+    expect(next?.crossVolume).toBe(true);
+  });
+
+  it("continues into the previous volume before the first poem", () => {
+    const hanFirst = getPoemsByVolume("han")[0];
+    expect(hanFirst).toBeDefined();
+
+    const { prev } = getReadingAdjacentPoems(hanFirst!.slug);
+    const guYiLast = getPoemsByVolume("gu-yi").at(-1);
+
+    expect(prev?.slug).toBe(guYiLast?.slug);
+    expect(prev?.crossVolume).toBe(true);
+  });
+
+  it("omits prev at the first poem of the first volume", () => {
+    const { prev, next } = getReadingAdjacentPoems("ji-rang-ge");
+
+    expect(prev).toBeUndefined();
+    expect(next?.slug).toBe("kang-qu-yao");
+  });
+
+  it("omits next at the last poem of the last volume", () => {
+    const last = getPoemsByVolume("sui").at(-1);
+    expect(last).toBeDefined();
+
+    const { prev, next } = getReadingAdjacentPoems(last!.slug);
+
+    expect(prev).toBeDefined();
+    expect(next).toBeUndefined();
+  });
+
+  it("returns empty neighbors for an unknown slug", () => {
+    expect(getReadingAdjacentPoems("not-a-poem")).toEqual({});
   });
 });
 
