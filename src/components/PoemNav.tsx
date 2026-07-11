@@ -1,9 +1,16 @@
 "use client";
 
+import type { ReactNode } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { VariantText } from "@/components/VariantText";
 import { useUiText } from "@/components/ScriptVariantProvider";
 import type { PoemMeta } from "@/lib/poems";
+import {
+  isPlainPrimaryClick,
+  navigateWithPoemTransition,
+  shouldUsePoemViewTransition,
+} from "@/lib/poem-view-transition";
 
 type PoemNavMeta = PoemMeta & {
   titleTraditional?: string;
@@ -26,6 +33,36 @@ function PoemNavTitle({ poem }: { poem: PoemNavMeta }) {
   );
 }
 
+function PoemNavLink({
+  href,
+  className,
+  children,
+}: {
+  href: string;
+  className: string;
+  children: ReactNode;
+}) {
+  const router = useRouter();
+
+  return (
+    <Link
+      href={href}
+      className={className}
+      onClick={(event) => {
+        if (!isPlainPrimaryClick(event) || !shouldUsePoemViewTransition()) {
+          return;
+        }
+        event.preventDefault();
+        navigateWithPoemTransition(href, (nextHref) => {
+          router.push(nextHref);
+        });
+      }}
+    >
+      {children}
+    </Link>
+  );
+}
+
 export function PoemNav({ prev, next }: PoemNavProps) {
   const ariaLabel = useUiText("poemNavAria");
   const prevPoemLabel = useUiText("prevPoem");
@@ -43,22 +80,28 @@ export function PoemNav({ prev, next }: PoemNavProps) {
   return (
     <nav aria-label={ariaLabel} className="poem-nav">
       {prev ? (
-        <Link href={`/p/${prev.slug}`} className="poem-nav__link poem-nav__link--prev">
+        <PoemNavLink
+          href={`/p/${prev.slug}`}
+          className="poem-nav__link poem-nav__link--prev"
+        >
           <span className="poem-nav__label">{prevLabel}</span>
           <span className="poem-nav__title">
             <PoemNavTitle poem={prev} />
           </span>
-        </Link>
+        </PoemNavLink>
       ) : (
         <span className="poem-nav__spacer" />
       )}
       {next ? (
-        <Link href={`/p/${next.slug}`} className="poem-nav__link poem-nav__link--next">
+        <PoemNavLink
+          href={`/p/${next.slug}`}
+          className="poem-nav__link poem-nav__link--next"
+        >
           <span className="poem-nav__label">{nextLabel}</span>
           <span className="poem-nav__title">
             <PoemNavTitle poem={next} />
           </span>
-        </Link>
+        </PoemNavLink>
       ) : (
         <span className="poem-nav__spacer" />
       )}

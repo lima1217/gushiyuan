@@ -145,6 +145,7 @@ body {
 
 .poem-reader__viewport {
   width: 100%;
+  view-transition-name: poem-reading;
 }
 
 .poem-reader__title {
@@ -842,6 +843,7 @@ body {
   justify-content: space-between;
   gap: 1rem;
   pointer-events: none;
+  view-transition-name: site-chrome;
 }
 
 /* 诗页与目录页：顶栏控件与版心左右对齐 */
@@ -1092,6 +1094,45 @@ body:has(.catalog-layout) .site-chrome {
   margin-top: 0;
 }
 
+/* 诗页切换：正文短淡入淡出，顶栏钉住不参与过渡 */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+
+::view-transition-group(site-chrome) {
+  animation: none;
+  z-index: 100;
+}
+
+::view-transition-old(site-chrome) {
+  display: none;
+}
+
+::view-transition-new(site-chrome) {
+  animation: none;
+}
+
+::view-transition-old(poem-reading) {
+  animation: 150ms ease-out both poem-vt-fade-out;
+}
+
+::view-transition-new(poem-reading) {
+  animation: 200ms ease-in 70ms both poem-vt-fade-in;
+}
+
+@keyframes poem-vt-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes poem-vt-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
 /* 站内检索：固定角落，低对比，唤起前不占正文空间 */
 
 @media (prefers-reduced-motion: reduce) {
@@ -1116,6 +1157,14 @@ body:has(.catalog-layout) .site-chrome {
   [data-slot="popover-content"] {
     animation: none !important;
     transition: none !important;
+  }
+
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
   }
 }
 

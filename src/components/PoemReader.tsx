@@ -31,6 +31,10 @@ import {
 } from "@/lib/vertical-layout";
 import { cn } from "@/lib/utils";
 import type { VariantableText } from "@/lib/script-variant";
+import {
+  navigateWithPoemTransition,
+  notifyPoemNavigationPainted,
+} from "@/lib/poem-view-transition";
 import { schedulePreloadRemainingWenkaiSubsets } from "@/lib/wenkai-font";
 
 function PoemAttribution({
@@ -111,6 +115,10 @@ export function PoemReader({
     }
   }, [next, nextVolume, prev, prevVolume, router]);
 
+  useEffect(() => {
+    notifyPoemNavigationPainted();
+  }, [poem.slug]);
+
   useEffect(() => schedulePreloadRemainingWenkaiSubsets(), []);
 
   useEffect(() => {
@@ -148,22 +156,30 @@ export function PoemReader({
 
       if (event.key === "ArrowLeft" && prev) {
         event.preventDefault();
-        router.push(`/p/${prev.slug}`);
+        navigateWithPoemTransition(`/p/${prev.slug}`, (href) => {
+          router.push(href);
+        });
         return;
       }
       if (event.key === "ArrowRight" && next) {
         event.preventDefault();
-        router.push(`/p/${next.slug}`);
+        navigateWithPoemTransition(`/p/${next.slug}`, (href) => {
+          router.push(href);
+        });
         return;
       }
       if (event.key === "ArrowUp" && prevVolume) {
         event.preventDefault();
-        router.push(`/p/${prevVolume.slug}`);
+        navigateWithPoemTransition(`/p/${prevVolume.slug}`, (href) => {
+          router.push(href);
+        });
         return;
       }
       if (event.key === "ArrowDown" && nextVolume) {
         event.preventDefault();
-        router.push(`/p/${nextVolume.slug}`);
+        navigateWithPoemTransition(`/p/${nextVolume.slug}`, (href) => {
+          router.push(href);
+        });
       }
     }
 
