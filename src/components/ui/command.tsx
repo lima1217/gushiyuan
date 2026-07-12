@@ -38,12 +38,14 @@ function CommandDialog({
   description = "Search for a command to run…",
   children,
   className,
+  contentStyle,
   showCloseButton = false,
   ...props
 }: Omit<React.ComponentProps<typeof Dialog>, "children"> & {
   title?: string
   description?: string
   className?: string
+  contentStyle?: React.CSSProperties
   showCloseButton?: boolean
   children: React.ReactNode
 }) {
@@ -58,6 +60,7 @@ function CommandDialog({
           "top-1/3 translate-y-0 overflow-hidden rounded-xl! p-0",
           className
         )}
+        style={contentStyle}
         showCloseButton={showCloseButton}
       >
         {children}

@@ -16,15 +16,25 @@ import {
 } from "@/components/ui/command";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { loadSearchIndex } from "@/lib/load-search-index";
+import {
+  searchDialogAnchorCss,
+  type SearchDialogAnchorStyle,
+} from "@/lib/search-dialog-anchor";
 import { filterSearchIndex } from "@/lib/search-filter";
 import type { SearchIndex } from "@/lib/search-index-types";
+import { cn } from "@/lib/utils";
 
 type SiteSearchDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  anchor?: SearchDialogAnchorStyle | null;
 };
 
-export function SiteSearchDialog({ open, onOpenChange }: SiteSearchDialogProps) {
+export function SiteSearchDialog({
+  open,
+  onOpenChange,
+  anchor = null,
+}: SiteSearchDialogProps) {
   const router = useRouter();
   const searchTitle = useUiText("searchTitle");
   const searchDescription = useUiText("searchDescription");
@@ -105,7 +115,11 @@ export function SiteSearchDialog({ open, onOpenChange }: SiteSearchDialogProps) 
       onOpenChange={handleOpenChange}
       title={searchTitle}
       description={searchDescription}
-      className="w-[min(100%,26rem)] gap-0 overflow-hidden rounded-xl border-0 bg-[var(--color-paper)] p-0 text-[var(--color-ink)] shadow-[0_24px_56px_-18px_color-mix(in_srgb,var(--color-ink)_30%,transparent)] ring-1 ring-[color-mix(in_srgb,var(--color-ink)_14%,transparent)] sm:max-w-md"
+      className={cn(
+        "w-[min(100%,26rem)] gap-0 overflow-hidden rounded-xl border-0 bg-[var(--color-paper)] p-0 text-[var(--color-ink)] shadow-[0_24px_56px_-18px_color-mix(in_srgb,var(--color-ink)_30%,transparent)] ring-1 ring-[color-mix(in_srgb,var(--color-ink)_14%,transparent)] sm:max-w-md",
+        anchor?.className,
+      )}
+      contentStyle={searchDialogAnchorCss(anchor?.style)}
     >
       <Command
         shouldFilter={false}

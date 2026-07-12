@@ -9,6 +9,7 @@ import {
   pickRandomPoemSlug,
   poemSlugFromPathname,
 } from "@/lib/random-poem";
+import { navigateWithPoemTransition } from "@/lib/poem-view-transition";
 
 export function RandomPoemButton() {
   const randomPoem = useUiText("randomPoem");
@@ -31,7 +32,9 @@ export function RandomPoemButton() {
       if (!slug) {
         return;
       }
-      router.push(`/p/${slug}`);
+      navigateWithPoemTransition(`/p/${slug}`, (href) => {
+        router.push(href);
+      });
     } catch {
       // Keep silent: no toast surface in chrome; match search failure tone.
     } finally {
