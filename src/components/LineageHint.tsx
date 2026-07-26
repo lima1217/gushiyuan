@@ -64,7 +64,7 @@ export function LineageHint({
           ? "poem-reader__sentence poem-reader__sentence--lineage"
           : "poem-reader__line poem-reader__line--lineage"
       }
-      contentClassName="lineage-hint__content w-72 max-w-[min(18rem,calc(100vw-2rem))] flex-col items-stretch gap-2 rounded-lg border border-[color-mix(in_srgb,var(--color-ink)_10%,transparent)] bg-[var(--color-paper)] px-3 py-2.5 text-[var(--color-ink)] shadow-md ring-0"
+      contentClassName="lineage-hint__content w-72 max-w-[min(18rem,calc(100vw-2rem))] flex-col items-stretch gap-2 rounded-lg bg-paper px-3 py-2.5 text-ink shadow-overlay"
       sideOffset={10}
     >
       <p className="lineage-hint__label">{label}</p>

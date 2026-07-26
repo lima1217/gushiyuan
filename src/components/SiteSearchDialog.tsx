@@ -178,7 +178,7 @@ export function SiteSearchDialog({
       title={searchTitle}
       description={searchDescription}
       className={cn(
-        "w-[min(100%,26rem)] gap-0 overflow-hidden rounded-xl border-0 bg-[var(--color-paper)] p-0 text-[var(--color-ink)] shadow-[0_24px_56px_-18px_color-mix(in_srgb,var(--color-ink)_30%,transparent)] ring-1 ring-[color-mix(in_srgb,var(--color-ink)_14%,transparent)] sm:max-w-md",
+        "w-[min(100%,26rem)] gap-0 overflow-hidden rounded-xl border-0 bg-paper p-0 text-ink shadow-overlay-strong sm:max-w-md",
         anchor?.className,
       )}
       contentStyle={searchDialogAnchorCss(anchor?.style)}
