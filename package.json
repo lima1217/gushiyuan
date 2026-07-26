@@ -17,7 +17,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
-    "verify": "npm run typecheck && npm run lint && npm test",
+    "verify": "npm run typecheck && npm run lint && npm test && npm run build",
     "verify:generated": "tsx scripts/verify-generated-artifacts.ts",
     "config:generate": "node scripts/generate-volume-config.mjs --all",
     "config:verify": "node scripts/verify-volume-configs.mjs"

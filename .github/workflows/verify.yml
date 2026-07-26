@@ -23,5 +23,4 @@ jobs:
       - run: npm ci
       - run: npm run font:icon
       - run: npm run verify
-      - run: npm run build
       - run: npm run verify:generated

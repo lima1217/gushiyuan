@@ -22,9 +22,7 @@
 ### 验证方式
 
 ```
-npx tsc --noEmit
-npx vitest run
-npm run build            # 必须跑，见 D-4：verify 不含 build，客户端边界问题只有 build 能抓到
+npm run verify           # typecheck + lint + test + build（含 next build；见 D-2）
 ```
 
 视觉验收**不要依赖 `npm run dev`**（该进程在 agent shell 里会被回收）。改用静态产物：
@@ -233,12 +231,9 @@ A 与 B 可以并行，但 B 若新增被客户端组件引用的运行时导出
 
 由此产生三条暂缓项（A-9、B-1、B-3，见末尾），以及一条**不受影响**的清理项（A-11 的 `.lineage-page__*` 死 CSS，那是给一个从未存在的独立页面写的，与浮层无关，照删）。
 
-### D-2（工程）`npm run verify` 不含 `next build`
+### D-2（工程）`npm run verify` 不含 `next build` — 已完成
 
-- 位置：`package.json:20`（`"verify": "npm run typecheck && npm run lint && npm test"`）
-- 现状：上一轮实施时，一个客户端组件对 `src/lib/site-ui-text.ts` 的值引用把 `fs` 拖进了客户端 bundle，全站 500。`tsc` 与 `vitest` 都通过，只有 `next build` 会报 `Module not found: Can't resolve 'fs'`。
-- 目标：把 `next build` 纳入 `verify`（或增设 `verify:build`，并在 AGENTS.md / CI 中要求提交前跑）。
-- 为什么：客户端/服务端边界是这个项目最容易踩的一类错误，而现有 verify 对它完全没有覆盖。
+- 已把 `npm run build`（含 `next build`）纳入 `verify`；AGENTS.md / README / CI 同步要求提交前跑。
 - 注意：`build` 会产出 `out/`（已在 `.gitignore` 中），别把它提交进来。
 
 ---
