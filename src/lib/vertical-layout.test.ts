@@ -5,16 +5,24 @@ import {
   VERTICAL_LAYOUT_OVERRIDE_LINE_PER_COLUMN,
   VERTICAL_LAYOUT_OVERRIDE_REFLOW,
   VERTICAL_LAYOUT_REFLOW,
+  VERTICAL_READING_EDGE_EPSILON_PX,
   alignVerticalScrollToFirstColumn,
+  applyVerticalReadingKeyboardScroll,
   applyVerticalReadingWheelDelta,
   chapterSentenceOffsets,
   hasVerticalReadingHorizontalOverflow,
   inferVerticalLayout,
+  isNegativeVerticalScrollOrigin,
+  isVerticalReadingAtHorizontalEdge,
   parseVerticalLayoutOverride,
   prepareVerticalDisplayChapters,
+  resolveNegativeVerticalScrollOrigin,
   resolveVerticalLayout,
   shouldConsumeVerticalReadingWheel,
   stripVerticalPunctuation,
+  verticalReadingKeyboardScrollDelta,
+  verticalReadingKeyboardScrollStep,
+  verticalReadingScrollBehavior,
   verticalReadingScrollLeft,
   verticalReadingWheelScrollLeft,
 } from "./vertical-layout";
@@ -221,6 +229,75 @@ describe("hasVerticalReadingHorizontalOverflow", () => {
   });
 });
 
+describe("isVerticalReadingAtHorizontalEdge", () => {
+  it("treats fitting content as at both edges", () => {
+    expect(isVerticalReadingAtHorizontalEdge(0, 320, 320, "left")).toBe(true);
+    expect(isVerticalReadingAtHorizontalEdge(0, 320, 320, "right")).toBe(true);
+  });
+
+  it("detects positive-origin start (right) and end (left)", () => {
+    expect(isVerticalReadingAtHorizontalEdge(480, 800, 320, "right")).toBe(
+      true,
+    );
+    expect(isVerticalReadingAtHorizontalEdge(480, 800, 320, "left")).toBe(
+      false,
+    );
+    expect(isVerticalReadingAtHorizontalEdge(0, 800, 320, "left")).toBe(true);
+    expect(isVerticalReadingAtHorizontalEdge(0, 800, 320, "right")).toBe(
+      false,
+    );
+    expect(isVerticalReadingAtHorizontalEdge(200, 800, 320, "left")).toBe(
+      false,
+    );
+    expect(isVerticalReadingAtHorizontalEdge(200, 800, 320, "right")).toBe(
+      false,
+    );
+  });
+
+  it("detects negative-origin start (right) and end (left)", () => {
+    expect(isVerticalReadingAtHorizontalEdge(-480, 800, 320, "right")).toBe(
+      true,
+    );
+    expect(isVerticalReadingAtHorizontalEdge(-480, 800, 320, "left")).toBe(
+      false,
+    );
+    expect(isVerticalReadingAtHorizontalEdge(0, 800, 320, "left")).toBe(true);
+    expect(isVerticalReadingAtHorizontalEdge(-200, 800, 320, "right")).toBe(
+      false,
+    );
+  });
+
+  it("treats scroll-padding / snap residual at the left edge as arrived", () => {
+    // 实测：step 滚向 0 后 snap 稳定停在 24，而非精确 0。
+    expect(isVerticalReadingAtHorizontalEdge(24, 3081, 1800, "left")).toBe(
+      true,
+    );
+    expect(isVerticalReadingAtHorizontalEdge(24, 3081, 1800, "right")).toBe(
+      false,
+    );
+    expect(VERTICAL_READING_EDGE_EPSILON_PX).toBeGreaterThanOrEqual(24);
+    // 容差须小于一栏间距（实测 45px），否则整栏未读也会被判为已到边缘。
+    expect(VERTICAL_READING_EDGE_EPSILON_PX).toBeLessThan(45);
+  });
+
+  it("keeps a full unread column from counting as the left edge", () => {
+    // 距读完端还剩一整栏（45px）时不能翻页，否则末栏被跳过。
+    expect(isVerticalReadingAtHorizontalEdge(45, 3081, 1800, "left")).toBe(
+      false,
+    );
+  });
+
+  it("does not treat mid-poem offsets within a screen as edges", () => {
+    // 一屏步长量级的位置仍须继续滚动，不能提前翻页。
+    expect(isVerticalReadingAtHorizontalEdge(600, 3081, 1800, "left")).toBe(
+      false,
+    );
+    expect(isVerticalReadingAtHorizontalEdge(600, 3081, 1800, "right")).toBe(
+      false,
+    );
+  });
+});
+
 describe("shouldConsumeVerticalReadingWheel", () => {
   it("consumes vertical-dominant wheel deltas", () => {
     expect(shouldConsumeVerticalReadingWheel(0, 120)).toBe(true);
@@ -250,6 +327,123 @@ describe("applyVerticalReadingWheelDelta", () => {
     expect(viewport.scrollBy).toHaveBeenCalledWith({
       left: -120,
       behavior: "instant",
+    });
+  });
+});
+
+describe("verticalReadingKeyboardScrollStep", () => {
+  it("uses one viewport width as the step", () => {
+    expect(verticalReadingKeyboardScrollStep(1800)).toBe(1800);
+    expect(verticalReadingKeyboardScrollStep(0)).toBe(1);
+  });
+});
+
+describe("isNegativeVerticalScrollOrigin", () => {
+  it("detects negative-origin mid and start positions", () => {
+    expect(isNegativeVerticalScrollOrigin(-480, 480)).toBe(true);
+    expect(isNegativeVerticalScrollOrigin(-200, 480)).toBe(true);
+  });
+
+  it("treats non-negative scrollLeft as positive origin", () => {
+    expect(isNegativeVerticalScrollOrigin(480, 480)).toBe(false);
+    expect(isNegativeVerticalScrollOrigin(0, 480)).toBe(false);
+    expect(isNegativeVerticalScrollOrigin(0, 0)).toBe(false);
+  });
+});
+
+describe("resolveNegativeVerticalScrollOrigin", () => {
+  it("lets clear signals override sticky", () => {
+    expect(resolveNegativeVerticalScrollOrigin(-200, 480, false)).toBe(true);
+    expect(resolveNegativeVerticalScrollOrigin(200, 480, true)).toBe(false);
+  });
+
+  it("keeps sticky near zero where origin is ambiguous", () => {
+    expect(resolveNegativeVerticalScrollOrigin(0, 480, true)).toBe(true);
+    expect(resolveNegativeVerticalScrollOrigin(0, 480, false)).toBe(false);
+    expect(resolveNegativeVerticalScrollOrigin(24, 1281, true)).toBe(true);
+  });
+});
+
+describe("verticalReadingKeyboardScrollDelta", () => {
+  it("advances leftward on ArrowLeft for positive-origin browsers", () => {
+    // start: scrollLeft = +overflow; ArrowLeft progresses toward 0
+    expect(
+      verticalReadingKeyboardScrollDelta("ArrowLeft", 1281, 3081, 1800),
+    ).toBe(-1800);
+    expect(
+      verticalReadingKeyboardScrollDelta("ArrowRight", 1281, 3081, 1800),
+    ).toBe(1800);
+  });
+
+  it("advances toward zero on ArrowLeft for negative-origin browsers", () => {
+    expect(
+      verticalReadingKeyboardScrollDelta("ArrowLeft", -1281, 3081, 1800),
+    ).toBe(1800);
+    expect(
+      verticalReadingKeyboardScrollDelta("ArrowRight", -600, 3081, 1800),
+    ).toBe(-1800);
+  });
+
+  it("uses sticky negative origin at the reading end near zero", () => {
+    // 读完端 scrollLeft≈0：无 sticky 时默认正原点；有 sticky 时 ArrowRight 回退须为 -step
+    expect(
+      verticalReadingKeyboardScrollDelta("ArrowRight", 0, 3081, 1800, false),
+    ).toBe(1800);
+    expect(
+      verticalReadingKeyboardScrollDelta("ArrowRight", 0, 3081, 1800, true),
+    ).toBe(-1800);
+    expect(
+      verticalReadingKeyboardScrollDelta("ArrowRight", 24, 3081, 1800, true),
+    ).toBe(-1800);
+  });
+});
+
+describe("verticalReadingScrollBehavior", () => {
+  it("uses auto when reduced motion is preferred", () => {
+    expect(verticalReadingScrollBehavior(true)).toBe("auto");
+    expect(verticalReadingScrollBehavior(false)).toBe("smooth");
+  });
+});
+
+describe("applyVerticalReadingKeyboardScroll", () => {
+  it("scrolls the viewport by the keyboard delta with the given behavior", () => {
+    const viewport = {
+      scrollLeft: 1281,
+      scrollWidth: 3081,
+      clientWidth: 1800,
+      scrollBy: vi.fn(),
+    } as unknown as HTMLElement;
+
+    expect(
+      applyVerticalReadingKeyboardScroll(viewport, "ArrowLeft", "smooth"),
+    ).toBe(false);
+
+    expect(viewport.scrollBy).toHaveBeenCalledWith({
+      left: -1800,
+      behavior: "smooth",
+    });
+  });
+
+  it("returns sticky negative origin when scrolling back from the reading end", () => {
+    const viewport = {
+      scrollLeft: 0,
+      scrollWidth: 3081,
+      clientWidth: 1800,
+      scrollBy: vi.fn(),
+    } as unknown as HTMLElement;
+
+    expect(
+      applyVerticalReadingKeyboardScroll(
+        viewport,
+        "ArrowRight",
+        "auto",
+        true,
+      ),
+    ).toBe(true);
+
+    expect(viewport.scrollBy).toHaveBeenCalledWith({
+      left: -1800,
+      behavior: "auto",
     });
   });
 });

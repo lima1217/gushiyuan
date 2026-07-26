@@ -143,6 +143,39 @@ export function hasVerticalReadingHorizontalOverflow(
   return scrollWidth > clientWidth + 1;
 }
 
+/**
+ * 边缘判定容差（px）。须同时满足两侧约束：
+ * 下界——容纳 scroll-padding（上限 2rem）与 scroll-snap 造成的残留，实测左缘可稳定停在约 24px；
+ * 上界——必须小于一栏间距（22px 字号下实测 45px），否则整栏未读也会被判为已到边缘而提前翻页。
+ */
+export const VERTICAL_READING_EDGE_EPSILON_PX = 36;
+
+/**
+ * 竖排横向滚动是否已到视觉左/右端点。
+ * 起读列在最右：正原点 ≈ +overflow，负原点 ≈ -overflow；读完端两种原点都 ≈ 0。
+ */
+export function isVerticalReadingAtHorizontalEdge(
+  scrollLeft: number,
+  scrollWidth: number,
+  clientWidth: number,
+  edge: "left" | "right",
+  epsilon = VERTICAL_READING_EDGE_EPSILON_PX,
+): boolean {
+  const maxScroll = Math.max(scrollWidth - clientWidth, 0);
+  if (maxScroll <= epsilon) {
+    return true;
+  }
+
+  if (edge === "right") {
+    return (
+      Math.abs(scrollLeft - maxScroll) <= epsilon ||
+      Math.abs(scrollLeft + maxScroll) <= epsilon
+    );
+  }
+
+  return Math.abs(scrollLeft) <= epsilon;
+}
+
 /** 触控板已有横向 delta 时不劫持；否则把纵向滚轮映射为横向阅读滚动。 */
 export function shouldConsumeVerticalReadingWheel(
   deltaX: number,
@@ -164,5 +197,106 @@ export function applyVerticalReadingWheelDelta(
     left: verticalReadingWheelScrollLeft(deltaY),
     behavior: "instant",
   });
+}
+
+/** 方向键横向滚动步长：一屏，便于长诗按视口翻栏。 */
+export function verticalReadingKeyboardScrollStep(clientWidth: number): number {
+  return Math.max(clientWidth, 1);
+}
+
+/**
+ * 当前 `scrollLeft` 是否为负原点实现（起读端 ≈ -overflow）。
+ * 仅认清晰负向信号；近 0 时请用 `resolveNegativeVerticalScrollOrigin` + sticky。
+ */
+export function isNegativeVerticalScrollOrigin(
+  scrollLeft: number,
+  maxScroll: number,
+): boolean {
+  if (maxScroll <= 0) {
+    return false;
+  }
+  return scrollLeft < -0.5;
+}
+
+/**
+ * 解析竖排横向滚动是否为负原点。
+ * 清晰负向（小于 -0.5）或明显正向（大于边缘容差）覆盖 sticky；
+ * 读完端附近（含 scroll-snap 残留约 24px）沿用 sticky。
+ */
+export function resolveNegativeVerticalScrollOrigin(
+  scrollLeft: number,
+  maxScroll: number,
+  stickyNegativeOrigin = false,
+  ambiguousEpsilon = VERTICAL_READING_EDGE_EPSILON_PX,
+): boolean {
+  if (maxScroll <= 0) {
+    return false;
+  }
+  if (scrollLeft < -0.5) {
+    return true;
+  }
+  if (scrollLeft > ambiguousEpsilon) {
+    return false;
+  }
+  return stickyNegativeOrigin;
+}
+
+/**
+ * ArrowLeft：沿阅读方向推进（视口左移）；ArrowRight：回退到起读端。
+ * 正原点推进 → 负 delta；负原点推进 → 正 delta。
+ */
+export function verticalReadingKeyboardScrollDelta(
+  key: "ArrowLeft" | "ArrowRight",
+  scrollLeft: number,
+  scrollWidth: number,
+  clientWidth: number,
+  stickyNegativeOrigin = false,
+): number {
+  const maxScroll = Math.max(scrollWidth - clientWidth, 0);
+  const step = verticalReadingKeyboardScrollStep(clientWidth);
+  const negativeOrigin = resolveNegativeVerticalScrollOrigin(
+    scrollLeft,
+    maxScroll,
+    stickyNegativeOrigin,
+  );
+  const towardReadingEnd = key === "ArrowLeft";
+
+  if (towardReadingEnd) {
+    return negativeOrigin ? step : -step;
+  }
+  return negativeOrigin ? -step : step;
+}
+
+export function verticalReadingScrollBehavior(
+  prefersReducedMotion: boolean,
+): ScrollBehavior {
+  return prefersReducedMotion ? "auto" : "smooth";
+}
+
+/** 应用键盘横向滚动，并返回更新后的负原点 sticky。 */
+export function applyVerticalReadingKeyboardScroll(
+  viewport: HTMLElement,
+  key: "ArrowLeft" | "ArrowRight",
+  behavior: ScrollBehavior,
+  stickyNegativeOrigin = false,
+): boolean {
+  const { scrollLeft, scrollWidth, clientWidth } = viewport;
+  const maxScroll = Math.max(scrollWidth - clientWidth, 0);
+  const negativeOrigin = resolveNegativeVerticalScrollOrigin(
+    scrollLeft,
+    maxScroll,
+    stickyNegativeOrigin,
+  );
+  viewport.scrollBy({
+    left: verticalReadingKeyboardScrollDelta(
+      key,
+      scrollLeft,
+      scrollWidth,
+      clientWidth,
+      stickyNegativeOrigin,
+    ),
+    behavior,
+  });
+  return negativeOrigin;
 }
 

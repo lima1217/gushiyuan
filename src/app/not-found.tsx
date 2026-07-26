@@ -7,6 +7,7 @@ export default function NotFound() {
   return (
     <main
       id="main-content"
+      tabIndex={-1}
       className="flex min-h-dvh flex-col items-center justify-center px-8 py-16 md:px-12 md:py-24"
     >
       <Link href="/" className="catalog__site-title">

@@ -12,5 +12,5 @@ export const WENKAI_SUBSET_PATHS: string[] = [
   "/fonts/wenkai/wenkai-subset.9.400.woff2",
   "/fonts/wenkai/wenkai-subset.10.400.woff2",
   "/fonts/wenkai/wenkai-subset.11.400.woff2",
-  "/fonts/wenkai/wenkai-subset.12.366.woff2"
+  "/fonts/wenkai/wenkai-subset.12.369.woff2"
 ];

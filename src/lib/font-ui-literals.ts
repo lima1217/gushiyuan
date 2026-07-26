@@ -1,4 +1,4 @@
-import { SITE_DESCRIPTION, SITE_NAME } from "@/lib/site-metadata";
+import { SITE_DESCRIPTION, SITE_NAME } from "@/lib/site-identity";
 import { SITE_UI_TEXT_SIMPLIFIED } from "@/lib/site-ui-text";
 
 /** 站点 UI 固定文案。新增可见中文 UI 时同步更新。 */
@@ -11,13 +11,11 @@ export const FONT_UI_LITERALS =
   "同卷诗作相邻诗作上一首下一首上一卷下一卷" +
   "查看此句的源流线索源后世化用" +
   "面包屑" +
-  "此卷尚无收录。" +
-  "目录古诗源分卷整理中" +
+  "目录古诗源分卷" +
   "未寻得此页所求不在此间。回目录" +
   "后世名句源头" +
   "打开检索检索站内检索" +
   "按诗题或作者检索" +
   "诗题、作者…" +
-  "未找到匹配" +
   "诗作者" +
   "·";

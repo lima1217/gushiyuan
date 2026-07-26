@@ -3,7 +3,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { VariantText } from "@/components/VariantText";
-import { useUiText } from "@/components/ScriptVariantProvider";
+import {
+  useUiText,
+  useVariantText,
+} from "@/components/ScriptVariantProvider";
 import {
   Command,
   CommandDialog,
@@ -22,6 +25,7 @@ import {
 } from "@/lib/search-dialog-anchor";
 import { filterSearchIndex } from "@/lib/search-filter";
 import type { SearchIndex } from "@/lib/search-index-types";
+import { formatSiteUiCount } from "@/lib/format-site-ui-count";
 import { cn } from "@/lib/utils";
 
 type SiteSearchDialogProps = {
@@ -29,6 +33,27 @@ type SiteSearchDialogProps = {
   onOpenChange: (open: boolean) => void;
   anchor?: SearchDialogAnchorStyle | null;
 };
+
+const selectedItemClassName =
+  "min-h-10 gap-3 rounded-lg px-3 py-2 text-[color-mix(in_srgb,var(--color-ink)_72%,transparent)] data-selected:bg-[color-mix(in_srgb,var(--color-ink)_13%,transparent)] data-selected:text-[var(--color-ink)] data-selected:shadow-[inset_2px_0_0_0_var(--color-ink)] [&>svg:last-child]:hidden";
+
+function SearchResultTitle({
+  simplified,
+  traditional,
+  className,
+}: {
+  simplified: string;
+  traditional: string;
+  className?: string;
+}) {
+  const title = useVariantText({ simplified, traditional });
+
+  return (
+    <span className={className} title={title}>
+      <VariantText text={{ simplified, traditional }} />
+    </span>
+  );
+}
 
 export function SiteSearchDialog({
   open,
@@ -41,6 +66,7 @@ export function SiteSearchDialog({
   const searchPlaceholder = useUiText("searchPlaceholder");
   const searchNoMatch = useUiText("searchNoMatch");
   const searchLoadError = useUiText("searchLoadError");
+  const searchMatchCount = useUiText("searchMatchCount");
   const searchPoemsHeading = useUiText("searchPoemsHeading");
   const searchAuthorsHeading = useUiText("searchAuthorsHeading");
   const [index, setIndex] = useState<SearchIndex | null>(null);
@@ -108,6 +134,42 @@ export function SiteSearchDialog({
       : null;
 
   const showList = hasResults || Boolean(emptyMessage);
+  const indexLoading = open && !index && !loadError;
+
+  const statusMessage = useMemo(() => {
+    if (!open) {
+      return "";
+    }
+    if (loadError) {
+      return searchLoadError;
+    }
+    if (!index || indexLoading) {
+      return "";
+    }
+    const trimmed = debouncedQuery.trim();
+    if (!trimmed) {
+      return "";
+    }
+    if (!hasResults) {
+      return searchNoMatch;
+    }
+    return formatSiteUiCount(
+      searchMatchCount,
+      results.poems.length + results.authors.length,
+    );
+  }, [
+    open,
+    loadError,
+    searchLoadError,
+    index,
+    indexLoading,
+    debouncedQuery,
+    hasResults,
+    searchNoMatch,
+    searchMatchCount,
+    results.poems.length,
+    results.authors.length,
+  ]);
 
   return (
     <CommandDialog
@@ -124,8 +186,12 @@ export function SiteSearchDialog({
       <Command
         shouldFilter={false}
         disablePointerSelection
+        aria-busy={indexLoading || undefined}
         className="rounded-none bg-transparent p-0 text-[var(--color-ink)]"
       >
+        <div role="status" className="sr-only">
+          {statusMessage}
+        </div>
         <CommandInput
           aria-label={searchTitle}
           name="site-search"
@@ -159,17 +225,14 @@ export function SiteSearchDialog({
                     key={`poem-${poem.slug}`}
                     value={`${poem.title} ${poem.titleTraditional} ${poem.author} ${poem.authorTraditional} ${poem.body} ${poem.bodyTraditional}`}
                     onSelect={() => navigate(`/p/${poem.slug}`)}
-                    className="min-h-10 gap-3 rounded-lg px-3 py-2 data-selected:bg-[color-mix(in_srgb,var(--color-ink)_6%,transparent)] data-selected:text-[var(--color-ink)] [&>svg:last-child]:hidden"
+                    className={selectedItemClassName}
                   >
                     <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-                      <span className="truncate text-[0.95rem] tracking-[0.02em]">
-                        <VariantText
-                          text={{
-                            simplified: poem.title,
-                            traditional: poem.titleTraditional,
-                          }}
-                        />
-                      </span>
+                      <SearchResultTitle
+                        simplified={poem.title}
+                        traditional={poem.titleTraditional}
+                        className="truncate text-[0.95rem] tracking-[0.02em]"
+                      />
                       {poem.matchedLine ? (
                         <span className="truncate text-xs tracking-[0.04em] text-[var(--color-ink-muted)]">
                           <VariantText text={poem.matchedLine} />
@@ -207,16 +270,13 @@ export function SiteSearchDialog({
                     onSelect={() =>
                       navigate(`/v/${author.volume}/${author.authorSlug}`)
                     }
-                    className="min-h-10 rounded-lg px-3 py-2 data-selected:bg-[color-mix(in_srgb,var(--color-ink)_6%,transparent)] data-selected:text-[var(--color-ink)] [&>svg:last-child]:hidden"
+                    className={cn(selectedItemClassName, "gap-0")}
                   >
-                    <span className="tracking-[0.02em]">
-                      <VariantText
-                        text={{
-                          simplified: author.name,
-                          traditional: author.nameTraditional,
-                        }}
-                      />
-                    </span>
+                    <SearchResultTitle
+                      simplified={author.name}
+                      traditional={author.nameTraditional}
+                      className="tracking-[0.02em]"
+                    />
                   </CommandItem>
                 ))}
               </CommandGroup>

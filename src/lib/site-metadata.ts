@@ -1,11 +1,19 @@
 import type { Metadata } from "next";
 import type { MetadataRoute } from "next";
 import { getAllPoems, getAllVolumes, getAuthorsByVolume } from "@/lib/poems";
+import {
+  OG_IMAGE_PATH,
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_URL,
+} from "@/lib/site-identity";
 
-export const SITE_URL = "https://gsy.aiwayfarer.net";
-export const SITE_NAME = "古诗源";
-export const SITE_DESCRIPTION = "清·沈德潜《古诗源》—— 唐前诗的源头";
-export const OG_IMAGE_PATH = "/og.png";
+export {
+  OG_IMAGE_PATH,
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_URL,
+} from "@/lib/site-identity";
 
 const ogImage = {
   url: OG_IMAGE_PATH,

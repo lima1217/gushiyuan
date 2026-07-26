@@ -29,7 +29,7 @@ def catalog_strings() -> set[str]:
             match = re.match(r"^(title|author|dynasty):\s*(.+)", line)
             if match:
                 strings.add(match.group(2).strip())
-    strings.update({"整理中", "目录", "古诗源"})
+    strings.update({"尚未录入", "目录", "古诗源"})
     return strings
 
 

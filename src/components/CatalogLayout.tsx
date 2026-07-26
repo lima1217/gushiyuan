@@ -22,7 +22,11 @@ export function CatalogLayout({ title, breadcrumbs, children }: CatalogLayoutPro
             <VariantText text={title} />
           </h1>
         </header>
-        <main id="main-content" className="mx-auto w-full max-w-md flex-1">
+        <main
+          id="main-content"
+          tabIndex={-1}
+          className="mx-auto w-full max-w-md flex-1"
+        >
           {children}
         </main>
       </div>

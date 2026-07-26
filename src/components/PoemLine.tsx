@@ -34,10 +34,12 @@ function VerticalColumnCharacters({
 }) {
   return (
     <>
+      <span className="sr-only">{sentence}</span>
       {splitIntoCharacters(sentence).map((character, index) => (
         <span
           key={`${lineIndex}-${index}-${character}`}
           className="poem-reader__char"
+          aria-hidden="true"
         >
           {character}
         </span>

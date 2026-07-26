@@ -4,7 +4,10 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { VariantText } from "@/components/VariantText";
-import { useUiText } from "@/components/ScriptVariantProvider";
+import {
+  useUiText,
+  useVariantText,
+} from "@/components/ScriptVariantProvider";
 import type { PoemMeta } from "@/lib/poems";
 import {
   isPlainPrimaryClick,
@@ -23,13 +26,20 @@ type PoemNavProps = {
 };
 
 function PoemNavTitle({ poem }: { poem: PoemNavMeta }) {
+  const title = useVariantText({
+    simplified: poem.title,
+    traditional: poem.titleTraditional ?? poem.title,
+  });
+
   return (
-    <VariantText
-      text={{
-        simplified: poem.title,
-        traditional: poem.titleTraditional ?? poem.title,
-      }}
-    />
+    <span title={title}>
+      <VariantText
+        text={{
+          simplified: poem.title,
+          traditional: poem.titleTraditional ?? poem.title,
+        }}
+      />
+    </span>
   );
 }
 

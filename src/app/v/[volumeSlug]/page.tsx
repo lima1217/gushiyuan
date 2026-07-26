@@ -9,7 +9,7 @@ import {
   getPoemsByAuthor,
   getVolumeBySlug,
 } from "@/lib/poems";
-import { makeTextVariant } from "@/lib/script-conversion";
+import { buildSiteUiText, makeTextVariant } from "@/lib/script-conversion";
 import { createPageMetadata } from "@/lib/site-metadata";
 
 type PageProps = {
@@ -37,18 +37,19 @@ export default async function VolumePage({ params }: PageProps) {
   }
 
   const authors = getAuthorsByVolume(volumeSlug);
+  const uiText = buildSiteUiText();
 
   return (
     <CatalogLayout
       title={makeTextVariant(volume.name)}
       breadcrumbs={[
-        { label: makeTextVariant("古诗源"), href: "/" },
+        { label: uiText.siteName, href: "/" },
         { label: makeTextVariant(volume.name) },
       ]}
     >
       {authors.length === 0 ? (
         <p className="catalog__empty">
-          <VariantText text={makeTextVariant("此卷尚无收录。")} />
+          <VariantText text={uiText.emptyVolume} />
         </p>
       ) : (
         <nav aria-label={`${volume.name}诗人`}>

@@ -3,18 +3,19 @@ import { CatalogLayout } from "@/components/CatalogLayout";
 import { VariantText } from "@/components/VariantText";
 import { VolumesNav } from "@/components/VolumesNav";
 import { getAllPoems, getAllVolumes } from "@/lib/poems";
-import { makeTextVariant } from "@/lib/script-conversion";
+import { buildSiteUiText, makeTextVariant } from "@/lib/script-conversion";
 
 export default function HomePage() {
   const volumes = getAllVolumes();
   const volumesWithPoems = new Set(getAllPoems().map((poem) => poem.volume));
+  const uiText = buildSiteUiText();
 
   return (
     <CatalogLayout
-      title={makeTextVariant("目录")}
+      title={uiText.catalogTitle}
       breadcrumbs={[
-        { label: makeTextVariant("古诗源"), href: "/" },
-        { label: makeTextVariant("目录") },
+        { label: uiText.siteName, href: "/" },
+        { label: uiText.catalogTitle },
       ]}
     >
       <VolumesNav>
@@ -30,7 +31,7 @@ export default function HomePage() {
                       <VariantText text={makeTextVariant(volume.name)} />
                     </span>
                     <span className="catalog__meta">
-                      <VariantText text={makeTextVariant("整理中")} />
+                      <VariantText text={uiText.organizing} />
                     </span>
                   </>
                 ) : (

@@ -10,6 +10,7 @@ import { VariantText } from "@/components/VariantText";
 import { PoemLine, PoemSentence } from "@/components/PoemLine";
 import {
   useScriptVariant,
+  useUiText,
   useVariantText,
 } from "@/components/ScriptVariantProvider";
 import type {
@@ -21,12 +22,16 @@ import { parsePoemBody } from "@/lib/poem-body";
 import {
   VERTICAL_LAYOUT_LINE_PER_COLUMN,
   alignVerticalScrollToFirstColumn,
+  applyVerticalReadingKeyboardScroll,
   applyVerticalReadingWheelDelta,
   chapterSentenceOffsets,
   hasVerticalReadingHorizontalOverflow,
+  isVerticalReadingAtHorizontalEdge,
   prepareVerticalDisplayChapters,
+  resolveNegativeVerticalScrollOrigin,
   resolveVerticalLayout,
   shouldConsumeVerticalReadingWheel,
+  verticalReadingScrollBehavior,
   verticalReadingScrollLeft,
 } from "@/lib/vertical-layout";
 import { cn } from "@/lib/utils";
@@ -81,6 +86,7 @@ export function PoemReader({
 }: PoemReaderProps) {
   const router = useRouter();
   const { variant } = useScriptVariant();
+  const poemBodyAria = useUiText("poemBodyAria");
   const body = useVariantText({
     simplified: poem.body,
     traditional: poem.bodyTraditional,
@@ -106,6 +112,8 @@ export function PoemReader({
 
   const readingAreaRef = useRef<HTMLDivElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
+  /** 负原点 sticky：读完端 scrollLeft≈0 时瞬时值无法区分，沿用曾观察到的负向信号。 */
+  const negativeScrollOriginRef = useRef(false);
 
   useEffect(() => {
     for (const neighbor of [prev, next, prevVolume, nextVolume]) {
@@ -154,20 +162,6 @@ export function PoemReader({
         return;
       }
 
-      if (event.key === "ArrowLeft" && prev) {
-        event.preventDefault();
-        navigateWithPoemTransition(`/p/${prev.slug}`, (href) => {
-          router.push(href);
-        });
-        return;
-      }
-      if (event.key === "ArrowRight" && next) {
-        event.preventDefault();
-        navigateWithPoemTransition(`/p/${next.slug}`, (href) => {
-          router.push(href);
-        });
-        return;
-      }
       if (event.key === "ArrowUp" && prevVolume) {
         event.preventDefault();
         navigateWithPoemTransition(`/p/${prevVolume.slug}`, (href) => {
@@ -180,6 +174,58 @@ export function PoemReader({
         navigateWithPoemTransition(`/p/${nextVolume.slug}`, (href) => {
           router.push(href);
         });
+        return;
+      }
+
+      // 左右：有横向未读内容时由 JS 主动滚阅读区（不依赖焦点落在滚动容器上）；
+      // 滚到该方向端点后再切诗。
+      if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+        const viewport = viewportRef.current;
+        if (viewport) {
+          const { scrollLeft, scrollWidth, clientWidth } = viewport;
+          const maxScroll = Math.max(scrollWidth - clientWidth, 0);
+          negativeScrollOriginRef.current = resolveNegativeVerticalScrollOrigin(
+            scrollLeft,
+            maxScroll,
+            negativeScrollOriginRef.current,
+          );
+          if (
+            hasVerticalReadingHorizontalOverflow(scrollWidth, clientWidth) &&
+            !isVerticalReadingAtHorizontalEdge(
+              scrollLeft,
+              scrollWidth,
+              clientWidth,
+              event.key === "ArrowLeft" ? "left" : "right",
+            )
+          ) {
+            event.preventDefault();
+            negativeScrollOriginRef.current =
+              applyVerticalReadingKeyboardScroll(
+                viewport,
+                event.key,
+                verticalReadingScrollBehavior(
+                  window.matchMedia("(prefers-reduced-motion: reduce)")
+                    .matches,
+                ),
+                negativeScrollOriginRef.current,
+              );
+            return;
+          }
+        }
+
+        if (event.key === "ArrowLeft" && prev) {
+          event.preventDefault();
+          navigateWithPoemTransition(`/p/${prev.slug}`, (href) => {
+            router.push(href);
+          });
+          return;
+        }
+        if (event.key === "ArrowRight" && next) {
+          event.preventDefault();
+          navigateWithPoemTransition(`/p/${next.slug}`, (href) => {
+            router.push(href);
+          });
+        }
       }
     }
 
@@ -196,6 +242,21 @@ export function PoemReader({
     let cancelled = false;
     let raf = 0;
 
+    function noteScrollOrigin() {
+      if (!scrollViewport) {
+        return;
+      }
+      const maxScroll = Math.max(
+        scrollViewport.scrollWidth - scrollViewport.clientWidth,
+        0,
+      );
+      negativeScrollOriginRef.current = resolveNegativeVerticalScrollOrigin(
+        scrollViewport.scrollLeft,
+        maxScroll,
+        negativeScrollOriginRef.current,
+      );
+    }
+
     function alignVerticalReadingStart() {
       if (!scrollViewport || cancelled) {
         return;
@@ -207,12 +268,15 @@ export function PoemReader({
       const current = scrollViewport.scrollLeft;
       // Skip no-op scroll writes (font settle / ResizeObserver chatter during VT).
       if (Math.abs(current - target) < 1) {
+        noteScrollOrigin();
         return;
       }
       if (target > 0 && Math.abs(current + target) < 1) {
+        noteScrollOrigin();
         return;
       }
       alignVerticalScrollToFirstColumn(scrollViewport, target);
+      noteScrollOrigin();
     }
 
     function scheduleAlign() {
@@ -222,6 +286,7 @@ export function PoemReader({
       });
     }
 
+    negativeScrollOriginRef.current = false;
     alignVerticalReadingStart();
     scheduleAlign();
 
@@ -247,12 +312,18 @@ export function PoemReader({
     if (!readingArea || !scrollViewport) {
       return;
     }
+    const viewport = scrollViewport;
+
+    function noteScrollOriginFromViewport() {
+      const maxScroll = Math.max(viewport.scrollWidth - viewport.clientWidth, 0);
+      negativeScrollOriginRef.current = resolveNegativeVerticalScrollOrigin(
+        viewport.scrollLeft,
+        maxScroll,
+        negativeScrollOriginRef.current,
+      );
+    }
 
     function onWheel(event: WheelEvent) {
-      if (!scrollViewport) {
-        return;
-      }
-
       if (
         event.target instanceof Element &&
         event.target.closest('[data-slot="popover-content"]')
@@ -262,8 +333,8 @@ export function PoemReader({
 
       if (
         !hasVerticalReadingHorizontalOverflow(
-          scrollViewport.scrollWidth,
-          scrollViewport.clientWidth,
+          viewport.scrollWidth,
+          viewport.clientWidth,
         )
       ) {
         return;
@@ -274,18 +345,24 @@ export function PoemReader({
       }
 
       event.preventDefault();
-      applyVerticalReadingWheelDelta(scrollViewport, event.deltaY);
+      applyVerticalReadingWheelDelta(viewport, event.deltaY);
+      noteScrollOriginFromViewport();
     }
 
     readingArea.addEventListener("wheel", onWheel, { passive: false });
+    viewport.addEventListener("scroll", noteScrollOriginFromViewport, {
+      passive: true,
+    });
     return () => {
       readingArea.removeEventListener("wheel", onWheel);
+      viewport.removeEventListener("scroll", noteScrollOriginFromViewport);
     };
   }, [sentenceCount, variant, verticalLayout]);
 
   return (
     <main
       id="main-content"
+      tabIndex={-1}
       className="poem-reader poem-reader--vertical relative flex min-h-dvh flex-col"
     >
       <SiteChromeTrail>
@@ -293,7 +370,13 @@ export function PoemReader({
       </SiteChromeTrail>
       <div ref={readingAreaRef} className="poem-reader__viewport">
         <div className="poem-reader__vertical-layout">
-          <div ref={viewportRef} className="poem-reader__columns-viewport">
+          <div
+            ref={viewportRef}
+            className="poem-reader__columns-viewport"
+            tabIndex={0}
+            role="region"
+            aria-label={poemBodyAria}
+          >
             <div
               className={cn(
                 "poem-reader__columns",

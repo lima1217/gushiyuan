@@ -23,6 +23,8 @@ html[lang="zh-Hant"] .variant-text__traditional {
   --color-paper: #faf8f4;
   --color-ink: #2c2a26;
   --color-ink-muted: #6b6560;
+  /* 60% ink ≈ 3.9:1 on paper；24% 仅 1.60:1，不达 WCAG 2.4.11 的 3:1 */
+  --color-focus-ring: color-mix(in srgb, var(--color-ink) 60%, transparent);
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -60,10 +62,21 @@ html[lang="zh-Hant"] .variant-text__traditional {
   --site-header-clearance: calc(
     var(--site-header-top) + var(--site-header-row-height)
   );
+  /* 版心边距单一来源；窄屏收进，桌面仍到 3.25 / 3.75 */
+  --page-gutter: clamp(1.25rem, 5vw, 3.25rem);
+  --poem-page-gutter: var(--page-gutter);
+}
+
+@media (min-width: 768px) {
+  :root {
+    --page-gutter: clamp(1.25rem, 5vw, 3.75rem);
+  }
 }
 
 @theme inline {
-  --font-wenkai: "LXGW WenKai", serif;
+  /* 子集 swap 未命中时避免落到泛型 serif（竖排下列长会漂） */
+  --font-wenkai: "LXGW WenKai", "Songti SC", "Noto Serif CJK SC",
+    "Source Han Serif SC", serif;
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
     "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
   --font-heading: var(--font-sans);
@@ -123,7 +136,6 @@ body {
 /* 阅读页中文排版：字面功夫用 CSS，骨架交给 Tailwind */
 
 .poem-reader {
-  --poem-page-gutter: 3.25rem;
   --poem-control-clearance: var(--poem-page-gutter);
   --poem-page-inset-inline: calc(
     var(--poem-page-gutter) +
@@ -133,14 +145,10 @@ body {
       )
   );
   padding-top: calc(var(--poem-control-clearance) + env(safe-area-inset-top, 0px));
-  padding-bottom: clamp(1.75rem, 5vh, 3.5rem);
+  padding-bottom: calc(
+    clamp(1.75rem, 5vh, 3.5rem) + env(safe-area-inset-bottom, 0px)
+  );
   padding-inline: var(--poem-page-inset-inline);
-}
-
-@media (min-width: 768px) {
-  .poem-reader {
-    --poem-page-gutter: 3.75rem;
-  }
 }
 
 .poem-reader__viewport {
@@ -181,7 +189,7 @@ body {
 .poem-reader__sentence--lineage:focus-visible {
   color: var(--color-ink);
   background: color-mix(in srgb, var(--color-ink) 4%, transparent);
-  outline: 2px solid color-mix(in srgb, var(--color-ink) 24%, transparent);
+  outline: 2px solid var(--color-focus-ring);
   outline-offset: 2px;
 }
 
@@ -190,7 +198,7 @@ body {
   display: inline;
   margin-inline-start: 0.15em;
   font-size: 0.85em;
-  color: color-mix(in srgb, var(--color-ink) 48%, transparent);
+  color: var(--color-ink-muted);
 }
 
 .poem-reader__line {
@@ -228,7 +236,7 @@ body {
 .poem-reader__line--lineage:focus-visible {
   color: var(--color-ink);
   background: color-mix(in srgb, var(--color-ink) 4%, transparent);
-  outline: 2px solid color-mix(in srgb, var(--color-ink) 24%, transparent);
+  outline: 2px solid var(--color-focus-ring);
   outline-offset: 2px;
 }
 
@@ -243,7 +251,7 @@ body {
   top: 0.18em;
   margin-inline-start: 0.2em;
   font-size: 0.55em;
-  color: color-mix(in srgb, var(--color-ink) 36%, transparent);
+  color: var(--color-ink-muted);
   letter-spacing: 0.02em;
   writing-mode: horizontal-tb;
   pointer-events: none;
@@ -251,7 +259,7 @@ body {
 
 .poem-reader__line--lineage:hover .poem-reader__lineage-mark,
 .poem-reader__line--lineage:focus-visible .poem-reader__lineage-mark {
-  color: color-mix(in srgb, var(--color-ink) 64%, transparent);
+  color: var(--color-ink);
 }
 
 .lineage-hint__content [class*="Arrow"] {
@@ -299,7 +307,7 @@ body {
 
 .lineage-hint__link:focus-visible {
   background: color-mix(in srgb, var(--color-ink) 4%, transparent);
-  outline: 2px solid color-mix(in srgb, var(--color-ink) 24%, transparent);
+  outline: 2px solid var(--color-focus-ring);
   outline-offset: 2px;
 }
 
@@ -323,7 +331,7 @@ body {
 
 .lineage-hint__source {
   font-size: 0.625rem;
-  color: color-mix(in srgb, var(--color-ink) 44%, transparent);
+  color: var(--color-ink-muted);
   letter-spacing: 0.04em;
 }
 
@@ -463,14 +471,33 @@ body {
    * - char-track：一句一列用 flex gap；栏内回行用 letter-spacing
    * - col-leading：列宽，沿 block 轴（line-height）
    * - column-gap：列与列之间
-   * - reflow-height：栏内回行栏高，默认 22em
+   * - reflow-height：栏高上限（非固定值）；与 available-height 取小
+   *
+   * 不用 cqh：viewport 高度来自 flex:1，祖先无确定高度时
+   * container-type:size 的查询尺寸解析为 0（使用值仍可能是数百 px）。
    */
   --vertical-body-size: clamp(1.125rem, 3.2vw, 1.375rem);
   --vertical-char-track: 0.2em;
   --vertical-col-leading: 2.05;
   --vertical-column-gap: 2em;
   --vertical-chapter-gap: 3em;
-  --vertical-reflow-height: 22em;
+  /* 34em@22px≈748px ≥ 击壤歌 24 字约 648px；22em 会句中断行 */
+  --vertical-reflow-height: 34em;
+  /* 与 .poem-reader__columns padding-block 上下限对齐，供栏高扣减 */
+  --vertical-columns-pad-block-start-max: 1rem;
+  --vertical-columns-pad-block-end-max: 1.5rem;
+  --vertical-columns-pad-block-max: calc(
+    var(--vertical-columns-pad-block-start-max) +
+      var(--vertical-columns-pad-block-end-max)
+  );
+  /* 底栏 poem-nav 最坏占位（含 vertical-foot 内边距） */
+  --vertical-foot-reserve: 5rem;
+  --poem-page-pad-block-end-max: 3.5rem;
+  --vertical-available-height: calc(
+    100dvh - var(--site-header-clearance) - env(safe-area-inset-top, 0px) -
+      env(safe-area-inset-bottom, 0px) - var(--poem-page-pad-block-end-max) -
+      var(--vertical-columns-pad-block-max) - var(--vertical-foot-reserve)
+  );
 }
 
 .poem-reader--vertical .poem-reader__viewport {
@@ -504,6 +531,23 @@ body {
   -webkit-overflow-scrolling: touch;
   scroll-snap-type: x proximity;
   scroll-padding-inline: clamp(1rem, 4vw, 2rem);
+  /* overlay 滚动条静止即隐；常显细条作为「左侧还有列」的稳定线索 */
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--color-ink) 20%, transparent)
+    transparent;
+}
+
+.poem-reader--vertical .poem-reader__columns-viewport::-webkit-scrollbar {
+  height: 0.375rem;
+}
+
+.poem-reader--vertical .poem-reader__columns-viewport::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.poem-reader--vertical .poem-reader__columns-viewport::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--color-ink) 20%, transparent);
+  border-radius: 9999px;
 }
 
 /* row-reverse 让 masthead 落最右端=起读列；正文列自右向左接续。 */
@@ -512,8 +556,14 @@ body {
   flex-direction: row-reverse;
   align-items: flex-start;
   gap: var(--vertical-column-gap);
-  padding-block: clamp(0.375rem, 2vh, 1rem) clamp(0.75rem, 3vh, 1.5rem);
-  padding-inline: clamp(1rem, 4vw, 2rem);
+  padding-block: clamp(
+      0.375rem,
+      2vh,
+      var(--vertical-columns-pad-block-start-max)
+    )
+    clamp(0.75rem, 3vh, var(--vertical-columns-pad-block-end-max));
+  /* 左侧加宽，让下一列露头 16–32px 作续读线索 */
+  padding-inline: clamp(2rem, 8vw, 3.5rem) clamp(1rem, 4vw, 2rem);
   min-height: min(52dvh, 100%);
   margin-block: auto;
 }
@@ -551,6 +601,12 @@ body {
   font-weight: 400;
   letter-spacing: var(--vertical-char-track);
   line-height: 1.8;
+  /* keep-all 禁断行使长题单列撑满视口；放开后沿 block 轴向左续列 */
+  word-break: normal;
+  max-height: min(
+    var(--vertical-reflow-height),
+    var(--vertical-available-height)
+  );
 }
 
 .poem-reader--vertical .poem-reader__masthead .poem-reader__meta {
@@ -604,7 +660,7 @@ body {
   font-size: var(--vertical-body-size);
 }
 
-/* 栏内回行：章内连续排入固定栏高，装满后自动向左回行。 */
+/* 栏内回行：章内连续排入栏高，装满后自动向左回行。 */
 .poem-reader--vertical .poem-reader__reflow-chapter {
   writing-mode: vertical-rl;
   text-orientation: upright;
@@ -612,8 +668,14 @@ body {
   white-space: normal;
   word-break: normal;
   font-size: var(--vertical-body-size);
-  height: var(--vertical-reflow-height);
-  max-height: min(var(--vertical-reflow-height), calc(100dvh - 11rem));
+  height: min(
+    var(--vertical-reflow-height),
+    var(--vertical-available-height)
+  );
+  max-height: min(
+    var(--vertical-reflow-height),
+    var(--vertical-available-height)
+  );
   overflow: hidden;
   flex-shrink: 0;
   line-height: var(--vertical-col-leading);
@@ -672,7 +734,7 @@ body {
   margin-inline-start: 0.2em;
   font-size: 0.55em;
   letter-spacing: 0.02em;
-  color: color-mix(in srgb, var(--color-ink) 36%, transparent);
+  color: var(--color-ink-muted);
   writing-mode: inherit;
   text-orientation: upright;
   pointer-events: none;
@@ -693,12 +755,13 @@ body {
   padding-inline: clamp(0.5rem, 3vw, 1rem);
 }
 .catalog-layout {
-  --poem-page-gutter: 3.25rem;
   --catalog-header-clearance: var(--site-header-clearance);
   padding-top: calc(
     var(--catalog-header-clearance) + env(safe-area-inset-top, 0px)
   );
-  padding-bottom: clamp(1.75rem, 5vh, 3.5rem);
+  padding-bottom: calc(
+    clamp(1.75rem, 5vh, 3.5rem) + env(safe-area-inset-bottom, 0px)
+  );
   padding-inline: calc(
     var(--poem-page-gutter) +
       max(
@@ -706,12 +769,6 @@ body {
         env(safe-area-inset-right, 0px)
       )
   );
-}
-
-@media (min-width: 768px) {
-  .catalog-layout {
-    --poem-page-gutter: 3.75rem;
-  }
 }
 
 .catalog__site-title {
@@ -728,7 +785,7 @@ body {
 
 .catalog__site-title:focus-visible {
   color: var(--color-ink);
-  outline: 2px solid color-mix(in srgb, var(--color-ink) 24%, transparent);
+  outline: 2px solid var(--color-focus-ring);
   outline-offset: 3px;
   border-radius: 0.125rem;
 }
@@ -781,9 +838,9 @@ body {
 
 .catalog__link {
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow: visible;
+  white-space: normal;
+  text-wrap: pretty;
   font-size: 1.1875rem;
   color: var(--color-ink);
   letter-spacing: 0.08em;
@@ -806,7 +863,7 @@ body {
 
 .catalog__link:focus-visible {
   color: var(--color-ink);
-  outline: 2px solid color-mix(in srgb, var(--color-ink) 24%, transparent);
+  outline: 2px solid var(--color-focus-ring);
   outline-offset: 3px;
   border-radius: 0.125rem;
 }
@@ -834,7 +891,7 @@ body {
 .skip-link {
   position: absolute;
   top: -100%;
-  left: 1.25rem;
+  inset-inline-start: calc(1.25rem + env(safe-area-inset-left, 0px));
   z-index: 20;
   padding: 0.5rem 0.75rem;
   border-radius: 0.375rem;
@@ -845,6 +902,8 @@ body {
   text-decoration: none;
 }
 
+/* :focus 覆盖程序化 focus()；仅 :focus-visible 时会停在 top:-100% 不可见 */
+.skip-link:focus,
 .skip-link:focus-visible {
   top: 1.25rem;
 }
@@ -852,12 +911,10 @@ body {
 .site-chrome {
   position: fixed;
   top: max(var(--site-header-top), env(safe-area-inset-top, 0px));
-  left: 50%;
-  width: min(
-    calc(100% - 2.5rem),
-    46rem
-  );
-  transform: translateX(-50%);
+  left: calc(var(--page-gutter) + env(safe-area-inset-left, 0px));
+  right: calc(var(--page-gutter) + env(safe-area-inset-right, 0px));
+  width: auto;
+  transform: none;
   z-index: 10;
   display: flex;
   align-items: center;
@@ -884,31 +941,6 @@ body:has(.catalog-layout) .site-chrome::before {
   );
 }
 
-/* 诗页与目录页：顶栏控件与版心左右对齐 */
-body:has(.poem-reader),
-body:has(.catalog-layout) {
-  --poem-page-gutter: 3.25rem;
-}
-
-@media (min-width: 768px) {
-  body:has(.poem-reader),
-  body:has(.catalog-layout) {
-    --poem-page-gutter: 3.75rem;
-  }
-}
-
-body:has(.poem-reader) .site-chrome,
-body:has(.catalog-layout) .site-chrome {
-  left: calc(
-    var(--poem-page-gutter) + env(safe-area-inset-left, 0px)
-  );
-  right: calc(
-    var(--poem-page-gutter) + env(safe-area-inset-right, 0px)
-  );
-  width: auto;
-  transform: none;
-}
-
 .site-chrome__trail {
   display: flex;
   align-items: center;
@@ -932,7 +964,7 @@ body:has(.catalog-layout) .site-chrome {
   gap: 0.25rem 0.375rem;
   font-size: 0.8125rem;
   line-height: 1;
-  color: color-mix(in srgb, var(--color-ink) 52%, transparent);
+  color: var(--color-ink-muted);
   letter-spacing: 0.1em;
   text-align: start;
 }
@@ -988,7 +1020,7 @@ body:has(.catalog-layout) .site-chrome {
 
 .site-chrome__control:focus-visible {
   color: var(--color-ink);
-  outline: 2px solid color-mix(in srgb, var(--color-ink) 24%, transparent);
+  outline: 2px solid var(--color-focus-ring);
   outline-offset: 2px;
 }
 
@@ -1009,8 +1041,12 @@ body:has(.catalog-layout) .site-chrome {
   white-space: nowrap;
 }
 
-/* 触控扩大命中，不撑开顶栏视觉尺寸 */
+/* 触控扩大命中，不撑开顶栏视觉尺寸；间距须 ≥ 两侧各扩 8px 之和，避免邻键重叠 */
 @media (pointer: coarse) {
+  .site-chrome__actions {
+    gap: 1.25rem;
+  }
+
   .site-chrome__control--icon::before,
   .site-chrome__control--text::before {
     content: "";
@@ -1027,7 +1063,7 @@ body:has(.catalog-layout) .site-chrome {
   font-family: var(--font-wenkai), serif;
   font-size: 0.8125rem;
   font-weight: 400;
-  color: color-mix(in srgb, var(--color-ink) 52%, transparent);
+  color: var(--color-ink-muted);
   letter-spacing: 0.1em;
   text-decoration: none;
   white-space: nowrap;
@@ -1036,12 +1072,12 @@ body:has(.catalog-layout) .site-chrome {
 }
 
 .site-logo:hover {
-  color: var(--color-ink-muted);
+  color: var(--color-ink);
 }
 
 .site-logo:focus-visible {
-  color: var(--color-ink-muted);
-  outline: 2px solid color-mix(in srgb, var(--color-ink) 24%, transparent);
+  color: var(--color-ink);
+  outline: 2px solid var(--color-focus-ring);
   outline-offset: 3px;
   border-radius: 0.125rem;
 }
@@ -1086,7 +1122,7 @@ body:has(.catalog-layout) .site-chrome {
 
 .breadcrumbs__link:focus-visible {
   color: var(--color-ink);
-  outline: 2px solid color-mix(in srgb, var(--color-ink) 24%, transparent);
+  outline: 2px solid var(--color-focus-ring);
   outline-offset: 3px;
   border-radius: 0.125rem;
 }
@@ -1111,7 +1147,7 @@ body:has(.catalog-layout) .site-chrome {
   gap: 0.25rem;
   min-width: 0;
   max-width: 45%;
-  color: color-mix(in srgb, var(--color-ink) 44%, transparent);
+  color: var(--color-ink-muted);
   text-decoration: none;
   letter-spacing: 0.05em;
   border-radius: 0.125rem;
@@ -1131,7 +1167,7 @@ body:has(.catalog-layout) .site-chrome {
 
 .poem-nav__link:focus-visible {
   color: var(--color-ink);
-  outline: 2px solid color-mix(in srgb, var(--color-ink) 24%, transparent);
+  outline: 2px solid var(--color-focus-ring);
   outline-offset: 3px;
 }
 
