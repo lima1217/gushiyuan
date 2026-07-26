@@ -48,13 +48,19 @@ describe("font subset slicing helpers", () => {
 });
 
 describe("font subset", () => {
-  it("exports multi-slice paths matching wenkai-subset.<index>.<count>.woff2", () => {
+  it("exports multi-slice paths matching wenkai-subset.<index>.<count>.<hash>.woff2", () => {
     expect(WENKAI_SUBSET_PATHS.length).toBeGreaterThan(1);
+    const hashTags = new Set<string>();
     for (const [index, publicPath] of WENKAI_SUBSET_PATHS.entries()) {
-      expect(publicPath).toMatch(
-        new RegExp(`^/fonts/wenkai/wenkai-subset\\.${index}\\.\\d+\\.woff2$`),
+      const match = publicPath.match(
+        new RegExp(
+          `^/fonts/wenkai/wenkai-subset\\.${index}\\.(\\d+)\\.([a-f0-9]{8})\\.woff2$`,
+        ),
       );
+      expect(match, publicPath).not.toBeNull();
+      hashTags.add(match![2]!);
     }
+    expect(hashTags.size).toBe(1);
   });
 
   it("declares font-display swap on every WenKai face", () => {
@@ -96,7 +102,7 @@ describe("font subset", () => {
         expect(manifest.totalBytes).toBeLessThanOrEqual(1536 * 1024);
         expect(typeof manifest.inputsHash).toBe("string");
         expect(manifest.inputsHash!.length).toBeGreaterThan(0);
-        expect(manifest.generatorVersion).toBe("1");
+        expect(manifest.generatorVersion).toBe("2");
         expect(Array.isArray(manifest.slices)).toBe(true);
         expect(manifest.slices!.length).toBe(WENKAI_SUBSET_PATHS.length);
       }

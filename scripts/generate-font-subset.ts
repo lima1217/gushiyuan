@@ -22,12 +22,14 @@ const CSS_OUT = path.join(ROOT, "src/fonts/wenkai.css");
 const PATH_OUT = path.join(ROOT, "src/lib/wenkai-subset-path.generated.ts");
 const MANIFEST_OUT = path.join(ROOT, "scripts/.cache/wenkai.manifest.json");
 const VALIDATE_SCRIPT = path.join(ROOT, "scripts/validate-subset-cmap.py");
-const GENERATOR_VERSION = "1";
+const GENERATOR_VERSION = "2";
 
 // 简繁双变体会把繁体派生码点纳入子集；保留上限防止异常膨胀。
 const MAX_FONT_BYTES = 1536 * 1024;
 /** 每片目标码点数；顺序分桶，约 13 片覆盖全站字形。 */
 const GLYPHS_PER_SLICE = 400;
+/** 写入文件名的 inputsHash 前缀长度；变更即换 URL，避免 CDN 长缓存喂旧坏文件。 */
+const HASH_TAG_LENGTH = 8;
 
 type WenKaiManifestSlice = {
   index: number;
@@ -119,12 +121,29 @@ async function ensureSourceFont(): Promise<void> {
   fs.writeFileSync(FONT_SOURCE, Buffer.from(await response.arrayBuffer()));
 }
 
-function subsetFileName(index: number, glyphCount: number): string {
-  return `wenkai-subset.${index}.${glyphCount}.woff2`;
+function hashTagFromInputs(inputsHash: string): string {
+  if (inputsHash.length < HASH_TAG_LENGTH) {
+    throw new Error(
+      `inputsHash too short for filename tag (need ≥${HASH_TAG_LENGTH})`,
+    );
+  }
+  return inputsHash.slice(0, HASH_TAG_LENGTH);
 }
 
-function subsetPublicPath(index: number, glyphCount: number): string {
-  return `/fonts/wenkai/${subsetFileName(index, glyphCount)}`;
+function subsetFileName(
+  index: number,
+  glyphCount: number,
+  hashTag: string,
+): string {
+  return `wenkai-subset.${index}.${glyphCount}.${hashTag}.woff2`;
+}
+
+function subsetPublicPath(
+  index: number,
+  glyphCount: number,
+  hashTag: string,
+): string {
+  return `/fonts/wenkai/${subsetFileName(index, glyphCount, hashTag)}`;
 }
 
 /** 将已排序码点按目标大小顺序分桶。 */
@@ -297,6 +316,7 @@ async function main(): Promise<void> {
   fs.mkdirSync(path.dirname(MANIFEST_OUT), { recursive: true });
 
   const sourceFont = fs.readFileSync(FONT_SOURCE);
+  const hashTag = hashTagFromInputs(inputsHash);
   const sliceMeta: WenKaiManifestSlice[] = [];
 
   let totalBytes = 0;
@@ -304,8 +324,8 @@ async function main(): Promise<void> {
   for (let index = 0; index < slices.length; index++) {
     const sliceGlyphs = slices[index]!;
     const text = String.fromCodePoint(...sliceGlyphs);
-    const fileName = subsetFileName(index, sliceGlyphs.length);
-    const publicPath = subsetPublicPath(index, sliceGlyphs.length);
+    const fileName = subsetFileName(index, sliceGlyphs.length, hashTag);
+    const publicPath = subsetPublicPath(index, sliceGlyphs.length, hashTag);
     const fontOut = path.join(OUT_DIR, fileName);
 
     const subset = await subsetFont(sourceFont, text, {

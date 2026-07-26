@@ -3,9 +3,9 @@
 /_next/static/*
   Cache-Control: public, max-age=31536000, immutable
 
-# WenKai subsets — long-lived; filenames are not content-hashed, so no immutable.
+# WenKai subsets — fingerprinted by inputs hash in filename; safe to cache forever.
 /fonts/wenkai/*
-  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+  Cache-Control: public, max-age=31536000, immutable
 
 # Poem HTML + RSC flight payloads — warm consecutive reads; refresh within an hour.
 /p/*
