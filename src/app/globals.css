@@ -52,22 +52,22 @@ html[lang="zh-Hant"] .variant-text__traditional {
   /* shadcn 表面接到纸墨，避免纯白压在 paper 上 */
   --background: var(--color-paper);
   --foreground: var(--color-ink);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card: var(--color-paper);
+  --card-foreground: var(--color-ink);
   --popover: var(--color-paper);
   --popover-foreground: var(--color-ink);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --primary: var(--palette-ink);
+  --primary-foreground: var(--palette-paper);
+  --secondary: color-mix(in srgb, var(--palette-ink) 6%, var(--palette-paper));
+  --secondary-foreground: var(--color-ink);
+  --muted: color-mix(in srgb, var(--palette-ink) 6%, var(--palette-paper));
+  --muted-foreground: var(--color-ink-muted);
+  --accent: color-mix(in srgb, var(--palette-ink) 6%, var(--palette-paper));
+  --accent-foreground: var(--color-ink);
   --destructive: oklch(0.577 0.245 27.325);
   --border: color-mix(in srgb, var(--palette-ink) 10%, transparent);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --input: color-mix(in srgb, var(--palette-ink) 10%, transparent);
+  --ring: color-mix(in srgb, var(--palette-ink) 40%, transparent);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
@@ -825,7 +825,7 @@ body {
 }
 
 .catalog__link:active:not(.catalog__link--disabled) {
-  color: var(--color-ink-muted);
+  background: color-mix(in srgb, var(--color-ink) 10%, transparent);
   transform: scale(var(--press-scale));
 }
 
