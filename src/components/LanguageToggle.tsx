@@ -4,17 +4,16 @@ import {
   useScriptVariant,
   useUiText,
 } from "@/components/ScriptVariantProvider";
+import { languageToggleActionLabel } from "@/lib/language-toggle-label";
 
 export function LanguageToggle() {
-  const { variant, setVariant } = useScriptVariant();
-  const simplified = useUiText("languageSimplified");
-  const traditional = useUiText("languageTraditional");
+  const { variant, setVariant, uiText } = useScriptVariant();
   const ariaLabel = useUiText(
     variant === "simplified"
       ? "languageToggleAriaSimplified"
       : "languageToggleAriaTraditional",
   );
-  const label = variant === "simplified" ? simplified : traditional;
+  const label = languageToggleActionLabel(variant, uiText);
 
   return (
     <button

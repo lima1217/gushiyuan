@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CatalogLayout } from "@/components/CatalogLayout";
+import { CatalogNamedNav } from "@/components/CatalogNamedNav";
 import { VariantText } from "@/components/VariantText";
+import { formatSiteUiCount } from "@/lib/format-site-ui-count";
 import {
   getAllVolumes,
   getAuthorsByVolume,
@@ -52,7 +54,10 @@ export default async function VolumePage({ params }: PageProps) {
           <VariantText text={uiText.emptyVolume} />
         </p>
       ) : (
-        <nav aria-label={`${volume.name}诗人`}>
+        <CatalogNamedNav
+          name={makeTextVariant(volume.name)}
+          ariaKey="volumeAuthorsAria"
+        >
           <ol className="catalog__list">
             {authors.map((author) => {
               const poemCount = getPoemsByAuthor(volumeSlug, author.slug).length;
@@ -64,12 +69,25 @@ export default async function VolumePage({ params }: PageProps) {
                   >
                     <VariantText text={makeTextVariant(author.name)} />
                   </Link>
-                  <span className="catalog__meta">{poemCount} 首</span>
+                  <span className="catalog__meta">
+                    <VariantText
+                      text={{
+                        simplified: formatSiteUiCount(
+                          uiText.poemCountLabel.simplified,
+                          poemCount,
+                        ),
+                        traditional: formatSiteUiCount(
+                          uiText.poemCountLabel.traditional,
+                          poemCount,
+                        ),
+                      }}
+                    />
+                  </span>
                 </li>
               );
             })}
           </ol>
-        </nav>
+        </CatalogNamedNav>
       )}
     </CatalogLayout>
   );

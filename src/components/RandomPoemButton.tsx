@@ -52,7 +52,7 @@ export function RandomPoemButton() {
       aria-label={randomPoem}
       disabled={pending}
     >
-      <Dices aria-hidden="true" className="size-3.5" />
+      <Dices aria-hidden="true" className="size-4" />
     </button>
   );
 }

@@ -88,7 +88,7 @@ export function SiteSearch() {
         aria-expanded={open}
         aria-haspopup="dialog"
       >
-        <SearchIcon aria-hidden="true" className="size-3.5" />
+        <SearchIcon aria-hidden="true" className="size-4" />
       </button>
 
       {Dialog && open ? (

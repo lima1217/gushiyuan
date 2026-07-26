@@ -38,5 +38,15 @@ describe("buildSiteUiText", () => {
       simplified: "找到 %n 项",
       traditional: "找到 %n 項",
     });
+    expect(uiText.languageTraditional).toEqual({
+      simplified: "繁体",
+      traditional: "繁體",
+    });
+    expect(uiText.volumeAuthorsAria.traditional).toBe("詩人");
+    expect(uiText.authorPoemsAria.traditional).toBe("詩作");
+    expect(uiText.poemCountLabel).toEqual({
+      simplified: "%n 首",
+      traditional: "%n 首",
+    });
   });
 });

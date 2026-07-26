@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { CatalogLayout } from "@/components/CatalogLayout";
+import { CatalogNamedNav } from "@/components/CatalogNamedNav";
 import { VariantText } from "@/components/VariantText";
 import {
   ANONYMOUS_AUTHOR_SLUG,
@@ -57,7 +58,10 @@ export default async function AuthorPage({ params }: PageProps) {
         { label: makeTextVariant(author.name) },
       ]}
     >
-      <nav aria-label={`${author.name}诗作`}>
+      <CatalogNamedNav
+        name={makeTextVariant(author.name)}
+        ariaKey="authorPoemsAria"
+      >
         <ol className="catalog__list">
           {poems.map((poem) => (
             <li key={poem.slug} className="catalog__item">
@@ -67,7 +71,7 @@ export default async function AuthorPage({ params }: PageProps) {
             </li>
           ))}
         </ol>
-      </nav>
+      </CatalogNamedNav>
     </CatalogLayout>
   );
 }
