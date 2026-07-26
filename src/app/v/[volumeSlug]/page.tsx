@@ -68,21 +68,21 @@ export default async function VolumePage({ params }: PageProps) {
                     className="catalog__link"
                   >
                     <VariantText text={makeTextVariant(author.name)} />
+                    <span className="catalog__meta">
+                      <VariantText
+                        text={{
+                          simplified: formatSiteUiCount(
+                            uiText.poemCountLabel.simplified,
+                            poemCount,
+                          ),
+                          traditional: formatSiteUiCount(
+                            uiText.poemCountLabel.traditional,
+                            poemCount,
+                          ),
+                        }}
+                      />
+                    </span>
                   </Link>
-                  <span className="catalog__meta">
-                    <VariantText
-                      text={{
-                        simplified: formatSiteUiCount(
-                          uiText.poemCountLabel.simplified,
-                          poemCount,
-                        ),
-                        traditional: formatSiteUiCount(
-                          uiText.poemCountLabel.traditional,
-                          poemCount,
-                        ),
-                      }}
-                    />
-                  </span>
                 </li>
               );
             })}

@@ -175,6 +175,11 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* 诗页禁止文档级竖滚；目录等仍用整页滚动 */
+body:has(.poem-reader--vertical) {
+  overflow: hidden;
+}
+
 /* 阅读页中文排版：字面功夫用 CSS，骨架交给 Tailwind */
 
 .poem-reader {
@@ -425,6 +430,10 @@ body {
 
 /* 竖排：顶栏横排导航，中段仅诗题与正文成列，底栏横排导航 */
 .poem-reader--vertical {
+  /* 一屏封顶：溢出只走阅读区横滑，避免浏览器窗口右侧文档竖滚条 */
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
   align-items: stretch;
   justify-content: flex-start;
   --poem-header-clearance: var(--site-header-clearance);
@@ -528,7 +537,7 @@ body {
     clamp(0.75rem, 3vh, var(--vertical-columns-pad-block-end-max));
   /* 左侧加宽，让下一列露头 16–32px 作续读线索 */
   padding-inline: clamp(2rem, 8vw, 3.5rem) clamp(1rem, 4vw, 2rem);
-  min-height: min(52dvh, 100%);
+  /* 高度随内容：短诗才能真正居中，避免贴在半屏空盒子顶上 */
   margin-block: auto;
 }
 
@@ -793,19 +802,32 @@ body {
 
 .catalog__item {
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.875rem 0;
   border-bottom: 1px solid color-mix(in srgb, var(--color-ink) 8%, transparent);
+  transition: background-color 100ms ease-out;
 }
 
 .catalog__item:first-child {
   border-top: 1px solid color-mix(in srgb, var(--color-ink) 8%, transparent);
 }
 
+/* 可点行轻洗；分隔线保持结构不动。深度与源流线索一致：hover 4% / active 8% */
+.catalog__item:has(.catalog__link:not(.catalog__link--disabled)):hover {
+  background: color-mix(in srgb, var(--color-ink) 4%, transparent);
+}
+
+.catalog__item:has(.catalog__link:active:not(.catalog__link--disabled)) {
+  background: color-mix(in srgb, var(--color-ink) 8%, transparent);
+}
+
+/* 链接铺满整行，hover 行底与点击热区一致 */
 .catalog__link {
+  display: flex;
+  flex: 1;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
   min-width: 0;
+  padding: 0.875rem 0;
   overflow: visible;
   white-space: normal;
   text-wrap: pretty;
@@ -814,18 +836,10 @@ body {
   color: var(--color-ink);
   letter-spacing: 0.08em;
   text-decoration: none;
-  transition:
-    color 100ms ease-out,
-    background-color 100ms ease-out,
-    transform 100ms ease-out;
-}
-
-.catalog__link:hover {
-  background: color-mix(in srgb, var(--color-ink) 6%, transparent);
+  transition: transform 100ms ease-out;
 }
 
 .catalog__link:active:not(.catalog__link--disabled) {
-  background: color-mix(in srgb, var(--color-ink) 10%, transparent);
   transform: scale(var(--press-scale));
 }
 
@@ -1226,6 +1240,7 @@ body:has(.catalog-layout) .site-chrome::before {
 @media (prefers-reduced-motion: reduce) {
   .site-chrome__control,
   .lineage-hint__link,
+  .catalog__item,
   .catalog__link,
   .poem-reader__line--lineage,
   .poem-reader__sentence--lineage,

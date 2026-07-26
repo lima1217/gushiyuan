@@ -363,7 +363,7 @@ export function PoemReader({
     <main
       id="main-content"
       tabIndex={-1}
-      className="poem-reader poem-reader--vertical relative flex min-h-dvh flex-col"
+      className="poem-reader poem-reader--vertical relative flex flex-col"
     >
       <SiteChromeTrail>
         <Breadcrumbs items={breadcrumbs} />

@@ -26,14 +26,12 @@ export default function HomePage() {
             return (
               <li key={volume.slug} className="catalog__item">
                 {empty ? (
-                  <>
-                    <span className="catalog__link catalog__link--disabled">
-                      <VariantText text={makeTextVariant(volume.name)} />
-                    </span>
+                  <span className="catalog__link catalog__link--disabled">
+                    <VariantText text={makeTextVariant(volume.name)} />
                     <span className="catalog__meta">
                       <VariantText text={uiText.organizing} />
                     </span>
-                  </>
+                  </span>
                 ) : (
                   <Link href={`/v/${volume.slug}`} className="catalog__link">
                     <VariantText text={makeTextVariant(volume.name)} />
