@@ -247,7 +247,7 @@ A 与 B 可以并行，但 B 若新增被客户端组件引用的运行时导出
 - 位置：`src/components/AnnotationPopover.tsx:47`（`aria-label={ariaLabel}`）；值来自 `src/components/LineageHint.tsx:46`（`useUiText("lineageAria")` = 「查看此句的源流线索」）；触发器包裹诗句在 `LineageHint.tsx:54`
 - 问题：`aria-label` 优先级高于子节点文本，带「源」标记的诗句在屏幕阅读器里**完全读不到原文**，只会听到一句通用提示。内容被隐藏（WCAG 4.1.2），且违反 2.5.3 Label in Name——语音控制用户无法用可见文字激活。
 - 修法：去掉触发器上的 `aria-label`，让可见诗句文本成为可访问名；动作说明改为触发器内的 `<span className="sr-only">` 或 `aria-describedby` 指向一段稳定的 sr-only 说明。
-- 注意：诗句已有一层 `sr-only` 整句文本（`PoemLine.tsx` 的既有修复），改动时确认不会变成朗读两遍。
+- 注意：诗句已有一层 `sr-only` 整句文本（`PoemSentence.tsx` 的既有修复），改动时确认不会变成朗读两遍。
 - 验收：需先注入至少一条 clue；`Accessibility.getFullAXTree` 中该触发器的 name 是诗句原文，描述里包含动作说明，单字节点仍为 0。
 
 ### 暂缓-2（MEDIUM · Writing）「后世化用」与关系值「化用」撞名

@@ -1,23 +1,15 @@
 "use client";
 
-import type { LineageClue } from "@/lib/lineage-types";
+import type { LineageClueWithTraditional } from "@/lib/script-conversion";
 import { LineageHint } from "@/components/LineageHint";
-
-type LineageClueWithTraditional = Omit<LineageClue, "streams"> & {
-  streams: (LineageClue["streams"][number] & {
-    textTraditional?: string;
-    authorTraditional?: string;
-    workTraditional?: string;
-    relationTraditional?: string;
-    sourceTraditional?: string;
-  })[];
-};
 
 type PoemSentenceProps = {
   sentence: string;
   lineIndex: number;
   lineageClue?: LineageClueWithTraditional;
+  /** 栏内回行：句嵌在章容器里，用 span */
   inline?: boolean;
+  /** 一句一列：逐字拆成 flex 字盒 */
   verticalColumn?: boolean;
 };
 
@@ -80,58 +72,6 @@ export function PoemSentence({
   return (
     <p id={`line-${lineIndex}`} className="poem-reader__line">
       {content}
-    </p>
-  );
-}
-
-type PoemLineProps = {
-  line: string;
-  lineIndex: number;
-  lineageClue?: LineageClueWithTraditional;
-  verticalColumn?: boolean;
-};
-
-export function PoemLine({
-  line,
-  lineIndex,
-  lineageClue,
-  verticalColumn = false,
-}: PoemLineProps) {
-  return (
-    <PoemSentence
-      sentence={line}
-      lineIndex={lineIndex}
-      lineageClue={lineageClue}
-      verticalColumn={verticalColumn}
-    />
-  );
-}
-
-type PoemRowProps = {
-  sentences: string[];
-  startLineIndex: number;
-  lineageByLine: Map<number, LineageClueWithTraditional>;
-};
-
-export function PoemRow({
-  sentences,
-  startLineIndex,
-  lineageByLine,
-}: PoemRowProps) {
-  return (
-    <p className="poem-reader__line">
-      {sentences.map((sentence, offset) => {
-        const lineIndex = startLineIndex + offset;
-        return (
-          <PoemSentence
-            key={`${lineIndex}-${sentence}`}
-            sentence={sentence}
-            lineIndex={lineIndex}
-            lineageClue={lineageByLine.get(lineIndex)}
-            inline
-          />
-        );
-      })}
     </p>
   );
 }

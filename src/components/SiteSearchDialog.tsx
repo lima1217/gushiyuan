@@ -26,6 +26,7 @@ import {
 import { filterSearchIndex } from "@/lib/search-filter";
 import type { SearchIndex } from "@/lib/search-index-types";
 import { formatSiteUiCount } from "@/lib/format-site-ui-count";
+import { shouldHidePoemAuthor } from "@/lib/poem-display";
 import { cn } from "@/lib/utils";
 
 type SiteSearchDialogProps = {
@@ -239,7 +240,7 @@ export function SiteSearchDialog({
                         </span>
                       ) : null}
                     </span>
-                    {poem.author === poem.title ? null : (
+                    {shouldHidePoemAuthor(poem) ? null : (
                       <span className="ml-auto shrink-0 self-center text-xs tracking-[0.06em] text-[var(--color-ink-muted)]">
                         <VariantText
                           text={{

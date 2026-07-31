@@ -8,15 +8,14 @@ import {
   useUiText,
   useVariantText,
 } from "@/components/ScriptVariantProvider";
-import type { PoemMeta } from "@/lib/poems";
+import type { PoemMetaWithTraditional } from "@/lib/script-conversion";
 import {
   isPlainPrimaryClick,
   navigateWithPoemTransition,
   shouldUsePoemViewTransition,
 } from "@/lib/poem-view-transition";
 
-type PoemNavMeta = PoemMeta & {
-  titleTraditional?: string;
+type PoemNavMeta = PoemMetaWithTraditional & {
   crossVolume?: boolean;
 };
 
@@ -28,7 +27,7 @@ type PoemNavProps = {
 function PoemNavTitle({ poem }: { poem: PoemNavMeta }) {
   const title = useVariantText({
     simplified: poem.title,
-    traditional: poem.titleTraditional ?? poem.title,
+    traditional: poem.titleTraditional,
   });
 
   return (
@@ -36,7 +35,7 @@ function PoemNavTitle({ poem }: { poem: PoemNavMeta }) {
       <VariantText
         text={{
           simplified: poem.title,
-          traditional: poem.titleTraditional ?? poem.title,
+          traditional: poem.titleTraditional,
         }}
       />
     </span>
