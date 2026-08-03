@@ -1,6 +1,9 @@
 import type { MetadataRoute } from "next";
-import { SITE_DESCRIPTION, SITE_NAME } from "@/lib/site-metadata";
-import { SITE_APP_ICON_PAPER } from "@/lib/site-app-icon";
+import {
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_THEME_COLOR,
+} from "@/lib/site-metadata";
 
 export const dynamic = "force-static";
 
@@ -11,17 +14,17 @@ export default function manifest(): MetadataRoute.Manifest {
     description: SITE_DESCRIPTION,
     start_url: "/",
     display: "standalone",
-    background_color: SITE_APP_ICON_PAPER,
-    theme_color: SITE_APP_ICON_PAPER,
+    background_color: SITE_THEME_COLOR,
+    theme_color: SITE_THEME_COLOR,
     icons: [
       {
-        src: "/icon",
+        src: "/icon.png",
         sizes: "192x192",
         type: "image/png",
         purpose: "any",
       },
       {
-        src: "/apple-icon",
+        src: "/apple-icon.png",
         sizes: "180x180",
         type: "image/png",
         purpose: "any",

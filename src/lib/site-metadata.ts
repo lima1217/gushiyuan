@@ -12,6 +12,7 @@ export {
   OG_IMAGE_PATH,
   SITE_DESCRIPTION,
   SITE_NAME,
+  SITE_THEME_COLOR,
   SITE_URL,
 } from "@/lib/site-identity";
 
