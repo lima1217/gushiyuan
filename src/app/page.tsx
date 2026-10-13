@@ -1,9 +1,14 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { CatalogLayout } from "@/components/CatalogLayout";
 import { VariantText } from "@/components/VariantText";
 import { VolumesNav } from "@/components/VolumesNav";
 import { getAllPoems, getAllVolumes } from "@/lib/poems";
 import { buildSiteUiText, makeTextVariant } from "@/lib/script-conversion";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 export default function HomePage() {
   const volumes = getAllVolumes();

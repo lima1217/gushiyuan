@@ -17,3 +17,7 @@
 
 /search-index.json
   Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+
+# Per-poem share cards — regenerated at build; crawlers re-fetch rarely.
+/og/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800

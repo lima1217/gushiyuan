@@ -16,6 +16,7 @@
 /out/
 /public/search-index.json
 /public/poem-slugs.json
+/public/og/
 
 # production
 /build

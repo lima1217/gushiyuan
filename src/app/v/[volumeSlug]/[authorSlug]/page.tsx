@@ -32,6 +32,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
   return createPageMetadata({
     title: `${author.name} · ${volume.name} · 古诗源`,
+    alternates: { canonical: `/v/${volume.slug}/${author.slug}` },
   });
 }
 

@@ -28,7 +28,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!volume) {
     return { title: "古诗源" };
   }
-  return createPageMetadata({ title: `${volume.name} · 古诗源` });
+  return createPageMetadata({
+    title: `${volume.name} · 古诗源`,
+    alternates: { canonical: `/v/${volume.slug}` },
+  });
 }
 
 export default async function VolumePage({ params }: PageProps) {
