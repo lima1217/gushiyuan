@@ -35,9 +35,13 @@
 
 源流是站点**唯一的行内注解形态**：带源流线索的诗句渲染为可点击/可聚焦的按钮（标记「源」，约 0.85em），点击打开 Popover 浮层（点击外部或 Esc 关闭），键盘与触屏均可用。浮层模式由通用组件 `AnnotationPopover` 提供（见 ADR 0002）。
 
+**现状：休眠。** `content/lineage/clues.json` 还是空的，诗页的「源」入口由 `src/lib/lineage.ts` 的 `LINEAGE_UI_ENABLED` 总开关关着。线索数据成批补齐之前不打开，避免只有零星几条上线。打开前须先修 `docs/specs/2026-07-ui-review-remaining.md` 里的三条暂缓项。
+
 ## 阅读方向（reading direction）
 
 阅读方向已固定为竖排，列自右向左；不再提供横排/竖排切换，也不再持久化 `gushiyuan-reading-direction`。注解浮层固定从左侧弹出。
+
+诗与诗之间的导航也顺着这个方向：「下一首」在左，`←` 或右滑进入下一首，`→` 或左滑回到上一首。滑动只在列已经滚到那一侧尽头时才切诗，以免和列内滚动冲突。
 
 ## 简繁切换（script variant）
 
