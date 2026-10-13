@@ -6,6 +6,7 @@ import {
   collectSiteFontGlyphs,
   extractCodePoints,
   FONT_GLYPH_FALLBACK,
+  rankSiteFontGlyphs,
   uniqueSortedCodePoints,
 } from "@/lib/font-glyphs";
 
@@ -102,5 +103,34 @@ describe("collectSiteFontGlyphs", () => {
     for (const codePoint of extra) {
       expect(glyphs).toContain(codePoint);
     }
+  });
+});
+
+describe("rankSiteFontGlyphs", () => {
+  it("covers the same glyph set as collectSiteFontGlyphs", () => {
+    const contentRoot = makeTempContent({
+      "poems/a.md": "关关雎鸠",
+      "poems/b.md": "在河之洲",
+    });
+    const options = { contentRoot, uiLiterals: "检索" };
+
+    expect(uniqueSortedCodePoints(rankSiteFontGlyphs(options))).toEqual(
+      collectSiteFontGlyphs(options),
+    );
+  });
+
+  it("puts UI glyphs first, then content glyphs by document frequency", () => {
+    const contentRoot = makeTempContent({
+      "poems/a.md": "山月",
+      "poems/b.md": "山风",
+      "poems/c.md": "山月",
+    });
+
+    const ranked = rankSiteFontGlyphs({ contentRoot, uiLiterals: "检" });
+    const position = (char: string) => ranked.indexOf(char.codePointAt(0)!);
+
+    expect(position("检")).toBeLessThan(position("山"));
+    expect(position("山")).toBeLessThan(position("月"));
+    expect(position("月")).toBeLessThan(position("风"));
   });
 });

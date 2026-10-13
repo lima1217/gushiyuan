@@ -3,7 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import subsetFont from "subset-font";
-import { collectSiteFontGlyphs } from "../src/lib/font-glyphs";
+import { rankSiteFontGlyphs } from "../src/lib/font-glyphs";
 import {
   computeInputFingerprint,
   isCacheHit,
@@ -22,11 +22,11 @@ const CSS_OUT = path.join(ROOT, "src/fonts/wenkai.css");
 const PATH_OUT = path.join(ROOT, "src/lib/wenkai-subset-path.generated.ts");
 const MANIFEST_OUT = path.join(ROOT, "scripts/.cache/wenkai.manifest.json");
 const VALIDATE_SCRIPT = path.join(ROOT, "scripts/validate-subset-cmap.py");
-const GENERATOR_VERSION = "2";
+const GENERATOR_VERSION = "3";
 
 // 简繁双变体会把繁体派生码点纳入子集；保留上限防止异常膨胀。
 const MAX_FONT_BYTES = 1536 * 1024;
-/** 每片目标码点数；顺序分桶，约 13 片覆盖全站字形。 */
+/** 每片目标码点数；按字频排序后顺序分桶，约 13 片覆盖全站字形。 */
 const GLYPHS_PER_SLICE = 400;
 /** 写入文件名的 inputsHash 前缀长度；变更即换 URL，避免 CDN 长缓存喂旧坏文件。 */
 const HASH_TAG_LENGTH = 8;
@@ -146,7 +146,7 @@ function subsetPublicPath(
   return `/fonts/wenkai/${subsetFileName(index, glyphCount, hashTag)}`;
 }
 
-/** 将已排序码点按目标大小顺序分桶。 */
+/** 将已按加载优先级排序的码点按目标大小顺序分桶。 */
 export function sliceCodePoints(
   codePoints: number[],
   perSlice = GLYPHS_PER_SLICE,
@@ -303,11 +303,11 @@ async function main(): Promise<void> {
     return;
   }
 
-  const glyphs = collectSiteFontGlyphs();
+  const glyphs = rankSiteFontGlyphs();
   const slices = sliceCodePoints(glyphs);
 
   console.log(
-    `Collected ${glyphs.length} unique glyphs → ${slices.length} slices (~${GLYPHS_PER_SLICE}/slice).`,
+    `Collected ${glyphs.length} unique glyphs → ${slices.length} slices (~${GLYPHS_PER_SLICE}/slice, frequency-ranked).`,
   );
 
   fs.rmSync(OUT_DIR, { recursive: true, force: true });

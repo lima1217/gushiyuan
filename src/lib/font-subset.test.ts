@@ -7,7 +7,7 @@ import {
   formatUnicodeRange,
   sliceCodePoints,
 } from "../../scripts/generate-font-subset";
-import { collectSiteFontGlyphs } from "@/lib/font-glyphs";
+import { rankSiteFontGlyphs } from "@/lib/font-glyphs";
 import { WENKAI_SUBSET_PATHS } from "@/lib/wenkai-subset-path.generated";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
@@ -75,7 +75,7 @@ describe("font subset", () => {
   it.skipIf(!pythonAvailable())(
     "each woff2 slice cmap covers its glyph bucket",
     () => {
-      const glyphs = collectSiteFontGlyphs();
+      const glyphs = rankSiteFontGlyphs();
       const slices = sliceCodePoints(glyphs);
 
       expect(WENKAI_SUBSET_PATHS.length).toBe(slices.length);
@@ -102,7 +102,7 @@ describe("font subset", () => {
         expect(manifest.totalBytes).toBeLessThanOrEqual(1536 * 1024);
         expect(typeof manifest.inputsHash).toBe("string");
         expect(manifest.inputsHash!.length).toBeGreaterThan(0);
-        expect(manifest.generatorVersion).toBe("2");
+        expect(manifest.generatorVersion).toBe("3");
         expect(Array.isArray(manifest.slices)).toBe(true);
         expect(manifest.slices!.length).toBe(WENKAI_SUBSET_PATHS.length);
       }

@@ -73,26 +73,57 @@ export interface CollectSiteFontGlyphsOptions {
 export function collectSiteFontGlyphs(
   options?: CollectSiteFontGlyphsOptions,
 ): number[] {
+  return uniqueSortedCodePoints(rankSiteFontGlyphs(options));
+}
+
+function addDocumentFrequency(
+  frequency: Map<number, number>,
+  text: string,
+): void {
+  for (const codePoint of new Set(extractCodePoints(text))) {
+    frequency.set(codePoint, (frequency.get(codePoint) ?? 0) + 1);
+  }
+}
+
+/**
+ * 与 collectSiteFontGlyphs 同一字集，但按加载优先级排序：
+ * UI/兜底字形在前（每页必用），其余按内容文件的文档频率降序（简繁取较高者），
+ * 同频按码点升序。按此顺序分片可让一首诗只命中少数几片，而非按码点分散到全部分片。
+ */
+export function rankSiteFontGlyphs(
+  options?: CollectSiteFontGlyphsOptions,
+): number[] {
   const contentRoot = options?.contentRoot ?? CONTENT_ROOT;
   const uiLiterals = options?.uiLiterals ?? FONT_UI_LITERALS;
 
-  const codePoints: number[] = [
+  const uiCodePoints = uniqueSortedCodePoints([
     ...extractCodePoints(FONT_GLYPH_FALLBACK),
     ...extractCodePoints(uiLiterals),
     ...extractCodePoints(toTraditional(uiLiterals)),
-  ];
+  ]);
+  const uiSet = new Set(uiCodePoints);
 
+  const simplifiedFrequency = new Map<number, number>();
+  const traditionalFrequency = new Map<number, number>();
   for (const file of walkFiles(contentRoot, [".md", ".json"])) {
     const content = fs.readFileSync(file, "utf8");
-    codePoints.push(
-      ...extractCodePoints(content),
-      ...extractCodePoints(toTraditional(content)),
+    addDocumentFrequency(simplifiedFrequency, content);
+    addDocumentFrequency(traditionalFrequency, toTraditional(content));
+  }
+
+  const score = (codePoint: number) =>
+    Math.max(
+      simplifiedFrequency.get(codePoint) ?? 0,
+      traditionalFrequency.get(codePoint) ?? 0,
     );
-  }
 
-  if (options?.extraCodePoints) {
-    codePoints.push(...options.extraCodePoints);
-  }
+  const contentCodePoints = uniqueSortedCodePoints([
+    ...simplifiedFrequency.keys(),
+    ...traditionalFrequency.keys(),
+    ...(options?.extraCodePoints ?? []),
+  ])
+    .filter((codePoint) => !uiSet.has(codePoint))
+    .sort((a, b) => score(b) - score(a) || a - b);
 
-  return uniqueSortedCodePoints(codePoints);
+  return [...uiCodePoints, ...contentCodePoints];
 }
