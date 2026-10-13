@@ -482,6 +482,65 @@ body:has(.poem-reader) {
   border-radius: 9999px;
 }
 
+/*
+ * 触屏阅读进度：iOS 等 overlay 滚动条静止即隐，长诗缺少「读到哪」的线索。
+ * 纯 CSS 滚动驱动动画，不支持 animation-timeline 的浏览器不显示。
+ * 未溢出时时间线 inactive，轨道与进度条都停在透明/零宽的默认态，短诗不出线。
+ * 视口为 LTR、首列在最右端：时间线 0 = 最左（读完），1 = 最右（起读）。
+ */
+.poem-reader__progress {
+  display: none;
+}
+
+@supports (animation-timeline: scroll()) {
+  @media (pointer: coarse) {
+    .poem-reader__vertical-layout {
+      timeline-scope: --poem-columns;
+    }
+
+    .poem-reader__columns-viewport {
+      scroll-timeline: --poem-columns x;
+    }
+
+    .poem-reader__progress {
+      display: block;
+      flex-shrink: 0;
+      height: 1px;
+      /* 抵消 vertical-layout 的 gap，贴着阅读区底边，不挤占列高 */
+      margin-block-start: calc(-1 * clamp(0.5rem, 1.5vh, 0.875rem));
+      margin-inline: clamp(1rem, 4vw, 2rem);
+      overflow: hidden;
+      animation: poem-reading-progress-track linear both;
+      animation-timeline: --poem-columns;
+    }
+
+    .poem-reader__progress-bar {
+      height: 100%;
+      background: color-mix(in srgb, var(--color-ink) 40%, transparent);
+      transform: scaleX(0);
+      transform-origin: right;
+      animation: poem-reading-progress linear both;
+      animation-timeline: --poem-columns;
+    }
+  }
+}
+
+@keyframes poem-reading-progress {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes poem-reading-progress-track {
+  from,
+  to {
+    background: color-mix(in srgb, var(--color-ink) 10%, transparent);
+  }
+}
+
 /* row-reverse 让 masthead 落最右端=起读列；正文列自右向左接续。 */
 .poem-reader__columns {
   display: flex;

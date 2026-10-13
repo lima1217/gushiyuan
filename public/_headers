@@ -11,6 +11,13 @@
 /p/*
   Cache-Control: public, max-age=3600, stale-while-revalidate=86400
 
+# Catalog HTML + RSC flight payloads — same policy as poem pages.
+/
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+
+/v/*
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+
 # Client-loaded indexes
 /poem-slugs.json
   Cache-Control: public, max-age=3600, stale-while-revalidate=86400

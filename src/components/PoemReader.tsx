@@ -224,6 +224,9 @@ export function PoemReader({
               })}
             </div>
           </div>
+          <div className="poem-reader__progress" aria-hidden="true">
+            <div className="poem-reader__progress-bar" />
+          </div>
           {(prev || next) && (
             <div className="poem-reader__vertical-foot">
               <PoemNav prev={prev} next={next} />
