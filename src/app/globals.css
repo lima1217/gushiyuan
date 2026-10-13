@@ -869,10 +869,24 @@ body:has(.catalog-layout) .site-chrome::before {
   overflow-y: hidden;
   overscroll-behavior-x: contain;
   -webkit-overflow-scrolling: touch;
+  /* 窄屏长题会横向溢出：隐藏滚动条（否则压在字上），改用尾端渐隐提示可滑动。 */
+  scrollbar-width: none;
+  mask-image: linear-gradient(
+    to right,
+    #000 calc(100% - 1.5rem),
+    transparent
+  );
+}
+
+.site-chrome__trail::-webkit-scrollbar {
+  display: none;
 }
 
 .site-chrome__trail .breadcrumbs {
   margin: 0;
+  /* 尾部留白计入滚动宽度，滚到底时末项移出渐隐区。 */
+  flex-shrink: 0;
+  padding-inline-end: 1.5rem;
 }
 
 .site-chrome__trail .breadcrumbs__list {

@@ -98,10 +98,15 @@ export default async function PoemPage({ params }: PageProps) {
         breadcrumbs={[
           { label: makeTextVariant("古诗源"), href: "/" },
           { label: makeTextVariant(volume.name), href: `/v/${volume.slug}` },
-          {
-            label: makeTextVariant(poem.author),
-            href: `/v/${volume.slug}/${getCatalogAuthorSlug(poem)}`,
-          },
+          // 题即作者名（如《左传》）时该归类只收这一首，面包屑不再重复诗题。
+          ...(shouldHidePoemAuthor(poem)
+            ? []
+            : [
+                {
+                  label: makeTextVariant(poem.author),
+                  href: `/v/${volume.slug}/${getCatalogAuthorSlug(poem)}`,
+                },
+              ]),
         ]}
         prev={
           prev
