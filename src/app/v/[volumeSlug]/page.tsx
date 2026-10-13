@@ -5,6 +5,7 @@ import { CatalogLayout } from "@/components/CatalogLayout";
 import { CatalogNamedNav } from "@/components/CatalogNamedNav";
 import { VariantText } from "@/components/VariantText";
 import { formatSiteUiCount } from "@/lib/format-site-ui-count";
+import { shouldHidePoemAuthor } from "@/lib/poem-display";
 import {
   getAllVolumes,
   getAuthorsByVolume,
@@ -63,28 +64,46 @@ export default async function VolumePage({ params }: PageProps) {
         >
           <ol className="catalog__list">
             {authors.map((author) => {
-              const poemCount = getPoemsByAuthor(volumeSlug, author.slug).length;
+              const poems = getPoemsByAuthor(volumeSlug, author.slug);
+              // 只有一首时直达诗页，行尾以诗题代替「1 首」，省掉一层只有一行的作者页。
+              const onlyPoem = poems.length === 1 ? poems[0] : undefined;
               return (
                 <li key={author.slug} className="catalog__item">
                   <Link
-                    href={`/v/${volumeSlug}/${author.slug}`}
+                    href={
+                      onlyPoem
+                        ? `/p/${onlyPoem.slug}`
+                        : `/v/${volumeSlug}/${author.slug}`
+                    }
                     className="catalog__link"
                   >
                     <VariantText text={makeTextVariant(author.name)} />
-                    <span className="catalog__meta">
-                      <VariantText
-                        text={{
-                          simplified: formatSiteUiCount(
-                            uiText.poemCountLabel.simplified,
-                            poemCount,
-                          ),
-                          traditional: formatSiteUiCount(
-                            uiText.poemCountLabel.traditional,
-                            poemCount,
-                          ),
-                        }}
-                      />
-                    </span>
+                    {onlyPoem && shouldHidePoemAuthor(onlyPoem) ? null : (
+                      <span
+                        className={
+                          onlyPoem
+                            ? "catalog__meta catalog__meta--title"
+                            : "catalog__meta"
+                        }
+                      >
+                        <VariantText
+                          text={
+                            onlyPoem
+                              ? makeTextVariant(onlyPoem.title)
+                              : {
+                                  simplified: formatSiteUiCount(
+                                    uiText.poemCountLabel.simplified,
+                                    poems.length,
+                                  ),
+                                  traditional: formatSiteUiCount(
+                                    uiText.poemCountLabel.traditional,
+                                    poems.length,
+                                  ),
+                                }
+                          }
+                        />
+                      </span>
+                    )}
                   </Link>
                 </li>
               );

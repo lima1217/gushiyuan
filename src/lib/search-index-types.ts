@@ -33,6 +33,8 @@ export type SearchResultPoem = SearchIndexPoem & {
     simplified: string;
     traditional: string;
   };
+  /** 命中句在正文中的句序，对应诗页锚点 `#line-N`。 */
+  matchedLineIndex?: number;
 };
 
 export type SearchResults = {

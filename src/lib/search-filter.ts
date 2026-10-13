@@ -28,12 +28,12 @@ function matchesBody(poem: SearchIndexPoem, query: string): boolean {
   );
 }
 
-/** 取含查询词的句号分句；简繁按同一分句下标对齐。 */
+/** 取含查询词的句号分句；简繁按同一分句下标对齐。正文每行恰一个「。」，故分句下标即诗页句序。 */
 export function extractMatchedLine(
   body: string,
   bodyTraditional: string,
   query: string,
-): { simplified: string; traditional: string } | undefined {
+): { simplified: string; traditional: string; lineIndex: number } | undefined {
   const simplifiedParts = body.split("。");
   const traditionalParts = bodyTraditional.split("。");
 
@@ -49,6 +49,7 @@ export function extractMatchedLine(
       return {
         simplified: `${simplified}${suffix}`,
         traditional: `${traditional}${suffix}`,
+        lineIndex: i,
       };
     }
   }
@@ -69,7 +70,11 @@ function toSearchResultPoem(
     poem.bodyTraditional,
     query,
   );
-  return matchedLine ? { ...poem, matchedLine } : poem;
+  if (!matchedLine) {
+    return poem;
+  }
+  const { lineIndex, ...text } = matchedLine;
+  return { ...poem, matchedLine: text, matchedLineIndex: lineIndex };
 }
 
 export function filterSearchIndex(

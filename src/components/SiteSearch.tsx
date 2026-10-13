@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { SearchIcon } from "lucide-react";
+import { ChromeTooltip } from "@/components/ChromeTooltip";
 import { useUiText } from "@/components/ScriptVariantProvider";
 import {
   computeSearchDialogAnchor,
@@ -77,19 +78,21 @@ export function SiteSearch() {
 
   return (
     <>
-      <button
-        ref={triggerRef}
-        type="button"
-        className="site-chrome__control site-chrome__control--icon"
-        onClick={() => handleOpen(true)}
-        onMouseEnter={preloadDialog}
-        onFocus={preloadDialog}
-        aria-label={openSearch}
-        aria-expanded={open}
-        aria-haspopup="dialog"
-      >
-        <SearchIcon aria-hidden="true" className="size-4" />
-      </button>
+      <ChromeTooltip label={openSearch}>
+        <button
+          ref={triggerRef}
+          type="button"
+          className="site-chrome__control site-chrome__control--icon"
+          onClick={() => handleOpen(true)}
+          onMouseEnter={preloadDialog}
+          onFocus={preloadDialog}
+          aria-label={openSearch}
+          aria-expanded={open}
+          aria-haspopup="dialog"
+        >
+          <SearchIcon aria-hidden="true" className="size-4" />
+        </button>
+      </ChromeTooltip>
 
       {Dialog && open ? (
         <Dialog

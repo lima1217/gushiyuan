@@ -135,6 +135,8 @@ describe("filterSearchIndex", () => {
     expect(yinJiu).toBeDefined();
     expect(yinJiu?.matchedLine?.simplified).toContain("采菊东篱下");
     expect(yinJiu?.matchedLine?.traditional).toContain("採菊東籬下");
+    // 句序即诗页锚点 #line-N（跳过章间空行）
+    expect(yinJiu?.matchedLineIndex).toBe(32);
   });
 
   it("matches traditional body queries", () => {

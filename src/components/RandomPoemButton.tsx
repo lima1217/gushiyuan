@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Dices } from "lucide-react";
+import { ChromeTooltip } from "@/components/ChromeTooltip";
 import { useUiText } from "@/components/ScriptVariantProvider";
 import { loadPoemSlugs } from "@/lib/load-poem-slugs";
 import {
@@ -43,16 +44,18 @@ export function RandomPoemButton() {
   }
 
   return (
-    <button
-      type="button"
-      className="site-chrome__control site-chrome__control--icon"
-      onClick={() => {
-        void handleClick();
-      }}
-      aria-label={randomPoem}
-      disabled={pending}
-    >
-      <Dices aria-hidden="true" className="size-4" />
-    </button>
+    <ChromeTooltip label={randomPoem}>
+      <button
+        type="button"
+        className="site-chrome__control site-chrome__control--icon"
+        onClick={() => {
+          void handleClick();
+        }}
+        aria-label={randomPoem}
+        disabled={pending}
+      >
+        <Dices aria-hidden="true" className="size-4" />
+      </button>
+    </ChromeTooltip>
   );
 }

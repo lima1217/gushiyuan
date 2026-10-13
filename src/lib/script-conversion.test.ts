@@ -33,7 +33,7 @@ describe("buildSiteUiText", () => {
       simplified: "古诗源",
       traditional: "古詩源",
     });
-    expect(uiText.searchPlaceholder.traditional).toBe("詩題、作者…");
+    expect(uiText.searchPlaceholder.traditional).toBe("詩題、作者、詩句…");
     expect(uiText.searchMatchCount).toEqual({
       simplified: "找到 %n 项",
       traditional: "找到 %n 項",

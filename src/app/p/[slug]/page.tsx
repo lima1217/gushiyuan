@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { PoemReader } from "@/components/PoemReader";
-import { getLineageForPoem } from "@/lib/lineage";
+import {
+  LINEAGE_UI_ENABLED,
+  getLineageForPoem,
+  type LineageByLine,
+} from "@/lib/lineage";
 import {
   getAdjacentVolumeEntryPoems,
   getAllPoems,
@@ -83,7 +87,9 @@ export default async function PoemPage({ params }: PageProps) {
 
   const { prev, next } = getReadingAdjacentPoems(slug);
   const { prevVolume, nextVolume } = getAdjacentVolumeEntryPoems(slug);
-  const lineageByLine = getLineageForPoem(slug);
+  const lineageByLine: LineageByLine = LINEAGE_UI_ENABLED
+    ? getLineageForPoem(slug)
+    : new Map();
 
   return (
     <>

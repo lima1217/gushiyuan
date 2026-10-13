@@ -429,6 +429,21 @@ body:has(.poem-reader) {
   animation: lineage-target 800ms ease;
 }
 
+/* 检索命中句：比锚点回跳更醒目、更久，便于在长诗里找到落点 */
+.poem-reader__hash-hit {
+  animation: poem-line-hit 1.8s ease-out;
+}
+
+@keyframes poem-line-hit {
+  0%,
+  30% {
+    background: color-mix(in srgb, var(--color-ink) 10%, transparent);
+  }
+  100% {
+    background: transparent;
+  }
+}
+
 @keyframes lineage-target {
   0%,
   15% {
@@ -525,6 +540,54 @@ body:has(.poem-reader) {
   }
 }
 
+/*
+ * 两侧还有未读列时边缘渐隐，作为「这边还有」的线索；滚到端点该侧即不隐。
+ * 时间线 0 = 最左（读完），1 = 最右（起读）。未溢出时时间线 inactive，变量取初值 0，不遮。
+ */
+@property --poem-fade-start {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --poem-fade-end {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@supports (animation-timeline: scroll()) {
+  .poem-reader__columns-viewport {
+    scroll-timeline: --poem-columns x;
+    animation: poem-columns-edge-fade linear both;
+    animation-timeline: --poem-columns;
+    mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      #000 var(--poem-fade-start),
+      #000 calc(100% - var(--poem-fade-end)),
+      transparent 100%
+    );
+  }
+}
+
+@keyframes poem-columns-edge-fade {
+  0% {
+    --poem-fade-start: 0px;
+    --poem-fade-end: 2.5rem;
+  }
+  4% {
+    --poem-fade-start: 2.5rem;
+  }
+  96% {
+    --poem-fade-end: 2.5rem;
+  }
+  100% {
+    --poem-fade-start: 2.5rem;
+    --poem-fade-end: 0px;
+  }
+}
+
 @keyframes poem-reading-progress {
   from {
     transform: scaleX(1);
@@ -557,6 +620,26 @@ body:has(.poem-reader) {
   padding-inline: clamp(2rem, 8vw, 3.5rem) clamp(1rem, 4vw, 2rem);
   /* 高度随内容：短诗才能真正居中，避免贴在半屏空盒子顶上 */
   margin-block: auto;
+}
+
+/*
+ * 窄屏（手机）：
+ * - 收紧列距，让六七句的短篇一屏放下，少一次横滑；
+ * - 正文自顶垂下（竖排书页的常态），不再上下居中留两大片空白。
+ */
+@media (max-width: 767px) {
+  .poem-reader {
+    --vertical-column-gap: 1.15em;
+  }
+
+  .poem-reader__columns-viewport {
+    align-items: flex-start;
+  }
+
+  .poem-reader__columns {
+    margin-block: clamp(0.5rem, 3vh, 1.5rem) auto;
+    padding-inline-start: 1.5rem;
+  }
 }
 
 /* 诗题与作者：竖排 block 流，题在右、作者在左 */
@@ -863,6 +946,13 @@ body:has(.poem-reader) {
   letter-spacing: 0.06em;
 }
 
+/* 单诗作者行尾显示诗题：长题可收缩换行，不挤掉作者名 */
+.catalog__meta--title {
+  flex-shrink: 1;
+  min-width: 0;
+  text-align: right;
+}
+
 /* 全局站标与检索：固定顶栏，低对比 */
 .skip-link {
   position: absolute;
@@ -1125,9 +1215,10 @@ body:has(.catalog-layout) .site-chrome::before {
   color: var(--color-ink);
 }
 
-/* 同卷上下首 */
+/* 同卷上下首：随竖排右起左行，上一首在右、下一首在左（DOM 仍为上→下） */
 .poem-nav {
   display: flex;
+  flex-direction: row-reverse;
   justify-content: space-between;
   gap: 1.5rem;
   margin-top: 2.25rem;
@@ -1165,7 +1256,7 @@ body:has(.catalog-layout) .site-chrome::before {
   outline-offset: 3px;
 }
 
-.poem-nav__link--next {
+.poem-nav__link--prev {
   align-items: flex-end;
   text-align: right;
 }
@@ -1265,7 +1356,8 @@ body:has(.catalog-layout) .site-chrome::before {
   .poem-reader__line:target,
   .poem-reader__sentence:target,
   .poem-reader__line--lineage:target,
-  .poem-reader__sentence--lineage:target {
+  .poem-reader__sentence--lineage:target,
+  .poem-reader__hash-hit {
     animation: none;
     background: color-mix(in srgb, var(--color-ink) 6%, transparent);
   }

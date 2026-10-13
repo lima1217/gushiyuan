@@ -18,6 +18,12 @@ function loadClues(): LineageClue[] {
 
 export type LineageByLine = Map<number, LineageClue>;
 
+/**
+ * 诗页「源」入口总开关。线索数据成批补齐前保持关闭，避免零星线索上线；
+ * 数据与 `getLineageForPoem` 照常可测。
+ */
+export const LINEAGE_UI_ENABLED = false;
+
 export function getLineageForPoem(poemSlug: string): LineageByLine {
   const map = new Map<number, LineageClue>();
 

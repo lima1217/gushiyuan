@@ -49,8 +49,53 @@ export function useVerticalReadingViewport({
       );
     }
 
+    let hashTargetHighlighted = false;
+
+    /**
+     * 检索命中句跳来时（`#line-N`）居中该句而非对齐起读列。
+     * 软导航用 pushState 换 hash，`:target` 不生效，故另加类名播放高亮。
+     */
+    function centerHashTarget(): boolean {
+      if (!scrollViewport) {
+        return false;
+      }
+      const hash = decodeURIComponent(window.location.hash.slice(1));
+      if (!hash.startsWith("line-")) {
+        return false;
+      }
+      const line = document.getElementById(hash);
+      if (!line || !scrollViewport.contains(line)) {
+        return false;
+      }
+      const lineRect = line.getBoundingClientRect();
+      const viewportRect = scrollViewport.getBoundingClientRect();
+      const delta =
+        lineRect.left +
+        lineRect.width / 2 -
+        (viewportRect.left + viewportRect.width / 2);
+      if (Math.abs(delta) >= 1) {
+        scrollViewport.scrollLeft += delta;
+      }
+      noteScrollOrigin();
+      if (!hashTargetHighlighted) {
+        hashTargetHighlighted = true;
+        line.classList.remove("poem-reader__hash-hit");
+        void line.offsetWidth;
+        line.classList.add("poem-reader__hash-hit");
+        line.addEventListener(
+          "animationend",
+          () => line.classList.remove("poem-reader__hash-hit"),
+          { once: true },
+        );
+      }
+      return true;
+    }
+
     function alignVerticalReadingStart() {
       if (!scrollViewport || cancelled) {
+        return;
+      }
+      if (centerHashTarget()) {
         return;
       }
       const target = verticalReadingScrollLeft(

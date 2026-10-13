@@ -225,7 +225,13 @@ export function SiteSearchDialog({
                   <CommandItem
                     key={`poem-${poem.slug}`}
                     value={`${poem.title} ${poem.titleTraditional} ${poem.author} ${poem.authorTraditional} ${poem.body} ${poem.bodyTraditional}`}
-                    onSelect={() => navigate(`/p/${poem.slug}`)}
+                    onSelect={() =>
+                      navigate(
+                        poem.matchedLineIndex === undefined
+                          ? `/p/${poem.slug}`
+                          : `/p/${poem.slug}#line-${poem.matchedLineIndex}`,
+                      )
+                    }
                     className={selectedItemClassName}
                   >
                     <span className="flex min-w-0 flex-1 flex-col gap-0.5">
